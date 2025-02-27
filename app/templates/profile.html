@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+
+
+
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+
+<body>
+    <nav class="navbar bg-dark navbar-expand-lg" data-bs-theme="dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><i class="fa-solid fa-book-bible"></i></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('bible') }}">Home</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('index') }}">Logout</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('profile') }}"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="text-center">
+            <h1>Profile</h1>
+            {% if user.is_authenticated %}
+            <img src="{{ static filename=userimage) }}" alt="Profile Image" width="155"
+                style="background-color: #0dcaf0; border-radius: 50%;">
+            {% else %}
+            <img src="{{ url_for('static', filename='images/user-regular.svg') }}" alt="Default Profile Image"
+                width="155" style="background-color: #0dcaf0; border-radius: 50%; height: 150px; padding: .2%;">
+            {% endif %}
+            <h4>{{ username }}</h4>
+        </div>
+        <br>
+        <hr>
+        <form method="post" action="{{ url_for('profile') }}" enctype="multipart/form-data">
+
+            <div class="row mb-3">
+                <label for="profile-image" class="col-sm-2 col-form-label">Profile Image</label>
+                <div class="col-sm-10">
+                    <input class="form-control" type="file" id="profile-image" name="profile-image">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="username-input" class="col-sm-2 col-form-label">Username</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="username-input" name="username-input"
+                        value="{{ username }}">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="email" class="col-sm-2 col-form-label">Email</label>
+                <div class="col-sm-10">
+                    <input type="email" class="form-control" id="email-input" name="email-input"
+                        value="{{ useremail }}">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="input-pass" class="col-sm-2 col-form-label">Password</label>
+                <div class="col-sm-10">
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="input-pass" name="input-pass"
+                            value="{{ userpass }}" />
+                        <span class="input-group-text" id="toggle-password">
+                            <i class="fa-solid fa-eye-slash"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            </fieldset>
+            <div class="row mb-3">
+                <div class="col-sm-10 offset-sm-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="change-input" name="change-input">
+                        <label class="form-check-label" for="change-input">
+                            Change info
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="change-image" name="change-image">
+                        <label class="form-check-label" for="change-image">
+                            Change image
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Update</button>
+        </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>
