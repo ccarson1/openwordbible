@@ -5,3 +5,6 @@ def home(request):
 
 def read(request):
     return render(request, 'read.html')
+
+def profile(request):
+    return render(request, 'profile.html')

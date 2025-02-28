@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+{% if user.is_authenticated and user.is_staff %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="{% static '/dashboard/css/dashboard.css' %}">
+</head>
+
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Dashboard</h2>
+        <a href="#">Analytics</a>
+        <a href="#">Users</a>
+        <a href="#">Settings</a>
+        <a href="#">Logout</a>
+        <a href="{% url 'home' %}">Website</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <h1 class="mb-4">Welcome to Your Dashboard</h1>
+
+        <div class="row">
+            <!-- Card 1 -->
+            <div class="col-md-4">
+                <div class="card p-3 text-center">
+                    <h3>Total Users</h3>
+                    <p class="fs-4 fw-bold">1,254</p>
+                </div>
+            </div>
+            
+            <!-- Card 2 -->
+            <div class="col-md-4">
+                <div class="card p-3 text-center">
+                    <h3>New Orders</h3>
+                    <p class="fs-4 fw-bold">342</p>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="col-md-4">
+                <div class="card p-3 text-center">
+                    <h3>Revenue</h3>
+                    <p class="fs-4 fw-bold">$12,670</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+{% else %}
+<h2>Not Authorized</h2>
+{% endif %}
+</html>

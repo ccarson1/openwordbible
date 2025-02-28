@@ -21,5 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('app.urls')),
     path('api/', include('api.urls')),
-    path('accounts/', include('accounts.urls', namespace="accounts"))
+    path('accounts/', include('accounts.urls', namespace="accounts")),
+    path('dashboard/', include('dashboard.urls', namespace="dashboard")),
 ]

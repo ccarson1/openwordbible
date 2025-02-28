@@ -10,47 +10,25 @@
 {% block content %}
 {% csrf_token %}
 
-<body>
-    <nav class="navbar bg-dark navbar-expand-lg" data-bs-theme="dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#"><i class="fa-solid fa-book-bible"></i></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ url_for('bible') }}">Home</a>
-                    </li>
+{% if user.is_authenticated %}
 
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ url_for('index') }}">Logout</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ url_for('profile') }}"></a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+<body>
 
     <div class="container">
         <div class="text-center">
             <h1>Profile</h1>
             {% if user.is_authenticated %}
-            <img src="{{ static filename=userimage) }}" alt="Profile Image" width="155"
+            <img src="" alt="Profile Image" width="155"
                 style="background-color: #0dcaf0; border-radius: 50%;">
             {% else %}
-            <img src="{{ url_for('static', filename='images/user-regular.svg') }}" alt="Default Profile Image"
+            <img src="" alt="Default Profile Image"
                 width="155" style="background-color: #0dcaf0; border-radius: 50%; height: 150px; padding: .2%;">
             {% endif %}
             <h4>{{ username }}</h4>
         </div>
         <br>
         <hr>
-        <form method="post" action="{{ url_for('profile') }}" enctype="multipart/form-data">
+        <form method="post" action="{% url 'profile' %}" enctype="multipart/form-data">
 
             <div class="row mb-3">
                 <label for="profile-image" class="col-sm-2 col-form-label">Profile Image</label>
@@ -114,3 +92,9 @@
 </body>
 
 </html>
+
+{% else %}
+<h2>No Profile. Go sign in...</h2>
+{% endif %}
+
+{% endblock %}
