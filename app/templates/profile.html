@@ -2,86 +2,84 @@
 {% load static %}
 
 {% block extra_head %}
-
+<script src="{% static '/app/js/profile/profile.js' %}" defer></script>
 
 
 {% endblock %}
 
 {% block content %}
-{% csrf_token %}
+
 
 {% if user.is_authenticated %}
 
 <body>
-
+    {% csrf_token %}
     <div class="container">
         <div class="text-center">
             <h1>Profile</h1>
-            {% if user.is_authenticated %}
-            <img src="" alt="Profile Image" width="155"
-                style="background-color: #0dcaf0; border-radius: 50%;">
+            {% if profile %}
+            <img src="{{ profile.profile_image.url }}" alt="" 
+                style="background-color: #0dcaf0; border-radius: 50%; width: 15%; border: 1px solid #0dcaf0;">
             {% else %}
-            <img src="" alt="Default Profile Image"
-                width="155" style="background-color: #0dcaf0; border-radius: 50%; height: 150px; padding: .2%;">
+            <img src="{% static '/app/images/user-regular.svg' %}" alt=""
+                style="background-color: #0dcaf0; border-radius: 50%; width: 100%; max-width: 9rem; height: 15vh; border: 1px solid #0dcaf0;">
             {% endif %}
-            <h4>{{ username }}</h4>
+            <h4>{{ user.username }}</h4>
         </div>
         <br>
         <hr>
-        <form method="post" action="{% url 'profile' %}" enctype="multipart/form-data">
 
-            <div class="row mb-3">
-                <label for="profile-image" class="col-sm-2 col-form-label">Profile Image</label>
-                <div class="col-sm-10">
-                    <input class="form-control" type="file" id="profile-image" name="profile-image">
-                </div>
+
+        <div class="row mb-3">
+            <label for="profile-image" class="col-sm-2 col-form-label">Profile Image</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="file" id="profile-image" name="profile-image">
             </div>
-            <div class="row mb-3">
-                <label for="username-input" class="col-sm-2 col-form-label">Username</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="username-input" name="username-input"
-                        value="{{ username }}">
-                </div>
+        </div>
+        <div class="row mb-3">
+            <label for="username-input" class="col-sm-2 col-form-label">Username</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="username-input" name="username-input"
+                    value="{{ user.username }}">
             </div>
-            <div class="row mb-3">
-                <label for="email" class="col-sm-2 col-form-label">Email</label>
-                <div class="col-sm-10">
-                    <input type="email" class="form-control" id="email-input" name="email-input"
-                        value="{{ useremail }}">
-                </div>
+        </div>
+        <div class="row mb-3">
+            <label for="email" class="col-sm-2 col-form-label">Email</label>
+            <div class="col-sm-10">
+                <input type="email" class="form-control" id="email-input" name="email-input" value="{{ user.email }}">
             </div>
-            <div class="row mb-3">
+        </div>
+        <!-- <div class="row mb-3">
                 <label for="input-pass" class="col-sm-2 col-form-label">Password</label>
                 <div class="col-sm-10">
                     <div class="input-group">
                         <input type="password" class="form-control" id="input-pass" name="input-pass"
-                            value="{{ userpass }}" />
+                            value="{{ user.password }}" />
                         <span class="input-group-text" id="toggle-password">
                             <i class="fa-solid fa-eye-slash"></i>
                         </span>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
-            </fieldset>
-            <div class="row mb-3">
-                <div class="col-sm-10 offset-sm-2">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="change-input" name="change-input">
-                        <label class="form-check-label" for="change-input">
-                            Change info
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="change-image" name="change-image">
-                        <label class="form-check-label" for="change-image">
-                            Change image
-                        </label>
-                    </div>
+        </fieldset>
+        <!-- <div class="row mb-3">
+            <div class="col-sm-10 offset-sm-2">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="change-input" name="change-input">
+                    <label class="form-check-label" for="change-input">
+                        Change info
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="change-image" name="change-image">
+                    <label class="form-check-label" for="change-image">
+                        Change image
+                    </label>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Update</button>
-        </form>
+        </div> -->
+        <button id="btnSendData" type="submit" class="btn btn-primary">Update</button>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

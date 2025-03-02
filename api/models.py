@@ -36,6 +36,7 @@ class Note(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_image = models.ImageField(upload_to="profile_images/", null=True, blank=True)
+    bookmark = models.CharField(max_length=255, null=True, blank=True, default="")
 
     def __str__(self):
         return self.user.username

@@ -1,0 +1,15 @@
+.nav_item{
+    margin-top: 2%;
+}
+.nav_item>a{
+    text-decoration: none;
+    color: white;
+    padding: .6rem;
+    border-radius: 5px;
+
+}
+.nav_item>a:hover{
+    opacity: .5;
+    background-color: aliceblue;
+    color: black;
+}

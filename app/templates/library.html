@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+{% if user.is_authenticated %}
+<h2>Library</h2>
+<div class="content">
+    <div class="row">
+        <!-- Card 1 -->
+        <div class="col-md-4">
+            <div class="card p-3 text-center">
+                <h3>KJV Bible</h3>
+                <div><a href="{% url 'read' %}">Read</a></div>
+            </div>
+        </div>
+</div>
+{% else %}
+<div>
+    <h2>You aren't supposed to be here!</h2>
+</div>
+{% endif %}
+{% endblock %}

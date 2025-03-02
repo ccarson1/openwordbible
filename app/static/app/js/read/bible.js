@@ -1,3 +1,6 @@
+
+const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
 function setupStartPage(current_page=0) {
     pages = document.getElementsByClassName("read_cols");
 
@@ -80,10 +83,11 @@ function loadBookmark() {
     username = document.getElementById("ui-username").innerText.trim();
     console.log(username)
 
-    fetch('/load-bookmark', {
+    fetch('/api/load-bookmark/', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
         },
         body: JSON.stringify({ "username": username })
     })

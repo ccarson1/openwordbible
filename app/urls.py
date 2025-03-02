@@ -1,10 +1,14 @@
 
 from django.urls import path, include
-from .views import home, read, profile
+from .views import home, read, profile, library
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('', home, name='home'), 
     path('read', read, name='read'),
-    path('profile', profile, name='profile')
+    path('profile', profile, name='profile'),
+    path('library', library, name='library')
     
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

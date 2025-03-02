@@ -3,14 +3,23 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 
+from api.models import Profile
+
 def user_login(request):
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
-        if user is not None:
+
+        if user is not None:    
             login(request, user)
-            return redirect("home")  # Redirect to homepage or dashboard
+            request.session["username"] = user.username
+            request.session["email"] = user.email
+            profile = Profile.objects.filter(user=user).first()
+            profile_image_url = profile.profile_image.url if profile and profile.profile_image else None
+            request.session["profile-image"] = profile_image_url
+            #request.session["userpass"] = user.password 
+            return redirect("home")
         else:
             messages.error(request, "Invalid username or password")
     return render(request, "accounts/login.html")
