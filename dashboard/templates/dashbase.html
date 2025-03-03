@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+{% if user.is_authenticated and user.is_staff %}
+{% csrf_token %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="{% static '/dashboard/css/dashboard.css' %}">
+    <script src="{% static '/dashboard/js/utilities.js' %}" defer></script>
+    <script src="{% static '/dashboard/js/dashboard.js' %}" defer></script>
+
+    <title>OpenWordBible</title>
+    {% block extra_head_dash %}
+    {% endblock %}
+</head>
+
+<body>
+<!-- Sidebar -->
+<div class="sidebar">
+    <h2>Dashboard</h2>
+    <a href="{% url 'dashboard:dashboard' %}">Upload</a>
+    <a href="{% url 'dashboard:books' %}">Books</a>
+    <a href="{% url 'dashboard:analytics' %}">Analytics</a>
+    <a href="#">Settings</a>
+    <a href="{% url 'accounts:logout' %}">Logout</a>
+    <a href="{% url 'home' %}">Website</a>
+</div>
+{% block content %}
+{% endblock %}
+
+{% else %}
+<h2>Not Authorized</h2>
+{% endif %}
+</body>
+</html>

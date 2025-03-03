@@ -1,145 +1,162 @@
+{% extends 'dashbase.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-{% if user.is_authenticated and user.is_staff %}
-{% csrf_token %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="{% static '/dashboard/css/dashboard.css' %}">
-    <script src="{% static '/dashboard/js/utilities.js' %}" defer></script>
-    <script src="{% static '/dashboard/js/dashboard.js' %}" defer></script>
-</head>
+{% block extra_head_dash %}
+
+{% endblock %}
+
+{% block content %}
 
 
-<body>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2>Dashboard</h2>
-        <a href="#">Books</a>
-        <a href="#">Analytics</a>
-        <a href="#">Settings</a>
-        <a href="{% url 'accounts:logout' %}">Logout</a>
-        <a href="{% url 'home' %}">Website</a>
+
+<!-- Main Content -->
+<div class="content">
+    <div id="spinner-overlay" class="overlay">
+        <div id="spinner-container" class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <h1>Open Word Bible Dashboard</h1>
+    <h2>Book Parameters</h2>
+    {% for message in messages %}
+    <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+
+    <div>
+        <div>
+            <label for="book-name">Book Name</label>
+            <input type="text" id="book-name" name="book-name">
+        </div>
+
+        <label for="book-religion">Book Religion</label>
+        <select name="book-religion" id="book-religion">
+            <option value="chistian">Christian</option>
+            <option value="islamic">Islamic</option>
+        </select>
+
+        <div>
+            <label for="input-book-denom">Book Denomination</label>
+            <input type="text" id="input-book-denom" name="input-book-denom">
+        </div>
+
     </div>
 
-    <!-- Main Content -->
-    <div class="content">
-        <div id="spinner-overlay" class="overlay">
-            <div id="spinner-container" class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-        <h1>Open Word Bible Dashboard</h1>
-        <h2>Book Parameters</h2>
+
+    <div class="container mt-4">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" id="myTabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#text">RTF</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#pdf">PDF</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#docx">DOCX</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#odt">ODT</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#epub">EPUB</a>
+            </li>
+        </ul>
 
 
         <div>
             <div>
-                <label for="book-name">Book Name</label>
-                <input type="text" id="book-name" name="book-name">
-            </div>
-
-            <label for="book-religion">Book Religion</label>
-            <select name="book-religion" id="book-religion">
-                <option value="chistian">Christian</option>
-                <option value="islamic">Islamic</option>
-            </select>
-
-            <div>
-                <label for="input-book-denom">Book Denomination</label>
-                <input type="text" id="input-book-denom" name="input-book-denom">
-            </div>
-
-        </div>
-
-
-        <div class="container mt-4">
-            <!-- Nav tabs -->
-            <ul class="nav nav-tabs" id="myTabs">
-                <li class="nav-item">
-                    <a class="nav-link active" data-bs-toggle="tab" href="#home">RTF</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#profile">PDF</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#contact">DOCX</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#contact">ODT</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="tab" href="#contact">EPUB</a>
-                </li>
-            </ul>
-
-            
-
-            <!-- Tab content -->
-            <div class="tab-content mt-3">
-                <div class="tab-pane fade show active" id="home">
-                    <h3>Text Upload</h3>
-                    <div>
-                        <div>
-                            <label for="up-book-txt">File</label>
-                            <input type="file" id="up-book-txt" accept=".txt">
-                        </div>
-                    </div>
-                    <div>
-                        <button class="btn-pre-back">back</button>
-                        <button class="btn-pre-next">next</button>
-                    </div>
-                    <div>
-                        <textarea name="text-preview" id="text-preview"></textarea>
-                    </div>
-                    <div>
-                        <button class="btn-pre-back">back</button>
-                        <button class="btn-pre-next">next</button>
-                    </div>
-                    
-                </div>
-                <div class="tab-pane fade" id="profile">
-                    <h3>PDF Upload</h3>
-                    <div>
-                        <div>
-                            <label for="up-book-txt">File</label>
-                            <input type="file" id="up-book-txt" accept=".txt">
-                        </div>
-                    </div>
-                    <div>
-                        <button class="btn-pre-back">back</button>
-                        <button class="btn-pre-next">next</button>
-                    </div>
-                    <div>
-                        <textarea name="text-preview" id="text-preview"></textarea>
-                    </div>
-                    <div>
-                        <button class="btn-pre-back">back</button>
-                        <button class="btn-pre-next">next</button>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="contact">
-                    <h3>Contact</h3>
-                    <p>Contact details are displayed here.</p>
-                </div>
+                <label for="up-book-txt">File</label>
+                <input type="file" id="up-book-txt" >
             </div>
             <div>
-                <button class="btn btn-success" id="upload-book">Upload</button>
+                <button class="btn btn-success" id="convert-book">Convert</button>
+
             </div>
         </div>
+        <!-- Tab content -->
+        <div class="tab-content mt-3">
+            <div class="tab-pane fade show active" id="text">
+                <h3>Text Upload</h3>
+
+                <div>
+                    <button class="btn-pre-back">back</button>
+                    <button class="btn-pre-next">next</button>
+                </div>
+                <div>
+                    <textarea name="text-preview" id="text-preview" class="preview-content"></textarea>
+                </div>
+                <div>
+                    <button class="btn-pre-back">back</button>
+                    <button class="btn-pre-next">next</button>
+                </div>
+
+            </div>
+            <div class="tab-pane fade" id="pdf">
+                <h3>PDF Upload</h3>
+                <div>
+                    <button class="btn-pre-back">back</button>
+                    <button class="btn-pre-next">next</button>
+                </div>
+                <div>
+                    <textarea name="pdf-preview" id="pdf-preview" class="preview-content"></textarea>
+                </div>
+                <div>
+                    <button class="btn-pre-back">back</button>
+                    <button class="btn-pre-next">next</button>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="docx">
+                <h3>DOCX Upload</h3>
+                <div>
+                    <button class="btn-pre-back">back</button>
+                    <button class="btn-pre-next">next</button>
+                </div>
+                <div>
+                    <textarea name="docx-content" id="docx-content" class="preview-content"></textarea>
+                </div>
+                <div>
+                    <button class="btn-pre-back">back</button>
+                    <button class="btn-pre-next">next</button>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="odt">
+                <h3>ODT Upload</h3>
+                <div>
+                    <button class="btn-pre-back">back</button>
+                    <button class="btn-pre-next">next</button>
+                </div>
+                <div>
+                    <textarea name="odt-content" id="odt-content" class="preview-content"></textarea>
+                </div>
+                <div>
+                    <button class="btn-pre-back">back</button>
+                    <button class="btn-pre-next">next</button>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="epub">
+                <h3>EPUB Upload</h3>
+                <div>
+                    <button class="btn-pre-back">back</button>
+                    <button class="btn-pre-next">next</button>
+                </div>
+                <div>
+                    <textarea name="epub-content" id="epub-content" class="preview-content"></textarea>
+                </div>
+                <div>
+                    <button class="btn-pre-back">back</button>
+                    <button class="btn-pre-next">next</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
 
 
 
-        <!-- <div class="row">
+    <!-- <div class="row">
             <div class="col-md-4">
                 <div class="card p-3 text-center">
                     <h3>Total Users</h3>
@@ -161,11 +178,10 @@
                 </div>
             </div>
         </div> -->
-    </div>
+</div>
 
-</body>
-{% else %}
-<h2>Not Authorized</h2>
-{% endif %}
 
-</html>
+
+{% endblock %}
+
+

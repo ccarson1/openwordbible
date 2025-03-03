@@ -25,6 +25,9 @@ from .models import Profile, Note
 import os
 import PyPDF2
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from .book_convert import ConvertBook
+
 
 
 class ProfileAPIView(APIView):
@@ -182,3 +185,30 @@ class LoadBookmarkAPIView(APIView):
         except Exception as e:
             print(f'Error loading bookmark: {e}')
             return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        
+class UploadBook(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    permission_classes = [IsAuthenticated]  
+    
+    def post(self, request, *args, **kwargs):
+        
+        user = request.user
+        print(user)
+        if user.is_authenticated:
+        
+            file = request.FILES.get("book-file")
+            print(f"The file uploaded was {file.name}")
+            convert_book = ConvertBook()
+            try:
+                book_text = convert_book.convert_from_epub(file)
+            except:
+                messages.error(request, "Passwords do not match")
+                return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        
+            return Response({
+                    'uploaded-file': book_text,
+                }, status=status.HTTP_200_OK)
+        
+        return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
