@@ -19,31 +19,67 @@
     </div>
     <h1>Open Word Bible Dashboard</h1>
     <h2>Book Parameters</h2>
-    {% for message in messages %}
-    <div class="alert alert-danger">{{ message }}</div>
-    {% endfor %}
 
     <div>
         <div>
             <label for="book-name">Book Name</label>
             <input type="text" id="book-name" name="book-name">
         </div>
+        <div>
+            <label for="input-book-cover">Book Cover</label>
+            <input type="file" id="input-book-cover" name="input-book-cover" accept="image/png, image/jpeg">
+        </div>
+        <div>
+            <label for="input-book-date">Book Date</label>
+            <input type="text" id="input-book-date" name="input-book-date">
+        </div>
 
         <label for="book-religion">Book Religion</label>
         <select name="book-religion" id="book-religion">
-            <option value="chistian">Christian</option>
+            <option value="christian">Christian</option>
             <option value="islamic">Islamic</option>
+            <option value="none">None</option>
         </select>
 
         <div>
             <label for="input-book-denom">Book Denomination</label>
             <input type="text" id="input-book-denom" name="input-book-denom">
         </div>
+        <div>
+            <label for="input-book-author">Author</label>
+            <input type="text" id="input-book-author" name="input-book-author">
+        </div>
+        <div>
+            <label for="input-book-id">ID </label>
+            <input type="text" id="input-book-id" name="input-book-id">
+            <small>(e.g. ISBN)</small> 
+        </div>
+        <div>
+            <label for="input-book-des">Description</label>
+            <textarea type="text" id="input-book-des" name="input-book-des"></textarea>
+
+        </div>
+        <div>
+            <label for="book-right">Rights:</label>
+            <input type="text" id="book-right" name="book-right">
+            <p id="book-right"></p>
+        </div>
+        <div>
+            <label for="book-pub">Publisher</label>
+            <input type="text" id="book-pub" name="book-pub">
+            <p id="book-pub"></p>
+        </div>
+
+        <div>
+            <label for="input-words-per-page">WordsPerPage</label>
+            <input type="number" id="input-words-per-page">
+        </div>
+        
 
     </div>
 
 
-    <div class="container mt-4">
+    <div class="container mt-4" id="upload-container">
         <!-- Nav tabs -->
         <ul class="nav nav-tabs" id="myTabs">
             <li class="nav-item">
@@ -136,6 +172,7 @@
             </div>
             <div class="tab-pane fade" id="epub">
                 <h3>EPUB Upload</h3>
+                
                 <div>
                     <button class="btn-pre-back">back</button>
                     <button class="btn-pre-next">next</button>
@@ -146,6 +183,13 @@
                 <div>
                     <button class="btn-pre-back">back</button>
                     <button class="btn-pre-next">next</button>
+                </div>
+                <div>
+                    <button class="btn btn-primary" id="btn-add-page">+ Add</button>
+                    <button class="btn btn-success" id="btn-add-page">Publish</button>
+
+                </div>
+                <div id="page-list">
                 </div>
             </div>
         </div>

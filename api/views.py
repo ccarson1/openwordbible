@@ -200,11 +200,11 @@ class UploadBook(APIView):
             file = request.FILES.get("book-file")
             print(f"The file uploaded was {file.name}")
             convert_book = ConvertBook()
-            try:
-                book_text = convert_book.convert_from_epub(file)
-            except:
-                messages.error(request, "Passwords do not match")
-                return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            book_text = convert_book.convert_from_epub(file)
+            # try:
+                
+            # except:
+            #     return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         
             return Response({

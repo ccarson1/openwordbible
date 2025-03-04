@@ -7,6 +7,7 @@ body {
     background: #343a40;
     color: white;
     padding: 15px;
+    height: 100vh;
 }
 .sidebar a {
     color: white;
@@ -21,7 +22,11 @@ body {
 .content {
     flex-grow: 1;
     padding: 20px;
+    overflow-y: scroll;
 }
+/* .content::-webkit-scrollbar {
+    display: none;
+} */
 .card {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -38,4 +43,36 @@ body {
   
     z-index: 1050;
     display: none;  
+}
+
+#upload-container{
+    height: 100vh;
+    overflow-y: scroll;
+}
+#upload-container::-webkit-scrollbar {
+    display: none;
+}
+/* styles for pagelist */
+
+#page-list{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 2%;
+    margin: 2%;
+}
+
+.page-list-item{
+    border: 1px solid black;
+    width: 20%;
+    height: 350px;
+    margin: 2%;
+    transition: 3s;
+    background-color: white;
+    font-size: .3rem;
+}
+.page-list-item:hover{
+    opacity: .2;
+    background-color: #495057;
+    transition: 3s;
 }
