@@ -8,8 +8,30 @@ class ConvertBook():
     def __init__(self):
         pass
     
-    def convert_from_text():
-        pass
+    def convert_from_text(self, file):
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            for chunk in file.chunks():
+                temp_file.write(chunk)
+            temp_file_path = temp_file.name
+
+        with open(temp_file_path, "r", encoding="utf-8") as temp_file:
+            file_content = temp_file.read()
+
+        book_data = {
+            'title': '',
+            'author': '',
+            'content': [file_content],
+            'identifier': '',
+            'publisher' : '',
+            'rights': '',
+            'coverage' : '',
+            'date': '',
+            'description': ''
+
+
+        }
+
+        return book_data
     
     def convert_from_pdf():
         pass
@@ -95,6 +117,9 @@ class ConvertBook():
         
         for item in book.get_items():
             
+            if item.get_type() != ebooklib.ITEM_DOCUMENT:
+                print(item.get_type())
+                #continue  # Skip non-text items
 
             try:
                 raw_content = item.get_content()

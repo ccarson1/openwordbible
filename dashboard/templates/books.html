@@ -1,11 +1,31 @@
 {% extends 'dashbase.html' %}
 {% load static %}
 
-{% block extra_head %}
+{% block extra_head_dash %}
+<link rel="stylesheet" href="{% static '/dashboard/css/books.css' %}">
 
 {% endblock %}
 
 {% block content %}
 {% csrf_token %}
-<H2>Books</H2>
+<div>
+    <H2>Books</H2>
+
+    <div class="books-container">
+        <div class="book-item">
+            <h4>{{ books.book_name }}</h4>
+            <p>Date: {{ books.book_date }}</p>
+            <p>Religion: {{ books.book_religion }}</p>
+            <a href="">Read</a>
+        </div>
+        <div class="book-item">
+            <h4>{{ books.book_name }}</h4>
+            <p>Date: {{ books.book_date }}</p>
+            <p>Religion: {{ books.book_religion }}</p>
+            <a href="">Read</a>
+        </div>
+    </div>
+    
+</div>
+
 {% endblock %}

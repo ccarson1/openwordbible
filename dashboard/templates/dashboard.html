@@ -3,6 +3,9 @@
 
 {% block extra_head_dash %}
 
+<script src="{% static '/dashboard/js/txtpub.js' %}" defer></script>
+<script src="{% static '/dashboard/js/epub.js' %}" defer></script>
+<script src="{% static '/dashboard/js/dashboard.js' %}" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -33,6 +36,13 @@
             <label for="input-book-date">Book Date</label>
             <input type="text" id="input-book-date" name="input-book-date">
         </div>
+        <div>
+            <label for="input-book-lang">Book Language</label>
+            <select name="input-book-lang" id="input-book-lang">
+                <option value="">Choose a Language</option>
+                <option value="english">English</option>
+            </select>
+        </div>
 
         <label for="book-religion">Book Religion</label>
         <select name="book-religion" id="book-religion">
@@ -50,9 +60,13 @@
             <input type="text" id="input-book-author" name="input-book-author">
         </div>
         <div>
-            <label for="input-book-id">ID </label>
-            <input type="text" id="input-book-id" name="input-book-id">
-            <small>(e.g. ISBN)</small> 
+            <label for="input-book-translator">Translator</label>
+            <input type="text" id="input-book-translator" name="input-book-translator">
+        </div>
+        <div>
+            <label for="input-book-isbn">ISBN</label>
+            <input type="text" id="input-book-isbn" name="input-book-isbn">
+            
         </div>
         <div>
             <label for="input-book-des">Description</label>
@@ -72,9 +86,13 @@
 
         <div>
             <label for="input-words-per-page">WordsPerPage</label>
-            <input type="number" id="input-words-per-page">
+            <input type="number" id="input-words-per-page" value="600">
         </div>
-        
+        <div>
+            <label for="">Publish</label>
+            <input type="checkbox" name="" id="">
+        </div>
+
 
     </div>
 
@@ -83,7 +101,7 @@
         <!-- Nav tabs -->
         <ul class="nav nav-tabs" id="myTabs">
             <li class="nav-item">
-                <a class="nav-link active" data-bs-toggle="tab" href="#text">RTF</a>
+                <a class="nav-link active" data-bs-toggle="tab" href="#text">TXT</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" href="#pdf">PDF</a>
@@ -114,24 +132,32 @@
         <div class="tab-content mt-3">
             <div class="tab-pane fade show active" id="text">
                 <h3>Text Upload</h3>
-
+<!-- 
                 <div>
                     <button class="btn-pre-back">back</button>
                     <button class="btn-pre-next">next</button>
-                </div>
-                <div>
+                </div> -->
+                
+                <!-- <div id="test-div" style="width: 100%;">
+
+                </div> -->
+                <!-- <div>
                     <textarea name="text-preview" id="text-preview" class="preview-content"></textarea>
                 </div>
                 <div>
                     <button class="btn-pre-back">back</button>
                     <button class="btn-pre-next">next</button>
-                </div>
+                </div> -->
 
             </div>
             <div class="tab-pane fade" id="pdf">
                 <h3>PDF Upload</h3>
-                <div>
+                <!-- <div>
                     <button class="btn-pre-back">back</button>
+                    <span>
+                        <span class="curr-page">0</span>/
+                        <span class="total-pages">0</span>
+                    </span>
                     <button class="btn-pre-next">next</button>
                 </div>
                 <div>
@@ -140,11 +166,11 @@
                 <div>
                     <button class="btn-pre-back">back</button>
                     <button class="btn-pre-next">next</button>
-                </div>
+                </div> -->
             </div>
             <div class="tab-pane fade" id="docx">
                 <h3>DOCX Upload</h3>
-                <div>
+                <!-- <div>
                     <button class="btn-pre-back">back</button>
                     <button class="btn-pre-next">next</button>
                 </div>
@@ -154,11 +180,11 @@
                 <div>
                     <button class="btn-pre-back">back</button>
                     <button class="btn-pre-next">next</button>
-                </div>
+                </div> -->
             </div>
             <div class="tab-pane fade" id="odt">
                 <h3>ODT Upload</h3>
-                <div>
+                <!-- <div>
                     <button class="btn-pre-back">back</button>
                     <button class="btn-pre-next">next</button>
                 </div>
@@ -168,29 +194,73 @@
                 <div>
                     <button class="btn-pre-back">back</button>
                     <button class="btn-pre-next">next</button>
-                </div>
+                </div> -->
             </div>
             <div class="tab-pane fade" id="epub">
                 <h3>EPUB Upload</h3>
-                
-                <div>
+
+                <!-- <div>
                     <button class="btn-pre-back">back</button>
+                    <span>
+                        <span class="curr-page">0</span>/
+                        <span class="total-pages">0</span>
+                    </span>
                     <button class="btn-pre-next">next</button>
                 </div>
+
                 <div>
                     <textarea name="epub-content" id="epub-content" class="preview-content"></textarea>
                 </div>
                 <div>
                     <button class="btn-pre-back">back</button>
+                    <span>
+                        <span class="curr-page">0</span>/
+                        <span class="total-pages">0</span>
+                    </span>
                     <button class="btn-pre-next">next</button>
-                </div>
-                <div>
-                    <button class="btn btn-primary" id="btn-add-page">+ Add</button>
-                    <button class="btn btn-success" id="btn-add-page">Publish</button>
+                </div> -->
 
-                </div>
-                <div id="page-list">
-                </div>
+            </div>
+            <div>
+                <label for="input-custom">Custom Regex</label>
+                <input type="checkbox" name="input-custom" id="input-custom">
+            </div>
+            <div>
+                <label for="">Label</label>
+                <input type="text" id="label-input">
+                <label for="" >Delimiter</label>
+                <input type="text" id="search-input" style="width: 50%;">
+                <button class="btn btn-primary" id="add-partition">Add</button>
+            </div>
+            <div>
+                <button class="btn-pre-back">back</button>
+                <span>
+                    <span class="curr-page">0</span>/
+                    <span class="total-pages">0</span>
+                </span>
+                <button class="btn-pre-next">next</button>
+            </div>
+            
+            <div>
+                <textarea name="text-preview" id="text-preview" class="preview-content"></textarea>
+            </div>
+            <div>
+                <button class="btn-pre-back">back</button>
+                <span>
+                    <span class="curr-page">0</span>/
+                    <span class="total-pages">0</span>
+                </span>
+                <button class="btn-pre-next">next</button>
+            </div>
+            <div>
+                <button class="btn btn-primary" id="btn-add-all-page">Add All</button>
+                <button class="btn btn-primary" id="btn-add-page">+ Add</button>
+                <button class="btn btn-primary" id="btn-reset-page-numbers">Reset Page Numbers</button>
+                <button class="btn btn-success" id="btn-upload-page">Upload</button>
+
+            </div>
+            <div id="total-preview-pages">Pages:</div>
+            <div id="page-list">
             </div>
         </div>
     </div>
@@ -207,7 +277,7 @@
                     <p class="fs-4 fw-bold">1,254</p>
                 </div>
             </div>
-            
+
             <div class="col-md-4">
                 <div class="card p-3 text-center">
                     <h3>New Orders</h3>

@@ -27,6 +27,7 @@ import PyPDF2
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from .book_convert import ConvertBook
+from .models import Book, Religion, Language 
 
 
 
@@ -194,13 +195,20 @@ class UploadBook(APIView):
     def post(self, request, *args, **kwargs):
         
         user = request.user
+        
         print(user)
+        
         if user.is_authenticated:
         
             file = request.FILES.get("book-file")
+            book_type = request.data.get("book-type")
             print(f"The file uploaded was {file.name}")
+            print(book_type)
             convert_book = ConvertBook()
-            book_text = convert_book.convert_from_epub(file)
+            if book_type == 'TXT':
+                book_text = convert_book.convert_from_text(file)
+            elif book_type == 'EPUB':
+                book_text = convert_book.convert_from_epub(file)
             # try:
                 
             # except:
@@ -212,3 +220,136 @@ class UploadBook(APIView):
                 }, status=status.HTTP_200_OK)
         
         return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+# class PublishBook(APIView):
+#     parser_classes = (MultiPartParser, FormParser)
+#     permission_classes = [IsAuthenticated]  
+
+#     def post(self, request, *args, **kwargs):
+        
+#         user = request.user
+        
+        
+#         if user.is_authenticated:
+
+#             pubished_book = request.data.get("published_book")
+#             book_name = request.data.get("book_name")
+#             book_date = request.data.get("book_date")
+#             book_religion = request.data.get("book_religion")
+#             book_denom = request.data.get("book_denom")
+#             book_author = request.data.get("book_author")
+#             book_translator = request.data.get("book_translator")
+#             book_id = request.data.get("book_id")
+#             book_description = request.data.get("book_description")
+#             book_rights = request.data.get("book_rights")
+            
+#             if request.FILES.get("book_image"):
+#                 book_image = request.FILES.get("book_image")
+#                 filename = book_image.name
+#                 book_images_dir = os.path.join(settings.MEDIA_ROOT, "book_images")
+
+#                 # Create the directory if it doesn't exist
+#                 if not os.path.exists(book_images_dir):
+#                     os.makedirs(book_images_dir)
+
+#                 file_path = os.path.join(book_images_dir, filename)
+
+#                 with default_storage.open(file_path, 'wb') as destination:
+#                     for chunk in book_image.chunks():
+#                         destination.write(chunk)
+
+
+
+#             new_book = {
+#                 'pubished_book': pubished_book,
+#                 'book_name': book_name,
+#                 'book_date': book_date,
+#                 'book_religion': book_religion,
+#                 'book_denom': book_denom,
+#                 'book_author': book_author,
+#                 'book_translator': book_translator,
+#                 'book_id': book_id,
+#                 'book_description': book_description,
+#                 'book_rights': book_rights
+#             }
+            
+#             print(new_book)
+            
+
+#             return Response(new_book, status=status.HTTP_200_OK)
+
+
+class PublishBook(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    permission_classes = [IsAuthenticated]  
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+
+        if user.is_authenticated:
+            # Extract data from request
+            book_name = request.data.get("book_name")
+            published_book = request.data.get("published_book")
+            book_date = request.data.get("book_date")
+            book_religion_id = request.data.get("book_religion")
+            book_denom = request.data.get("book_denom")
+            book_author = request.data.get("book_author")
+            book_translator = request.data.get("book_translator")
+            book_id = request.data.get("book_id")
+            book_description = request.data.get("book_description")
+            book_rights = request.data.get("book_rights")
+            book_publisher = request.data.get("book_publisher")
+            book_language_id = request.data.get("book_language")  # Assuming it's an ID
+            
+            print(book_religion_id)
+            print(book_language_id)
+
+            # Fetch foreign key objects
+            try:
+                book_religion = Religion.objects.get(name=book_religion_id)
+                book_language = Language.objects.get(name=book_language_id)
+            except Religion.DoesNotExist:
+                return Response({"error": "Religion not found"}, status=status.HTTP_400_BAD_REQUEST)
+            except Language.DoesNotExist:
+                return Response({"error": "Language not found"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Handle Image Upload
+            book_image = request.FILES.get("book_image", None)
+
+            # Create and Save Book Object
+            new_book = Book.objects.create(
+                name=book_name,
+                language=book_language,
+                date=book_date,
+                religion=book_religion,
+                authors=book_author,
+                denomination=book_denom,
+                translator=book_translator,
+                book_id=book_id,
+                description=book_description,
+                rights=book_rights,
+                publisher=book_publisher,
+                image=book_image
+            )
+            
+
+            book_dir = os.path.join(settings.MEDIA_ROOT, "books")
+
+            # Create the directory if it doesn't exist
+            os.makedirs(book_dir, exist_ok=True)
+
+            filename = book_name.replace(" ", "_") + ".json"
+            file_path = os.path.join(book_dir, filename)
+
+            book_json = {
+                'published_book': published_book
+            }
+
+            # Write JSON data to the file
+            with open(file_path, 'w', encoding='utf-8') as destination:
+                json.dump(book_json, destination, indent=4, ensure_ascii=False)
+
+            return Response({"message": "Book saved successfully!", "book_id": new_book.id}, status=status.HTTP_201_CREATED)
+
+        return Response({"error": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)

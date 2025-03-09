@@ -53,7 +53,14 @@ body {
     display: none;
 }
 /* styles for pagelist */
-
+.page-container{
+    width: 250px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 2%;
+    margin: 2%;
+}
 #page-list{
     display: flex;
     flex-direction: row;
@@ -64,7 +71,7 @@ body {
 
 .page-list-item{
     border: 1px solid black;
-    width: 20%;
+    overflow: hidden;
     height: 350px;
     margin: 2%;
     transition: 3s;
@@ -75,4 +82,26 @@ body {
     opacity: .2;
     background-color: #495057;
     transition: 3s;
+}
+.page-number{
+    text-align: center;
+    width: 100%;
+}
+
+#test-div{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    border: 1px solid black;
+    min-height: 500px;
+    max-height: 500px;
+    overflow-y: scroll;
+}
+
+.test-item{
+    padding-left: .5rem;
+}
+.test-item-par{
+    background-color: yellow;
+    padding-left: .5rem;
 }

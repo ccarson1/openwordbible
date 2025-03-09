@@ -16,10 +16,16 @@ class Religion(models.Model):
 class Book(models.Model):
     name = models.CharField(max_length=255)
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
-    date = models.DateField()
+    date = models.CharField(max_length=255, default=None)
     religion = models.ForeignKey(Religion, on_delete=models.CASCADE)
-    authors = models.CharField(max_length=255, default=None)
-    denomination = models.CharField(max_length=255, default=None)
+    authors = models.CharField(max_length=255, blank=True, null=True, default=None)
+    denomination = models.CharField(max_length=255, blank=True, null=True,default=None)
+    translator = models.CharField(max_length=255, blank=True, null=True,default=None)
+    book_id = models.CharField(max_length=255, blank=True, null=True,  default=None)
+    description = models.CharField(max_length=255, blank=True, null=True, default=None)
+    rights = models.CharField(max_length=255, blank=True, null=True, default=None)
+    publisher = models.CharField(max_length=255, blank=True, null=True, default=None)
+    image = models.ImageField(upload_to="book_images/", default="book_images/default.jpg")
 
     def __str__(self):
         return self.name
