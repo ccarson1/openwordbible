@@ -2,10 +2,75 @@
 {% load static %}
 
 {% block extra_head %}
-
+<link rel="stylesheet" href="{% static 'css/analytics.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 {% block content %}
 {% csrf_token %}
 <h2>Analytics</h2>
+
+<div class="chart-container">
+    <h3>Books Read by Users</h3>
+    <canvas id="booksChart"></canvas>
+</div>
+
+<div class="chart-container">
+    <h3>Words Read by Users</h3>
+    <canvas id="wordsChart"></canvas>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var ctx1 = document.getElementById('booksChart').getContext('2d');
+        var ctx2 = document.getElementById('wordsChart').getContext('2d');
+
+        var usernames = {{ usernames|safe }};
+        var bookCounts = {{ book_counts|safe }};
+        var wordCounts = {{ word_counts|safe }};
+
+        new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: usernames,
+                datasets: [{
+                    label: 'Books Read',
+                    data: bookCounts,
+                    backgroundColor: 'rgba(0, 123, 255, 0.6)',
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: usernames,
+                datasets: [{
+                    label: 'Words Read',
+                    data: wordCounts,
+                    backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    });
+</script>
+
 {% endblock %}
