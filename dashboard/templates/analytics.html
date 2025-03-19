@@ -25,9 +25,9 @@
         var ctx1 = document.getElementById('booksChart').getContext('2d');
         var ctx2 = document.getElementById('wordsChart').getContext('2d');
 
-        var usernames = {{ usernames|safe }};
-        var bookCounts = {{ book_counts|safe }};
-        var wordCounts = {{ word_counts|safe }};
+        // var usernames = {{ usernames|safe }};
+        // var bookCounts = {{ book_counts|safe }};
+        // var wordCounts = {{ word_counts|safe }};
 
         new Chart(ctx1, {
             type: 'bar',
