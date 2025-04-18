@@ -11,6 +11,9 @@ def dashboard(request):
 def analytics(request):
     return render(request, "analytics.html")
 
+def settings_view(request):
+    return render(request, "settings.html")
+
 def books(request):
     json_file_path = os.path.join(settings.MEDIA_ROOT, "books/test_book.json")
     print(os.path.exists(json_file_path))

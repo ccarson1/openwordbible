@@ -5,8 +5,11 @@ body {
     padding: 0;
     color: #333;
     text-align: center;
+    
 }
-
+.main-chart-container{
+    display: block;
+}
 h2 {
     margin-top: 20px;
     color: #444;

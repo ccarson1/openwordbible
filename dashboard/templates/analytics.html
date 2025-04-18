@@ -1,33 +1,35 @@
 {% extends 'dashbase.html' %}
 {% load static %}
 
-{% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/analytics.css' %}">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block extra_head_dash %}
+<link rel="stylesheet" href="{% static '/dashboard/css/analytics.css' %}">
+
 {% endblock %}
 
 {% block content %}
 {% csrf_token %}
 <h2>Analytics</h2>
 
-<div class="chart-container">
-    <h3>Books Read by Users</h3>
-    <canvas id="booksChart"></canvas>
+<div class="main-chart-container">
+    <div class="chart-container">
+        <h3>Books Read by Users</h3>
+        <canvas id="booksChart"></canvas>
+    </div>
+    
+    <div class="chart-container">
+        <h3>Words Read by Users</h3>
+        <canvas id="wordsChart"></canvas>
+    </div>
 </div>
-
-<div class="chart-container">
-    <h3>Words Read by Users</h3>
-    <canvas id="wordsChart"></canvas>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         var ctx1 = document.getElementById('booksChart').getContext('2d');
         var ctx2 = document.getElementById('wordsChart').getContext('2d');
 
-        // var usernames = {{ usernames|safe }};
-        // var bookCounts = {{ book_counts|safe }};
-        // var wordCounts = {{ word_counts|safe }};
+        var usernames = ['test', 'test2'];
+        var bookCounts = [45, 23];
+        var wordCounts = [23, 12];
 
         new Chart(ctx1, {
             type: 'bar',
