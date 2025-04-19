@@ -33,6 +33,7 @@ document.getElementById("up-book-txt").addEventListener('change', function (even
 
     let file = event.target.files[0];
     let allowedTypes = []
+    activeTabText = activeTabText.toLocaleUpperCase();
     if (file) {
         if (activeTabText == 'TXT') {
             allowedTypes.push("text/plain");
@@ -50,13 +51,13 @@ document.getElementById("up-book-txt").addEventListener('change', function (even
             console.log(activeTabText)
             allowedTypes.push("application/epub+zip");
         }
-
-        if (!allowedTypes.includes(file.type)) {
-            console.error(`Invalid file type. Please upload a ${activeTabText} file.`);
-            alert(`Invalid file type. Only ${activeTabText} files are allowed.`);
-            event.target.value = "";
-            return;
-        }
+        console.log("Detected file type:", file.type);
+        // if (!allowedTypes.includes(file.type)) {
+        //     console.error(`Invalid file type. Please upload a ${activeTabText} file.`);
+        //     alert(`Invalid file type. Only ${activeTabText} files are allowed.`);
+        //     event.target.value = "";
+        //     return;
+        // }
 
         console.log("File accepted:", file.name);
     }
@@ -203,7 +204,7 @@ document.getElementById("btn-upload-page").addEventListener("click", function ()
 
         pages_array.push(pages_to_upload[p].textContent)
     }
-    console.log(pages_array);
+    //console.log(pages_array);
 
     book_image = document.getElementById("input-book-cover");
 
@@ -213,7 +214,7 @@ document.getElementById("btn-upload-page").addEventListener("click", function ()
     }else{
         console.error("No file selected");
     }
-    book_data.append("published_book", pages_array)
+    book_data.append("published_book", JSON.stringify(pages_array));
     book_data.append("book_name", document.getElementById('book-name').value);
     book_data.append("book_date", document.getElementById('input-book-date').value);
     book_data.append("book_language", document.getElementById('input-book-lang').value);
@@ -224,9 +225,10 @@ document.getElementById("btn-upload-page").addEventListener("click", function ()
     book_data.append("book_isbn", document.getElementById("input-book-isbn").value);
     book_data.append("book_description", document.getElementById("input-book-des").value);
     book_data.append("book_rights", document.getElementById("book-right").value);
+    book_data.append("book_publisher", document.getElementById("book-pub").value);
 
 
-
+    console.log(JSON.stringify(pages_array))
     fetch("/api/publish-book/", {
         method: "POST",
         body: book_data,

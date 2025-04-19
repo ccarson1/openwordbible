@@ -26,6 +26,7 @@ class Book(models.Model):
     rights = models.CharField(max_length=255, blank=True, null=True, default=None)
     publisher = models.CharField(max_length=255, blank=True, null=True, default=None)
     image = models.ImageField(upload_to="book_images/", default="book_images/default.jpg")
+    book_file = models.FileField(upload_to="books/", blank=True, null=True)
     is_published = models.BooleanField(default=False)
 
     def __str__(self):

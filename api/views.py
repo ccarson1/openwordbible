@@ -113,7 +113,7 @@ class LoadBookmarkAPIView(APIView):
 
         #pdf_file = 'D:\Library/bible\KJVBible\kjvbible\pdfs/'+ book_name +'.pdf'
         pdf_file = 'pdfs/'+ book_name +'.pdf'
-        print(pdf_file)
+        #print(pdf_file)
 
         file = open(pdf_file, 'rb')
         pdfreader = PyPDF2.PdfReader(file)
@@ -197,6 +197,8 @@ class UploadBook(APIView):
         user = request.user
         
         print(user)
+        file = request.FILES.get("book-file")
+
         
         if user.is_authenticated:
         
@@ -280,15 +282,19 @@ class UploadBook(APIView):
 #             return Response(new_book, status=status.HTTP_200_OK)
 
 
+from django.core.files import File  # Add this import
+import os
+import json
+
 class PublishBook(APIView):
     parser_classes = (MultiPartParser, FormParser)
-    permission_classes = [IsAuthenticated]  
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         user = request.user
 
         if user.is_authenticated:
-            # Extract data from request
+            # Extract form data
             book_name = request.data.get("book_name")
             published_book = request.data.get("published_book")
             book_date = request.data.get("book_date")
@@ -296,60 +302,92 @@ class PublishBook(APIView):
             book_denom = request.data.get("book_denom")
             book_author = request.data.get("book_author")
             book_translator = request.data.get("book_translator")
-            book_id = request.data.get("book_id")
+            book_id = request.data.get("book_isbn")
             book_description = request.data.get("book_description")
             book_rights = request.data.get("book_rights")
             book_publisher = request.data.get("book_publisher")
-            book_language_id = request.data.get("book_language")  # Assuming it's an ID
-            
-            print(book_religion_id)
-            print(book_language_id)
+            book_language_id = request.data.get("book_language")
+            book_image = request.FILES.get("book_image")
 
-            # Fetch foreign key objects
+            # Get Language and Religion objects by ID
             try:
-                book_religion = Religion.objects.get(name=book_religion_id)
-                book_language = Language.objects.get(name=book_language_id)
-            except Religion.DoesNotExist:
-                return Response({"error": "Religion not found"}, status=status.HTTP_400_BAD_REQUEST)
+                book_language = Language.objects.get(name=book_language_id)  # Changed from .get(id=...)
+                print("Book Language")
+                print(book_language)
             except Language.DoesNotExist:
                 return Response({"error": "Language not found"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Handle Image Upload
-            book_image = request.FILES.get("book_image", None)
+            book_religion = None
+            religion_name = None
+            print(book_religion_id)
+            #print(published_book)
+            print("book_name:", book_name)
+            #print("published_book:", published_book)
+            print("book_date:", book_date)
+            print("book_religion_id:", book_religion_id)
+            print("book_denom:", book_denom)
+            print("book_author:", book_author)
+            print("book_translator:", book_translator)
+            print("book_id (ISBN):", book_id)
+            print("book_description:", book_description)
+            print("book_rights:", book_rights)
+            print("book_publisher:", book_publisher)
+            print("book_language_id:", book_language_id)
+            print("book_image:", book_image)
 
-            # Create and Save Book Object
-            new_book = Book.objects.create(
-                name=book_name,
-                language=book_language,
-                date=book_date,
-                religion=book_religion,
-                authors=book_author,
-                denomination=book_denom,
-                translator=book_translator,
-                book_id=book_id,
-                description=book_description,
-                rights=book_rights,
-                publisher=book_publisher,
-                image=book_image
-            )
+            if book_religion_id and book_religion_id.lower() != "none":
+                try:
+                    book_religion = Religion.objects.get(name=book_religion_id)
+                    religion_name = book_religion.name
+                except Religion.DoesNotExist:
+                    return Response({"error": "Religion not found"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                print("No religion provided or explicitly set to 'none'.")
+
+            language_name = book_language.name
+            print("Language Name:", language_name)
             
-
+            # Write JSON to disk
             book_dir = os.path.join(settings.MEDIA_ROOT, "books")
+            
+            filename = book_name.replace(" ", "_").replace(":", "").replace("/", "").replace("\\", "") + ".json"
+            file_path = os.path.join(book_dir, filename)
+            print(f"File path for saving: {file_path}")
 
-            # Create the directory if it doesn't exist
+
             os.makedirs(book_dir, exist_ok=True)
 
-            filename = book_name.replace(" ", "_") + ".json"
-            file_path = os.path.join(book_dir, filename)
+            try:
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    json.dump({'published_book': published_book}, f, indent=4, ensure_ascii=False)
+                
+                # Reopen the file as a Django File to assign to FileField
+                with open(file_path, 'rb') as f:
+                    django_file = File(f)
+                    
+                    print(f"Django File: {django_file}")
+                    # Save the book details to the database
+                    new_book = Book.objects.create(
+                        name=book_name,
+                        language=book_language,
+                        date=book_date,
+                        religion=book_religion,
+                        authors=book_author,
+                        denomination=book_denom,
+                        translator=book_translator,
+                        book_id=book_id,
+                        description=book_description,
+                        rights=book_rights,
+                        publisher=book_publisher,
+                        image=book_image,
+                        book_file=file_path
+                    )
 
-            book_json = {
-                'published_book': published_book
-            }
+                print(f"Book {book_name} saved successfully with ID {new_book.id}")
+                return Response({"message": "Book saved successfully!", "book_id": new_book.id}, status=status.HTTP_201_CREATED)
 
-            # Write JSON data to the file
-            with open(file_path, 'w', encoding='utf-8') as destination:
-                json.dump(book_json, destination, indent=4, ensure_ascii=False)
+            except Exception as e:
+                print(f"Error while saving the book: {str(e)}")
 
-            return Response({"message": "Book saved successfully!", "book_id": new_book.id}, status=status.HTTP_201_CREATED)
 
         return Response({"error": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)

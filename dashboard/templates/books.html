@@ -10,31 +10,26 @@
 {% csrf_token %}
 <div>
     <H2>Books</H2>
-
+    {% for book in books %}
     <div class="books-container">
         <div class="book-item">
-            <h4>{{ books.book_name }}</h4>
-            <p>Date: {{ books.book_date }}</p>
-            <p>Religion: {{ books.book_religion }}</p>
+            <h4>{{ book.name }}</h4>
+            <p>Date: {{ book.date }}</p>
+            <p>Religion: {{ book.religion }}</p>
             <a href="">Read</a>
             <div>
-                <label for="">Publish</label>
-                <input type="checkbox" name="" id="">
-                
-            </div>
-        </div>
-        <div class="book-item">
-            <h4>{{ books.book_name }}</h4>
-            <p>Date: {{ books.book_date }}</p>
-            <p>Religion: {{ books.book_religion }}</p>
-            <a href="">Read</a>
-            <div>
-                <label for="">Publish</label>
-                <input type="checkbox" name="" id="">
-                
+                <label for="publish-{{ book.id }}">Publish</label>
+                <input 
+                    type="checkbox" 
+                    id="publish-{{ book.id }}" 
+                    name="publish-{{ book.id }}"
+                    {% if book.published %}checked{% endif %}
+                >
             </div>
         </div>
     </div>
+    {% endfor %}
+    
     
 </div>
 

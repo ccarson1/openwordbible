@@ -1,10 +1,17 @@
-.book-item{
+.books-container {
+    display: flex;
+    gap: 2%;
+    flex-wrap: wrap; /* wrap onto multiple lines if needed */
+    margin: 2%;
+    padding: 2%;
+}
+
+.book-item {
     border: 1px solid black;
     padding: 2%;
-    margin: 2%;
-}
-.books-container{
-    display: flex;
-    margin: 2%;
-    padding: 2%;
+    margin: 0;
+    flex: 1 1 500px; /* grow/shrink, minimum width 300px */
+    max-width: 500px; /* optional: limit max width */
+    min-height: 250px; /* set a fixed height if needed */
+    box-sizing: border-box;
 }
