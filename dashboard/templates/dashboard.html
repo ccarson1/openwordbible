@@ -5,7 +5,9 @@
 
 <script src="{% static '/dashboard/js/txtpub.js' %}" defer></script>
 <script src="{% static '/dashboard/js/epub.js' %}" defer></script>
+<script src="{% static '/dashboard/js/pdf_obj.js' %}" defer></script>
 <script src="{% static '/dashboard/js/dashboard.js' %}" defer></script>
+<link rel="stylesheet" href="{% static '/dashboard/css/upload.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -23,7 +25,7 @@
     <h1>Open Word Bible Dashboard</h1>
     <h2>Book Parameters</h2>
 
-    <div>
+    <div class="text-input-grid">
         <div>
             <label for="book-name">Book Name</label>
             <input type="text" id="book-name" name="book-name">
@@ -40,15 +42,20 @@
             <label for="input-book-lang">Book Language</label>
             <select name="input-book-lang" id="input-book-lang">
                 <option value="">Choose a Language</option>
-                <option value="english">English</option>
+                {% for language in languages %}
+                    <option value="{{ language.name }}">{{ language.name }}</option>
+                {% endfor %}
+                
+                
             </select>
         </div>
 
         <label for="book-religion">Book Religion</label>
         <select name="book-religion" id="book-religion">
-            <option value="christian">Christian</option>
-            <option value="islamic">Islamic</option>
-            <option value="none">None</option>
+            {% for religion in religions %}
+                <option value="{{ religion.name }}">{{ religion.name }}</option>
+            {% endfor %}
+
         </select>
 
         <div>

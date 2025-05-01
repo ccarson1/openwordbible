@@ -163,13 +163,13 @@ class Book{
         // let globalRegex = new RegExp(regex.source, regex.flags.includes("g") ? regex.flags : regex.flags + "g");
     
         let globalRegex = new RegExp(regex, "g");
-        console.log(text.match(/\d+/g))
+        //console.log(text.match(/\d+/g))
         console.log(globalRegex)
         console.log(regex)
         matches = [...text.matchAll(regex)]
         console.log(matches);
-        console.log(matches[0][0]);
-        console.log(matches[0][1]);
+        // console.log(matches[0][0]);
+        // console.log(matches[0][1]);
 
 
         // while ((match = regex.exec(text)) !== null) {

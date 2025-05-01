@@ -38,7 +38,7 @@ document.getElementById("up-book-txt").addEventListener('change', function (even
         if (activeTabText == 'TXT') {
             allowedTypes.push("text/plain");
         }
-        else if (activeTabText == 'PDf') {
+        else if (activeTabText == 'PDF') {
             allowedTypes.push("application/pdf");
         }
         else if (activeTabText == 'DOCX') {
@@ -77,6 +77,9 @@ document.getElementById("convert-book").addEventListener("click", function () {
     else if (activeTabText == 'EPUB') {
         page_pile = new Epub(book_file.files[0]);
     }
+    else if (activeTabText == 'PDF') {
+        page_pile = new Pdf_obj(book_file.files[0]);
+    }
 
 
     fetch("/api/upload-book/", {
@@ -103,8 +106,12 @@ document.getElementById("convert-book").addEventListener("click", function () {
             page_pile.populate_preview_text();
         }
         else if (activeTabText == 'EPUB') {
-            epub_content = document.getElementById("text-preview");
-            epub_content.innerText = page_pile.get_content();
+            preview_content = document.getElementById("text-preview");
+            preview_content.innerText = page_pile.get_content();
+        }
+        else if (activeTabText == 'PDF') {
+            preview_content = document.getElementById("text-preview");
+            preview_content.innerText = page_pile.get_content();
         }
 
         current_page = page_pile.get_current_page();
@@ -126,7 +133,7 @@ for (let a = 0; a < back_btns.length; a++) {
             page_pile.set_current_page(current_page);
             page_pile.set_content();
             page_pile.set_content_pages();
-            epub_content.innerText = page_pile.get_content();
+            preview_content.innerText = page_pile.get_content();
             update_page_numbers();
         }
     });
@@ -139,7 +146,7 @@ for (let b = 0; b < next_btns.length; b++) {
             current_page++
             page_pile.set_current_page(current_page);
             page_pile.set_content();
-            epub_content.innerText = page_pile.get_content();
+            preview_content.innerText = page_pile.get_content();
             update_page_numbers();
         }
     });
@@ -178,6 +185,9 @@ document.getElementById("btn-add-all-page").addEventListener("click", function (
         else if (activeTabText == "TXT") {
             page_pile.populate_preview_pages(content_pages[0]);
         }
+        else if (activeTabText == "PDF") {
+            page_pile.populate_preview_pages(content_pages[c].join(" "));
+        }
     }
     document.getElementById("total-preview-pages").innerText = `Pages: ${document.getElementsByClassName("page-container").length}`
 
@@ -198,6 +208,7 @@ document.getElementById("add-partition").addEventListener("click", function () {
 });
 
 document.getElementById("btn-upload-page").addEventListener("click", function () {
+    showSpinner();
     let pages_to_upload = document.getElementsByClassName("page-container");
     let pages_array = [];
     for (let p = 0; p < pages_to_upload.length; p++) {
@@ -246,5 +257,6 @@ document.getElementById("btn-upload-page").addEventListener("click", function ()
     .then(data => {
         console.log(data)
     })
+    hideSpinner();
 });
 

@@ -1,13 +1,22 @@
 from django.shortcuts import render
 from django.conf import settings
-from api.models import Book
+from api.models import Book, Language, Religion
 
 import os
 import json
 
 
 def dashboard(request):
-    return render(request, "dashboard.html")
+
+    languages = Language.objects.all()
+    religions = Religion.objects.all()
+
+    context = {
+        "languages": languages,
+        "religions": religions
+    }
+
+    return render(request, "dashboard.html", context)
 
 def analytics(request):
     return render(request, "analytics.html")

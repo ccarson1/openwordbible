@@ -211,6 +211,8 @@ class UploadBook(APIView):
                 book_text = convert_book.convert_from_text(file)
             elif book_type == 'EPUB':
                 book_text = convert_book.convert_from_epub(file)
+            elif book_type == 'PDF':
+                book_text = convert_book.convert_from_pdf(file)
             # try:
                 
             # except:
