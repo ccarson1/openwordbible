@@ -1,11 +1,11 @@
-###Docker Setup###
+Docker Setup of the OpenWordBible Web Application
 
 1. **Download the repository**
    
 2. **Build the docker image***
-  ```Bash
-    docker build -t openwordbible_1.0.0 .
-  ```
+   ```Bash
+      docker build -t openwordbible_1.0.0 .
+   ```
 3. **Run the docker image**
    ```Bash
       docker run -p 8000:8000 openwordbible
