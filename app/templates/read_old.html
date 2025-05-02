@@ -3,8 +3,8 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static '/app/css/read/read.css' %}">
-<!-- <script src="{% static '/app/js/read/bible.js' %}" defer></script>
-<script src="{% static '/app/js/read/loadBook.js' %}" defer></script> -->
+<script src="{% static '/app/js/read/bible.js' %}" defer></script>
+<script src="{% static '/app/js/read/loadBook.js' %}" defer></script>
 <script src="{% static '/app/js/read/bookmark.js' %}" defer></script>
 <script src="{% static '/app/js/read/note.js' %}" defer></script>
 <script src="{% static '/app/js/read/utilities.js' %}" defer></script>
@@ -18,7 +18,7 @@
 <li class="nav-item dropdown">
     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
         aria-expanded="false">
-        {{ book.name }}
+        KJV Bible
     </a>
     <ul class="dropdown-menu p-3" style="min-width: 500px;">
         <div class="row">
@@ -140,11 +140,8 @@
             
             
         </div>
-        <script>
-            console.log('{{ book }}')
-        </script>
-        <h1>{{ book.name }}</h1>
-        <p>{{ book.content }}</p>
+
+
         <!-- Main content -->
         <div class="main-content container">
             <h1 class="text-center" id="book-header"></h1>
@@ -160,9 +157,9 @@
                     </ul>
                 </nav>
             </div>
-            
+
             <div id=page-text>
-                
+
 
             </div>
             <div class="d-flex justify-content-center page-nav">

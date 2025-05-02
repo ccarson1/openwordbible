@@ -1,0 +1,51 @@
+.content{
+    display: flex;
+    flex-wrap: wrap;
+}
+.books-container {
+    display: flex;
+
+    gap: 20px;
+    padding: 20px;
+}
+
+.book-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 8px;
+    width: 300px;
+    height: 500px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    background-color: white;
+    transition: .3s;
+}
+.book-item:hover {
+    transform: scale(1.03); /* slightly zoom in */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); /* deeper shadow */
+    transition: .3s;
+
+}
+.book-image {
+    width: 300px;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+.book-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.9); /* Optional: white background with transparency */
+    height: 40%;
+}
+
+.book-link {
+    text-decoration: none;
+    color: inherit;
+}
+

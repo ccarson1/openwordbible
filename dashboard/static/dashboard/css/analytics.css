@@ -73,7 +73,9 @@ body.dark-mode canvas {
     border: 1px solid #555;
 }
 */
-
+.sidebar{
+    height: 100vh;
+}
 .main-chart-container {
     width: 100%;
     display: flex;

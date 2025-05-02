@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static '/dashboard/css/books.css' %}">
+<link rel="stylesheet" href="{% static '/app/css/library/library.css' %}">
 
 {% endblock %}
 
@@ -10,29 +10,58 @@
 {% csrf_token %}
 {% if user.is_authenticated %}
 <h2>Library</h2>
-<!-- <div class="content">
-    <div class="row">
 
-        <div class="col-md-4">
-            <div class="card p-3 text-center">
-                <h3>KJV Bible</h3>
-                <div><a href="{% url 'read' %}">Read</a></div>
+<div class="content">
+    {% for book in books %}
+
+    <div class="books-container">
+        {% if book.id %}
+        <a href="{% url 'read' book.id %}" class="book-link">
+            <div class="book-item">
+                {% if book.image %}
+                    <div class="book-image" style="background-image: url('/media/{{ book.image }}');"></div>
+                {% else %}
+                    <div class="book-image" style="background-image: url('/media/book_images/book_default.png');"></div>
+                {% endif %}
+                <div class="book-info">
+                    <p>{{ book.name }}</p>
+                    <p>Date: {{ book.date }}</p>
+                    <p>Religion: {{ book.religion }}</p>
+                </div>
+            </div>
+        </a>
+        {% else %}
+        <div class="book-item">
+            <div class="book-image" style="background-image: url('/media/{{ book.image }}');"></div>
+            <div class="book-info">
+                <p>Name: {{ book.name }}</p>
+                <p>Date: {{ book.date }}</p>
+                <p>Religion: {{ book.religion }}</p>
+                <span>Unavailable</span>
             </div>
         </div>
-</div> -->
-<div class="content"></div>
-{% for book in books %}
-    <div class="books-container">
+        {% endif %}
+    </div>
+<!-- 
+    <div class="books-container" style="background-image: url('/media/{{ book.image }}');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;">
         <div class="book-item">
-            <h4>{{ book.name }}</h4>
             <p>Date: {{ book.date }}</p>
             <p>Religion: {{ book.religion }}</p>
-            <a href="">Read</a>
+            {% if book.id %}
+            <a href="{% url 'read' book.id %}">Read</a>
+            {% else %}
+            <span>Unavailable</span>
+            {% endif %}
+
 
         </div>
-    </div>
+    </div> -->
     {% endfor %}
-{% else %}
+    {% else %}
+</div>
 <div>
     <h2>You aren't supposed to be here!</h2>
 </div>

@@ -3,6 +3,7 @@ from ebooklib import epub
 from bs4 import BeautifulSoup
 import tempfile
 import PyPDF2
+import pdfplumber
 
 class ConvertBook():
     
@@ -35,19 +36,21 @@ class ConvertBook():
         return book_data
     
     def convert_from_pdf(self, file):
-        reader = PyPDF2.PdfReader(file)
-        book_text =  [[page.extract_text()] for page in reader.pages]
-        metadata = reader.metadata 
+        book_text = []
+        with pdfplumber.open(file) as pdf:
+            for page in pdf.pages:
+                text = page.extract_text()
+                book_text.append(text)
 
         book_data = {
-            'title': metadata.title,
-            'author': metadata.author,
+            'title': '',
+            'author': '',
             'content': book_text,
             'identifier':'',
-            'publisher' : metadata.producer,
+            'publisher' : '',
             'rights': '',
             'coverage' : '',
-            'date': metadata.get('/CreationDate'),
+            'date': '',
             'description': ''
         }
 
