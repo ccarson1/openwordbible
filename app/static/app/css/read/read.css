@@ -111,4 +111,11 @@ overflow-y: scroll;
   margin-left: 50%;
 }
 
+.tab-pane {
+  display: none;
+}
+.tab-pane.active {
+  display: block;
+}
+
 

@@ -28,6 +28,10 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from .book_convert import ConvertBook
 from .models import Book, Religion, Language 
+from django.core.files import File
+import os
+import json
+
 
 
 
@@ -226,67 +230,6 @@ class UploadBook(APIView):
         return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 
-# class PublishBook(APIView):
-#     parser_classes = (MultiPartParser, FormParser)
-#     permission_classes = [IsAuthenticated]  
-
-#     def post(self, request, *args, **kwargs):
-        
-#         user = request.user
-        
-        
-#         if user.is_authenticated:
-
-#             pubished_book = request.data.get("published_book")
-#             book_name = request.data.get("book_name")
-#             book_date = request.data.get("book_date")
-#             book_religion = request.data.get("book_religion")
-#             book_denom = request.data.get("book_denom")
-#             book_author = request.data.get("book_author")
-#             book_translator = request.data.get("book_translator")
-#             book_id = request.data.get("book_id")
-#             book_description = request.data.get("book_description")
-#             book_rights = request.data.get("book_rights")
-            
-#             if request.FILES.get("book_image"):
-#                 book_image = request.FILES.get("book_image")
-#                 filename = book_image.name
-#                 book_images_dir = os.path.join(settings.MEDIA_ROOT, "book_images")
-
-#                 # Create the directory if it doesn't exist
-#                 if not os.path.exists(book_images_dir):
-#                     os.makedirs(book_images_dir)
-
-#                 file_path = os.path.join(book_images_dir, filename)
-
-#                 with default_storage.open(file_path, 'wb') as destination:
-#                     for chunk in book_image.chunks():
-#                         destination.write(chunk)
-
-
-
-#             new_book = {
-#                 'pubished_book': pubished_book,
-#                 'book_name': book_name,
-#                 'book_date': book_date,
-#                 'book_religion': book_religion,
-#                 'book_denom': book_denom,
-#                 'book_author': book_author,
-#                 'book_translator': book_translator,
-#                 'book_id': book_id,
-#                 'book_description': book_description,
-#                 'book_rights': book_rights
-#             }
-            
-#             print(new_book)
-            
-
-#             return Response(new_book, status=status.HTTP_200_OK)
-
-
-from django.core.files import File  # Add this import
-import os
-import json
 
 class PublishBook(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -382,7 +325,7 @@ class PublishBook(APIView):
                         rights=book_rights,
                         publisher=book_publisher,
                         image=book_image,
-                        book_file=file_path
+                        book_file=os.path.join("books", filename)
                     )
 
                 print(f"Book {book_name} saved successfully with ID {new_book.id}")

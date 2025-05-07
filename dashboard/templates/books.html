@@ -8,8 +8,9 @@
 
 {% block content %}
 {% csrf_token %}
-<div>
-    <H2>Books</H2>
+<h1>Books</h1>
+<div class="content">
+    
     {% for book in books %}
     <div class="books-container">
         <div class="book-item">

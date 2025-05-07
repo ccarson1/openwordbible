@@ -2,7 +2,8 @@
 
 .content {
     width: 65%;
-    margin: 80px auto;
+    margin-left: 25%;
+    margin-top: 50px;
     padding: 20px;
     background-color: #fff;
     border-radius: 12px;
@@ -39,6 +40,12 @@ textarea {
 textarea.preview-content {
     min-height: 150px;
     resize: vertical;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #d3d2d2 !important;
+    font-weight: 300; 
 }
 
 button,

@@ -31,6 +31,25 @@ class Book(models.Model):
 
     def __str__(self):
         return self.name
+    
+class Bookmark(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="bookmarks")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bookmarks")
+    current_page = models.IntegerField(default=1)
+    scroll_position = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Bookmark for {self.book.name} by {self.user.username}"
+    
+class BookFormat(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="bookformats")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bookformats")
+    words = models.IntegerField()
+    columns = models.PositiveSmallIntegerField(choices=[(i, str(i)) for i in range(1, 5)])
+    font = models.CharField(max_length=25, blank=True, null=True)
+    font_size = models.PositiveSmallIntegerField(default=1)
+    color = models.CharField(max_length=50, default="black")
 
 class Note(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)

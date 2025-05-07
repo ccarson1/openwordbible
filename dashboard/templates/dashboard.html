@@ -43,59 +43,71 @@
             <select name="input-book-lang" id="input-book-lang">
                 <option value="">Choose a Language</option>
                 {% for language in languages %}
-                    <option value="{{ language.name }}">{{ language.name }}</option>
+                <option value="{{ language.name }}">{{ language.name }}</option>
                 {% endfor %}
-                
-                
+
+
             </select>
         </div>
 
         <label for="book-religion">Book Religion</label>
         <select name="book-religion" id="book-religion">
             {% for religion in religions %}
-                <option value="{{ religion.name }}">{{ religion.name }}</option>
+            <option value="{{ religion.name }}">{{ religion.name }}</option>
             {% endfor %}
 
         </select>
+        <div>
+            <small style="font-size: .6rem;">*Add more parameters to the book upload</small>
 
-        <div>
-            <label for="input-book-denom">Book Denomination</label>
-            <input type="text" id="input-book-denom" name="input-book-denom">
         </div>
-        <div>
-            <label for="input-book-author">Author</label>
-            <input type="text" id="input-book-author" name="input-book-author">
-        </div>
-        <div>
-            <label for="input-book-translator">Translator</label>
-            <input type="text" id="input-book-translator" name="input-book-translator">
-        </div>
-        <div>
-            <label for="input-book-isbn">ISBN</label>
-            <input type="text" id="input-book-isbn" name="input-book-isbn">
+        <!-- Toggle Button -->
+        <button class="btn btn-primary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForm"
+            aria-expanded="false" aria-controls="collapseForm">
             
-        </div>
-        <div>
-            <label for="input-book-des">Description</label>
-            <textarea type="text" id="input-book-des" name="input-book-des"></textarea>
+            Advanced
+        </button>
 
+        <!-- Collapsible Section -->
+        <div class="collapse" id="collapseForm">
+            <div class="card card-body">
+                <div>
+                    <label for="input-book-denom">Book Denomination</label>
+                    <input type="text" id="input-book-denom" name="input-book-denom" class="form-control">
+                </div>
+                <div>
+                    <label for="input-book-author">Author</label>
+                    <input type="text" id="input-book-author" name="input-book-author" class="form-control">
+                </div>
+                <div>
+                    <label for="input-book-translator">Translator</label>
+                    <input type="text" id="input-book-translator" name="input-book-translator" class="form-control">
+                </div>
+                <div>
+                    <label for="input-book-isbn">ISBN</label>
+                    <input type="text" id="input-book-isbn" name="input-book-isbn" class="form-control" >
+                </div>
+                <div>
+                    <label for="input-book-des">Description</label>
+                    <textarea id="input-book-des" name="input-book-des" class="form-control"></textarea>
+                </div>
+                <div>
+                    <label for="book-right">Rights:</label>
+                    <input type="text" id="book-right" name="book-right" class="form-control">
+                </div>
+                <div>
+                    <label for="book-pub">Publisher</label>
+                    <input type="text" id="book-pub" name="book-pub" class="form-control">
+                </div>
+            </div>
         </div>
-        <div>
-            <label for="book-right">Rights:</label>
-            <input type="text" id="book-right" name="book-right">
-            <p id="book-right"></p>
-        </div>
-        <div>
-            <label for="book-pub">Publisher</label>
-            <input type="text" id="book-pub" name="book-pub">
-            <p id="book-pub"></p>
-        </div>
+
 
         <div>
             <label for="input-words-per-page">WordsPerPage</label>
             <input type="number" id="input-words-per-page" value="600">
         </div>
-        
+
 
 
     </div>
@@ -125,7 +137,7 @@
         <div>
             <div>
                 <label for="up-book-txt">File</label>
-                <input type="file" id="up-book-txt" >
+                <input type="file" id="up-book-txt">
             </div>
             <div>
                 <button class="btn btn-success" id="convert-book">Convert</button>
@@ -136,12 +148,12 @@
         <div class="tab-content mt-3">
             <div class="tab-pane fade show active" id="text">
                 <h3>Text Upload</h3>
-<!-- 
+                <!-- 
                 <div>
                     <button class="btn-pre-back">back</button>
                     <button class="btn-pre-next">next</button>
                 </div> -->
-                
+
                 <!-- <div id="test-div" style="width: 100%;">
 
                 </div> -->
@@ -232,7 +244,7 @@
             <div>
                 <label for="">Label</label>
                 <input type="text" id="label-input">
-                <label for="" >Delimiter</label>
+                <label for="">Delimiter</label>
                 <input type="text" id="search-input" style="width: 50%;">
                 <button class="btn btn-primary" id="add-partition">Add</button>
             </div>
@@ -244,7 +256,7 @@
                 </span>
                 <button class="btn-pre-next">next</button>
             </div>
-            
+
             <div>
                 <textarea name="text-preview" id="text-preview" class="preview-content"></textarea>
             </div>
@@ -301,5 +313,3 @@
 
 
 {% endblock %}
-
-

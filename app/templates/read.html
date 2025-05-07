@@ -3,118 +3,131 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static '/app/css/read/read.css' %}">
-<!-- <script src="{% static '/app/js/read/bible.js' %}" defer></script>
-<script src="{% static '/app/js/read/loadBook.js' %}" defer></script> -->
+<script src="{% static '/app/js/read/book.js' %}" defer></script>
+<script src="{% static '/app/js/read/bookFormatter.js' %}" defer></script>
+<script src="{% static '/app/js/read/bible.js' %}" defer></script>
+<script src="{% static '/app/js/read/loadBook.js' %}" defer></script> 
 <script src="{% static '/app/js/read/bookmark.js' %}" defer></script>
 <script src="{% static '/app/js/read/note.js' %}" defer></script>
 <script src="{% static '/app/js/read/utilities.js' %}" defer></script>
 <script src="{% static '/app/js/read/validators.js' %}" defer></script>
+
 {% endblock %}
 
 {% block content %}
 {% csrf_token %}
 {% if user.is_authenticated %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("Loading book");
+    let current_book = new Book({
+        name: "{{ book.name|escapejs }}",
+        language: "{{ book.language|escapejs }}",
+        date: "{{ book.date|escapejs }}",
+        religion: "{{ book.religion|escapejs }}",
+        content: "{{ book.content|escapejs }}",
+        authors: "{{ book.authors|escapejs }}"
+    });
+    console.log(current_book);
+});
+</script>
 
-<li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-        aria-expanded="false">
-        {{ book.name }}
-    </a>
-    <ul class="dropdown-menu p-3" style="min-width: 500px;">
-        <div class="row">
-            <div class="col-4">
-                <li><a class="dropdown-item" href="#" value="Genesis">Genesis</a></li>
-                <li><a class="dropdown-item" href="#" value="Exodus">Exodus</a></li>
-                <li><a class="dropdown-item" href="#" value="Leviticus">Leviticus</a></li>
-                <li><a class="dropdown-item" href="#" value="Numbers">Numbers</a></li>
-                <li><a class="dropdown-item" href="#" value="Deuteronomy">Deuteronomy</a></li>
-                <li><a class="dropdown-item" href="#" value="Joshua">Joshua</a></li>
-                <li><a class="dropdown-item" href="#" value="Judges">Judges</a></li>
-                <li><a class="dropdown-item" href="#" value="Ruth">Ruth</a></li>
-                <li><a class="dropdown-item" href="#" value="1_Samual">1 Samuel</a></li>
-                <li><a class="dropdown-item" href="#" value="2_Samual">2 Samuel</a></li>
-                <li><a class="dropdown-item" href="#" value="1_Kings">1 Kings</a></li>
-                <li><a class="dropdown-item" href="#" value="2_Kings">2 Kings</a></li>
-                <li><a class="dropdown-item" href="#" value="1_Chronicles">1 Chronicles</a></li>
-                <li><a class="dropdown-item" href="#" value="2_Chronicles">2 Chronicles</a></li>
-                <li><a class="dropdown-item" href="#" value="Ezra">Ezra</a></li>
-                <li><a class="dropdown-item" href="#" value="Nehemiah">Nehemiah</a></li>
-                <li><a class="dropdown-item" href="#" value="Esther">Esther</a></li>
-                <li><a class="dropdown-item" href="#" value="Job">Job</a></li>
-                <li><a class="dropdown-item" href="#" value="Psalms">Psalms</a></li>
-                <li><a class="dropdown-item" href="#" value="Proverbs">Proverbs</a></li>
-                <li><a class="dropdown-item" href="#" value="Ecclesiastes">Ecclesiastes</a></li>
-                <li><a class="dropdown-item" href="#" value="Song_of_Solomon">Song of Solomon</a>
-                </li>
-            </div>
-            <div class="col-4">
-                <li><a class="dropdown-item" href="#" value="Isaiah">Isaiah</a></li>
-                <li><a class="dropdown-item" href="#" value="Jeremiah">Jeremiah</a></li>
-                <li><a class="dropdown-item" href="#" value="Lamentations">Lamentations</a></li>
-                <li><a class="dropdown-item" href="#" value="Ezekiel">Ezekiel</a></li>
-                <li><a class="dropdown-item" href="#" value="Daniel">Daniel</a></li>
-                <li><a class="dropdown-item" href="#" value="Hosea">Hosea</a></li>
-                <li><a class="dropdown-item" href="#" value="Joel">Joel</a></li>
-                <li><a class="dropdown-item" href="#" value="Amos">Amos</a></li>
-                <li><a class="dropdown-item" href="#" value="Obadiah">Obadiah</a></li>
-                <li><a class="dropdown-item" href="#" value="Jonah">Jonah</a></li>
-                <li><a class="dropdown-item" href="#" value="Micah">Micah</a></li>
-                <li><a class="dropdown-item" href="#" value="Nahum">Nahum</a></li>
-                <li><a class="dropdown-item" href="#" value="Habakkuk">Habakkuk</a></li>
-                <li><a class="dropdown-item" href="#" value="Zephaniah">Zephaniah</a></li>
-                <li><a class="dropdown-item" href="#" value="Haggai">Haggai</a></li>
-                <li><a class="dropdown-item" href="#" value="Zechariah">Zechariah</a></li>
-                <li><a class="dropdown-item" href="#" value="Malachi">Malachi</a></li>
-                <li><a class="dropdown-item" href="#" value="Matthew">Matthew</a></li>
-                <li><a class="dropdown-item" href="#" value="Mark">Mark</a></li>
-                <li><a class="dropdown-item" href="#" value="Luke">Luke</a></li>
-                <li><a class="dropdown-item" href="#" value="John">John</a></li>
-                <li><a class="dropdown-item" href="#" value="Acts">Acts</a></li>
-            </div>
-            <div class="col-4">
-                <li><a class="dropdown-item" href="#" value="Romans">Romans</a></li>
-                <li><a class="dropdown-item" href="#" value="1_Corinthians">1 Corinthians</a></li>
-                <li><a class="dropdown-item" href="#" value="2_Corinthians">2 Corinthians</a></li>
-                <li><a class="dropdown-item" href="#" value="Galatians">Galatians</a></li>
-                <li><a class="dropdown-item" href="#" value="Ephesians">Ephesians</a></li>
-                <li><a class="dropdown-item" href="#" value="Philippians">Philippians</a></li>
-                <li><a class="dropdown-item" href="#" value="Colossians">Colossians</a></li>
-                <li><a class="dropdown-item" href="#" value="1_Thessalonians">1 Thessalonians</a>
-                </li>
-                <li><a class="dropdown-item" href="#" value="2_Thessalonians">2 Thessalonians</a>
-                </li>
-                <li><a class="dropdown-item" href="#" value="1_Timothy">1 Timothy</a></li>
-                <li><a class="dropdown-item" href="#" value="2_Timothy">2 Timothy</a></li>
-                <li><a class="dropdown-item" href="#" value="Titus">Titus</a></li>
-                <li><a class="dropdown-item" href="#" value="Philemon">Philemon</a></li>
-                <li><a class="dropdown-item" href="#" value="Hebrews">Hebrews</a></li>
-                <li><a class="dropdown-item" href="#" value="James">James</a></li>
-                <li><a class="dropdown-item" href="#" value="1_Peter">1 Peter</a></li>
-                <li><a class="dropdown-item" href="#" value="2_Peter">2 Peter</a></li>
-                <li><a class="dropdown-item" href="#" value="1_John">1 John</a></li>
-                <li><a class="dropdown-item" href="#" value="2_John">2 John</a></li>
-                <li><a class="dropdown-item" href="#" value="3_John">3 John</a></li>
-                <li><a class="dropdown-item" href="#" value="Jude">Jude</a></li>
-                <li><a class="dropdown-item" href="#" value="Revelation">Revelation</a></li>
-            </div>
-        </div>
-    </ul>
-</li>
 
     <div class="d-flex">
         <!-- Sidebar -->
         <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white"
             style="width: 380px; border-right: 1px solid black; padding: 1%;">
-            <ul class="nav nav-tabs">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item">
-                <a class="nav-link results active" aria-current="page" >Notes</a>
+                  <a class="nav-link active" id="index-tab" data-bs-toggle="tab" data-target="#index-container" role="tab">Index</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link results" >Book</a>
+                  <a class="nav-link " id="notes-tab" data-bs-toggle="tab" data-target="#note-container" role="tab">Notes</a>
                 </li>
-
-            </ul>
-            <div id="note-container">
+                <li class="nav-item">
+                  <a class="nav-link" id="search-tab" data-bs-toggle="tab" data-target="#search-container" role="tab">Search Results</a>
+                </li>
+              </ul>
+            <div class="tab-pane fade show active" id="index-container" role="tabpanel">
+                <div class="p-3" style="min-width: 500px;">
+                    <div class="row">
+                        <div >
+                            <p class="p-2 card" style="width: 18rem;" value="Genesis">Genesis</p>
+                            <li><a class="dropdown-item" href="#" value="Exodus">Exodus</a></li>
+                            <li><a class="dropdown-item" href="#" value="Leviticus">Leviticus</a></li>
+                            <li><a class="dropdown-item" href="#" value="Numbers">Numbers</a></li>
+                            <li><a class="dropdown-item" href="#" value="Deuteronomy">Deuteronomy</a></li>
+                            <li><a class="dropdown-item" href="#" value="Joshua">Joshua</a></li>
+                            <li><a class="dropdown-item" href="#" value="Judges">Judges</a></li>
+                            <li><a class="dropdown-item" href="#" value="Ruth">Ruth</a></li>
+                            <li><a class="dropdown-item" href="#" value="1_Samual">1 Samuel</a></li>
+                            <li><a class="dropdown-item" href="#" value="2_Samual">2 Samuel</a></li>
+                            <li><a class="dropdown-item" href="#" value="1_Kings">1 Kings</a></li>
+                            <li><a class="dropdown-item" href="#" value="2_Kings">2 Kings</a></li>
+                            <li><a class="dropdown-item" href="#" value="1_Chronicles">1 Chronicles</a></li>
+                            <li><a class="dropdown-item" href="#" value="2_Chronicles">2 Chronicles</a></li>
+                            <li><a class="dropdown-item" href="#" value="Ezra">Ezra</a></li>
+                            <li><a class="dropdown-item" href="#" value="Nehemiah">Nehemiah</a></li>
+                            <li><a class="dropdown-item" href="#" value="Esther">Esther</a></li>
+                            <li><a class="dropdown-item" href="#" value="Job">Job</a></li>
+                            <li><a class="dropdown-item" href="#" value="Psalms">Psalms</a></li>
+                            <li><a class="dropdown-item" href="#" value="Proverbs">Proverbs</a></li>
+                            <li><a class="dropdown-item" href="#" value="Ecclesiastes">Ecclesiastes</a></li>
+                            <li><a class="dropdown-item" href="#" value="Song_of_Solomon">Song of Solomon</a>
+                            </li>
+                       
+                            <li><a class="dropdown-item" href="#" value="Isaiah">Isaiah</a></li>
+                            <li><a class="dropdown-item" href="#" value="Jeremiah">Jeremiah</a></li>
+                            <li><a class="dropdown-item" href="#" value="Lamentations">Lamentations</a></li>
+                            <li><a class="dropdown-item" href="#" value="Ezekiel">Ezekiel</a></li>
+                            <li><a class="dropdown-item" href="#" value="Daniel">Daniel</a></li>
+                            <li><a class="dropdown-item" href="#" value="Hosea">Hosea</a></li>
+                            <li><a class="dropdown-item" href="#" value="Joel">Joel</a></li>
+                            <li><a class="dropdown-item" href="#" value="Amos">Amos</a></li>
+                            <li><a class="dropdown-item" href="#" value="Obadiah">Obadiah</a></li>
+                            <li><a class="dropdown-item" href="#" value="Jonah">Jonah</a></li>
+                            <li><a class="dropdown-item" href="#" value="Micah">Micah</a></li>
+                            <li><a class="dropdown-item" href="#" value="Nahum">Nahum</a></li>
+                            <li><a class="dropdown-item" href="#" value="Habakkuk">Habakkuk</a></li>
+                            <li><a class="dropdown-item" href="#" value="Zephaniah">Zephaniah</a></li>
+                            <li><a class="dropdown-item" href="#" value="Haggai">Haggai</a></li>
+                            <li><a class="dropdown-item" href="#" value="Zechariah">Zechariah</a></li>
+                            <li><a class="dropdown-item" href="#" value="Malachi">Malachi</a></li>
+                            <li><a class="dropdown-item" href="#" value="Matthew">Matthew</a></li>
+                            <li><a class="dropdown-item" href="#" value="Mark">Mark</a></li>
+                            <li><a class="dropdown-item" href="#" value="Luke">Luke</a></li>
+                            <li><a class="dropdown-item" href="#" value="John">John</a></li>
+                            <li><a class="dropdown-item" href="#" value="Acts">Acts</a></li>
+                        
+                            <li><a class="dropdown-item" href="#" value="Romans">Romans</a></li>
+                            <li><a class="dropdown-item" href="#" value="1_Corinthians">1 Corinthians</a></li>
+                            <li><a class="dropdown-item" href="#" value="2_Corinthians">2 Corinthians</a></li>
+                            <li><a class="dropdown-item" href="#" value="Galatians">Galatians</a></li>
+                            <li><a class="dropdown-item" href="#" value="Ephesians">Ephesians</a></li>
+                            <li><a class="dropdown-item" href="#" value="Philippians">Philippians</a></li>
+                            <li><a class="dropdown-item" href="#" value="Colossians">Colossians</a></li>
+                            <li><a class="dropdown-item" href="#" value="1_Thessalonians">1 Thessalonians</a>
+                            </li>
+                            <li><a class="dropdown-item" href="#" value="2_Thessalonians">2 Thessalonians</a>
+                            </li>
+                            <li><a class="dropdown-item" href="#" value="1_Timothy">1 Timothy</a></li>
+                            <li><a class="dropdown-item" href="#" value="2_Timothy">2 Timothy</a></li>
+                            <li><a class="dropdown-item" href="#" value="Titus">Titus</a></li>
+                            <li><a class="dropdown-item" href="#" value="Philemon">Philemon</a></li>
+                            <li><a class="dropdown-item" href="#" value="Hebrews">Hebrews</a></li>
+                            <li><a class="dropdown-item" href="#" value="James">James</a></li>
+                            <li><a class="dropdown-item" href="#" value="1_Peter">1 Peter</a></li>
+                            <li><a class="dropdown-item" href="#" value="2_Peter">2 Peter</a></li>
+                            <li><a class="dropdown-item" href="#" value="1_John">1 John</a></li>
+                            <li><a class="dropdown-item" href="#" value="2_John">2 John</a></li>
+                            <li><a class="dropdown-item" href="#" value="3_John">3 John</a></li>
+                            <li><a class="dropdown-item" href="#" value="Jude">Jude</a></li>
+                            <li><a class="dropdown-item" href="#" value="Revelation">Revelation</a></li>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade " id="note-container" role="tabpanel">
                 <button class="btn btn-primary" id="btn-new-note" style="width: 90%;" disabled>New</button>
                 <form class="d-flex my-2 my-lg-0" onsubmit="return false">
                     <input class="form-control me-2" type="search" placeholder="Search Notes" aria-label="Search" id="note-search">
@@ -131,7 +144,7 @@
 
                 </div>
             </div>
-            <div id="search-container">
+            <div class="tab-pane fade" id="search-container" role="tabpanel">
                 <h4 class="text-center">Results <span id="num_of_results"></span></h4>
                 <div id="search-results">
                 
@@ -139,15 +152,15 @@
             </div>
             
             
+            
         </div>
-        <script>
-            console.log('{{ book }}')
-        </script>
-        <h1>{{ book.name }}</h1>
-        <p>{{ book.content }}</p>
+
+        
+
         <!-- Main content -->
         <div class="main-content container">
-            <h1 class="text-center" id="book-header"></h1>
+            
+            <h1 class="text-center" id="book-header">{{ book.name }}</h1>
             <button class="btn btn-primary" style="margin-left: 80%;" id="bookmark">bookmark</button>
             <div class="d-flex justify-content-center page-nav" id="pg1">
                 <nav aria-label="Page navigation example">
@@ -161,7 +174,7 @@
                 </nav>
             </div>
             
-            <div id=page-text>
+            <div id="page-text">
                 
 
             </div>
@@ -219,4 +232,6 @@
     <h2>You aren't supposed to be here!</h2>
 </div>
 {% endif %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 {% endblock %}

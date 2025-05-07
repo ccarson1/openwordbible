@@ -186,7 +186,7 @@ document.getElementById("btn-add-all-page").addEventListener("click", function (
             page_pile.populate_preview_pages(content_pages[0]);
         }
         else if (activeTabText == "PDF") {
-            page_pile.populate_preview_pages(content_pages[c].join(" "));
+            page_pile.populate_preview_pages(content_pages[c]);
         }
     }
     document.getElementById("total-preview-pages").innerText = `Pages: ${document.getElementsByClassName("page-container").length}`

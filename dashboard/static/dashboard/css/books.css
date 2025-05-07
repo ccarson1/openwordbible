@@ -1,9 +1,25 @@
-.books-container {
+.content {
+    width: 65%;
+    margin-left: 25%;
+    margin-top: 100px;
+    padding: 20px;
+    background-color: #fff;
     display: flex;
+    flex-wrap: wrap;
+}
+h1{
+    position: absolute;
+    margin-left: 50%;
+    margin-top: 10px;
+}
+
+.books-container {
+    
     gap: 2%;
-    flex-wrap: wrap; /* wrap onto multiple lines if needed */
+     /* wrap onto multiple lines if needed */
     margin: 2%;
     padding: 2%;
+    width: 400px;
 }
 
 .book-item {
