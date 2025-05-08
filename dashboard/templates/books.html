@@ -3,6 +3,7 @@
 
 {% block extra_head_dash %}
 <link rel="stylesheet" href="{% static '/dashboard/css/books.css' %}">
+<script src="{% static 'dashboard/js/updateBookStatus.js' %}" defer></script>
 
 {% endblock %}
 
@@ -18,13 +19,17 @@
             <p>Date: {{ book.date }}</p>
             <p>Religion: {{ book.religion }}</p>
             <a href="">Read</a>
+            <a href="">Edit</a>
             <div>
+                
                 <label for="publish-{{ book.id }}">Publish</label>
                 <input 
                     type="checkbox" 
                     id="publish-{{ book.id }}" 
                     name="publish-{{ book.id }}"
-                    {% if book.published %}checked{% endif %}
+                    onchange="updatePublishStatus('{{ book.id }}')"
+                    {% if book.is_published %}checked{% endif %}
+                    
                 >
             </div>
         </div>

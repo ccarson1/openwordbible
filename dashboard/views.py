@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.conf import settings
 from api.models import Book, Language, Religion
+from django.http import JsonResponse
 
 import os
 import json
@@ -43,21 +44,17 @@ def books(request):
 
     # Optionally convert to a list of dictionaries for the template
     books_data = []
-    for book in book_objects:
-        books_data.append({
-            "name": book.name,
-            "language": book.language.name if book.language else None,
-            "date": book.date,
-            "religion": book.religion.name if book.religion else None,
-            "authors": book.authors,
-            "denomination": book.denomination,
-            "translator": book.translator,
-            "book_id": book.book_id,
-            "description": book.description,
-            "rights": book.rights,
-            "publisher": book.publisher,
-            "image_url": book.image.url if book.image else None,
-            "file_url": book.book_file.url if book.book_file else None,
-        })
 
-    return render(request, "books.html", {"books": books_data})
+
+    return render(request, "books.html", {"books": book_objects})
+
+def update_publish_status(request, book_id):
+    if request.method == 'POST':
+        try:
+            book = Book.objects.get(pk=book_id)
+            book.is_published = not book.is_published
+            book.save()
+            return JsonResponse({'success': True, 'is_published': book.is_published})
+        except Book.DoesNotExist:
+            return JsonResponse({'error': 'Book not found'}, status=404)
+    return JsonResponse({'error': 'Invalid method'}, status=405)

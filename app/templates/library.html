@@ -13,7 +13,7 @@
 
 <div class="content">
     {% for book in books %}
-
+    {% if book.is_published %}
     <div class="books-container">
         {% if book.id %}
         <a href="{% url 'read' book.id %}" class="book-link">
@@ -42,6 +42,7 @@
         </div>
         {% endif %}
     </div>
+    {% endif %}
 <!-- 
     <div class="books-container" style="background-image: url('/media/{{ book.image }}');
             background-size: cover;
