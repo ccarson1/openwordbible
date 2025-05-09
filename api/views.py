@@ -31,8 +31,8 @@ from .models import Book, Religion, Language
 from django.core.files import File
 import os
 import json
-
-
+from rest_framework import serializers
+from rest_framework.decorators import api_view
 
 
 class ProfileAPIView(APIView):
@@ -391,4 +391,23 @@ class LoadBook(APIView):
             "book": books_data,
             "book_format": format_data,
         })
+    
+
+class BookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        fields = ['id', 'name']
+    
+@api_view(['GET'])
+def search_books(request):
+    query = request.GET.get('query', '')
+    print(f"The query is {query}")
+    if query:
+        books = Book.objects.filter(name__icontains=query, is_published=True)
+    else:
+        books = Book.objects.none()
+
+    serializer = BookSerializer(books, many=True)
+    return Response(serializer.data)
+
                 

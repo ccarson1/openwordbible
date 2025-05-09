@@ -16,7 +16,7 @@ document.querySelectorAll('.nav-link').forEach(link => {
       link.classList.add('active');
   
       // Hide all tab panes
-      ['#index-container', '#note-container', '#search-container'].forEach(id => {
+      ['#index-container', '#note-container', '#search-container', '#layout-container'].forEach(id => {
         const el = document.querySelector(id);
         if (el) {
           el.classList.remove('show', 'active');

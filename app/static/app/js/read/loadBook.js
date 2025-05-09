@@ -15,46 +15,46 @@
 //     });
 // }
 
-function create_clickable_passages(verses) {
-    let clickable_passages = document.getElementsByClassName("passage");
-    for (let cp = 0; cp < clickable_passages.length; cp++) {
-        clickable_passages[cp].addEventListener("click", function () {
-            Array.from(document.getElementsByClassName("word")).forEach(word => {
-                word.style.backgroundColor = "white";
-                //word.style.borderColor = "white";
-                //word.onmouseover = function(){word.style.borderRadius = "5px";}
-                //word.onmouseover = function(){word.style.backgroundColor = "rgba(90, 136, 204, 0.795)";}
-                //word.onmouseout = function(){word.style.backgroundColor = "white";}
-            });
-            //set tooltip attributes
-            this.setAttribute("data-bs-toggle", "popover");
-            this.setAttribute("data-placement", "bottom");
-            this.setAttribute("title", "Double click to make a note for " + this.innerText);
-            this.style.padding = "2%";
+// function create_clickable_passages(verses) {
+//     let clickable_passages = document.getElementsByClassName("passage");
+//     for (let cp = 0; cp < clickable_passages.length; cp++) {
+//         clickable_passages[cp].addEventListener("click", function () {
+//             Array.from(document.getElementsByClassName("word")).forEach(word => {
+//                 word.style.backgroundColor = "white";
+//                 //word.style.borderColor = "white";
+//                 //word.onmouseover = function(){word.style.borderRadius = "5px";}
+//                 //word.onmouseover = function(){word.style.backgroundColor = "rgba(90, 136, 204, 0.795)";}
+//                 //word.onmouseout = function(){word.style.backgroundColor = "white";}
+//             });
+//             //set tooltip attributes
+//             this.setAttribute("data-bs-toggle", "popover");
+//             this.setAttribute("data-placement", "bottom");
+//             this.setAttribute("title", "Double click to make a note for " + this.innerText);
+//             this.style.padding = "2%";
 
-            let selection = document.getElementsByClassName("w"+ (cp+1) + " p"+(current_page));
-            console.log("w"+ (cp+1) + " p"+(current_page));
-            console.log("Current page: " + current_page);
-            for(let s=0; s<selection.length; s++){
-                console.log(selection[s]);
-                selection[s].style.backgroundColor = "#0dcaf0";
-                // selection[s].style.borderColor = "#0dcaf0";
-                // selection[s].style.border = "1px solid #0dcaf0";
-                // selection[s].style.borderRadius = "5px";
-            }
-            console.log(selection);
-            console.log(selection.length)
-        });
+//             let selection = document.getElementsByClassName("w"+ (cp+1) + " p"+(current_page));
+//             console.log("w"+ (cp+1) + " p"+(current_page));
+//             console.log("Current page: " + current_page);
+//             for(let s=0; s<selection.length; s++){
+//                 console.log(selection[s]);
+//                 selection[s].style.backgroundColor = "#0dcaf0";
+//                 // selection[s].style.borderColor = "#0dcaf0";
+//                 // selection[s].style.border = "1px solid #0dcaf0";
+//                 // selection[s].style.borderRadius = "5px";
+//             }
+//             console.log(selection);
+//             console.log(selection.length)
+//         });
 
-        clickable_passages[cp].addEventListener("dblclick", function(){
-            myModal.show();
-            document.getElementById("note-title").value = document.getElementById("notes-header").innerText + " Verse " + this.innerText;
-            document.getElementById("note-data").value = "";
-            document.getElementById("NoteModalLabel").innerText = "New Note";
-        });
+//         clickable_passages[cp].addEventListener("dblclick", function(){
+//             myModal.show();
+//             document.getElementById("note-title").value = document.getElementById("notes-header").innerText + " Verse " + this.innerText;
+//             document.getElementById("note-data").value = "";
+//             document.getElementById("NoteModalLabel").innerText = "New Note";
+//         });
 
-    }
-}
+//     }
+// }
 
 // function sendBookRequest(book) {
 //     // Define the data to send
@@ -137,13 +137,26 @@ function create_clickable_passages(verses) {
 //     return page_array;
 
 // }
+
+
+
+function create_word_layout(textArray){
+    let textLayout = document.getElementById("text-layout");
+    for(let w=0; w< 300; w++){
+        let newWord = document.createElement("div");
+        newWord.setAttribute("class", "word");
+        newWord.innerText = textArray[w];
+        document.getElementById("text-layout").append(newWord);
+    }
+}
 window.onload = (event) => {
 
     let pageText = document.getElementById("page-text").innerText;
     console.log(pageText);
     let textArray = pageText.split(" ");
     console.log(textArray);
-    create_clickable_passages(textArray);
+    create_word_layout(textArray);
+    
 
 }
 

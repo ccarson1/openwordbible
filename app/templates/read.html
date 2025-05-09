@@ -6,11 +6,12 @@
 <script src="{% static '/app/js/read/book.js' %}" defer></script>
 <script src="{% static '/app/js/read/bookFormatter.js' %}" defer></script>
 <script src="{% static '/app/js/read/bible.js' %}" defer></script>
-<script src="{% static '/app/js/read/loadBook.js' %}" defer></script> 
+<script src="{% static '/app/js/read/loadBook.js' %}" defer></script>
 <script src="{% static '/app/js/read/bookmark.js' %}" defer></script>
 <script src="{% static '/app/js/read/note.js' %}" defer></script>
 <script src="{% static '/app/js/read/utilities.js' %}" defer></script>
 <script src="{% static '/app/js/read/validators.js' %}" defer></script>
+<script src="{% static '/app/js/read/textCompare.js' %}" defer></script>
 
 {% endblock %}
 
@@ -18,164 +19,246 @@
 {% csrf_token %}
 {% if user.is_authenticated %}
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("Loading book");
-    console.log('{{ book.name}}')
-    let current_book = new Book({
-        id: "{{ book.id }}",
-        name: "{{ book.name}}",
-        language: "{{ book.language|default:''|escapejs }}",
-        date: "{{ book.date|default:''|escapejs }}",
-        religion: "{{ book.religion|default:''|escapejs }}",
-        content: `{{ book.content|safe }}`,
-        authors: "{{ book.authors|default:''|escapejs }}"
+    document.addEventListener("DOMContentLoaded", () => {
+        console.log("Loading book");
+        console.log('{{ book.name}}')
+        let current_book = new Book({
+            id: "{{ book.id }}",
+            name: "{{ book.name}}",
+            language: "{{ book.language|default:''|escapejs }}",
+            date: "{{ book.date|default:''|escapejs }}",
+            religion: "{{ book.religion|default:''|escapejs }}",
+            content: `{{ book.content|safe }}`,
+            authors: "{{ book.authors|default:''|escapejs }}"
+        });
+        console.log('{{book_format}}');
+        let book_format = new BookFormatter(
+            '{{book_format.book}}',
+            '{{book_format.user}}',
+            '{{book_format.words}}',
+            '{{book_format.columns}}',
+            '{{book_format.font}}',
+            '{{book_format.font_size}}',
+            '{{book_format.color}}'
+        );
+        console.log(book_format);
+        console.log(current_book);
+        document.getElementById("page-text").innerText = '{{ book.content }}'
     });
-    console.log('{{book_format}}');
-    let book_format = new BookFormatter(
-        '{{book_format.book}}',
-        '{{book_format.user}}',
-        '{{book_format.words}}',
-        '{{book_format.columns}}',
-        '{{book_format.font}}',
-        '{{book_format.font_size}}',
-        '{{book_format.color}}'
-    );
-    console.log(book_format);
-    console.log(current_book);
-    document.getElementById("page-text").innerText = '{{ book.content }}'
-});
 </script>
 
-
-    <div class="d-flex">
-        <!-- Sidebar -->
-        <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white"
-            style="width: 380px; border-right: 1px solid black; padding: 1%;">
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-                <li class="nav-item">
-                  <a class="nav-link active" id="index-tab" data-bs-toggle="tab" data-target="#index-container" role="tab">Index</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link " id="notes-tab" data-bs-toggle="tab" data-target="#note-container" role="tab">Notes</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" id="search-tab" data-bs-toggle="tab" data-target="#search-container" role="tab">Search Results</a>
-                </li>
-              </ul>
-            <div class="tab-pane fade show active" id="index-container" role="tabpanel">
-                <div class="p-3" style="min-width: 500px;">
-                    <div class="row">
-                        <div >
-                            <p class="p-2 card" style="width: 18rem;" value="Genesis">Genesis</p>
-                            <p><a class="dropdown-item" href="#" value="Exodus">Exodus</a></p>
-                            <p><a class="dropdown-item" href="#" value="Leviticus">Leviticus</a></p>
-                            <p><a class="dropdown-item" href="#" value="Numbers">Numbers</a></p>
-                            <p><a class="dropdown-item" href="#" value="Deuteronomy">Deuteronomy</a></p>
+<div class="corner-icon" id="openSearchPopup">
+    <i class="bi bi-plus-lg"></i>
+</div>
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white"
+        style="width: 380px; border-right: 1px solid black; padding: 1%;">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="index-tab" data-bs-toggle="tab" data-target="#index-container"
+                    role="tab">Index</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link " id="notes-tab" data-bs-toggle="tab" data-target="#note-container"
+                    role="tab">Notes</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="search-tab" data-bs-toggle="tab" data-target="#search-container"
+                    role="tab">Search Results</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="layout-tab" data-bs-toggle="tab" data-target="#layout-container"
+                    role="tab">layout</a>
+            </li>
+        </ul>
+        <div class="tab-pane fade show active" id="index-container" role="tabpanel">
+            <div class="p-3">
+                <div class="accordion" id="bookAccordion">
+                    <!-- Genesis -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingGenesis">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseGenesis" aria-expanded="true" aria-controls="collapseGenesis">
+                                Chapter 1
+                            </button>
+                        </h2>
+                        <div id="collapseGenesis" class="accordion-collapse collapse show"
+                            aria-labelledby="headingGenesis" data-bs-parent="#bookAccordion">
+                            <div class="accordion-body">
+                                <ul class="list-group">
+                                    <li class="list-group-item"><a href="#" value="Genesis 1">Paragraph 1</a></li>
+                                    <li class="list-group-item"><a href="#" value="Genesis 2">Paragraph 2</a></li>
+                                    <li class="list-group-item"><a href="#" value="Genesis 3">Paragraph 3</a></li>
+                                    <!-- Add more chapters as needed -->
+                                </ul>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Exodus -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingExodus">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseExodus" aria-expanded="false" aria-controls="collapseExodus">
+                                Chapter 2
+                            </button>
+                        </h2>
+                        <div id="collapseExodus" class="accordion-collapse collapse" aria-labelledby="headingExodus"
+                            data-bs-parent="#bookAccordion">
+                            <div class="accordion-body">
+                                <ul class="list-group">
+                                    <li class="list-group-item"><a href="#" value="Exodus 1">Paragraph 1</a></li>
+                                    <li class="list-group-item"><a href="#" value="Exodus 2">Paragraph 2</a></li>
+                                    <li class="list-group-item"><a href="#" value="Exodus 3">Paragraph 3</a></li>
+                                    <!-- Add more chapters as needed -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Repeat for Leviticus, Numbers, Deuteronomy -->
                 </div>
             </div>
-            <div class="tab-pane fade " id="note-container" role="tabpanel">
-                <button class="btn btn-primary" id="btn-new-note" style="width: 90%;" disabled>New</button>
-                <form class="d-flex my-2 my-lg-0" onsubmit="return false">
-                    <input class="form-control me-2" type="search" placeholder="Search Notes" aria-label="Search" id="note-search">
-                    <button class="btn btn-outline-success"  id="btn-search-notes">Find</button>
-                </form>
-                <span class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
-                    <svg class="bi me-2" width="30" height="24">
-                        <use xlink:href="#bootstrap"></use>
-                    </svg>
-                    <span class="fs-5 fw-semibold">Notes</span><small style="margin-left: 40%;" id="notes-header">-</small>
-                </span>
-                <div class="list-group list-group-flush border-bottom scrollarea" id="notes-list">
+        </div>
+        <div class="tab-pane fade " id="note-container" role="tabpanel">
+            <button class="btn btn-primary" id="btn-new-note" style="width: 90%;" disabled>New</button>
+            <form class="d-flex my-2 my-lg-0" onsubmit="return false">
+                <input class="form-control me-2" type="search" placeholder="Search Notes" aria-label="Search"
+                    id="note-search">
+                <button class="btn btn-outline-success" id="btn-search-notes">Find</button>
+            </form>
+            <span class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
+                <svg class="bi me-2" width="30" height="24">
+                    <use xlink:href="#bootstrap"></use>
+                </svg>
+                <span class="fs-5 fw-semibold">Notes</span><small style="margin-left: 40%;" id="notes-header">-</small>
+            </span>
+            <div class="list-group list-group-flush border-bottom scrollarea" id="notes-list">
 
 
-                </div>
             </div>
-            <div class="tab-pane fade" id="search-container" role="tabpanel">
-                <h4 class="text-center">Results <span id="num_of_results"></span></h4>
-                <div id="search-results">
-                
-                </div>
+        </div>
+        <div class="tab-pane fade" id="search-container" role="tabpanel">
+            <h4 class="text-center">Results <span id="num_of_results"></span></h4>
+            <div id="search-results">
+
             </div>
-            
-            
-            
+        </div>
+        <div class="tab-pane fade" id="layout-container" role="tabpanel">
+            <form id="layout-form" class="container mt-4">
+                <h4 class="text-center mb-4">Layout Settings</h4>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="cols" class="form-label">Columns</label>
+                        <input type="number" class="form-control" id="cols" name="columns" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="wordsPerPage" class="form-label">Words Per Page</label>
+                        <input type="number" class="form-control" id="wordsPerPage" name="words_per_page" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="font" class="form-label">Font</label>
+                        <input type="text" class="form-control" id="font" name="font" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="color" class="form-label">Color</label>
+                        <input type="text" class="form-control" id="color" name="color" required>
+                    </div>
+                    <div class="col-12 text-center mt-3">
+                        <button type="submit" class="btn btn-primary">Apply Layout</button>
+                    </div>
+                </div>
+            </form>
+
         </div>
 
-        
 
-        <!-- Main content -->
-        <div class="main-content container">
-            
-            <h1 class="text-center" id="book-header">{{ book.name }}</h1>
-            <p id="book_id" hidden>{{ book.id }}</p>
-            <button class="btn btn-primary" style="margin-left: 80%;" id="bookmark">bookmark</button>
-            <div class="d-flex justify-content-center page-nav" id="pg1">
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination">
-                        <li class="page-item"><a class="page-link prev">Previous</a></li>
-                        <li class="page-item"><a class="page-link pag">1</a></li>
-                        <li class="page-item"><a class="page-link pag">2</a></li>
-                        <li class="page-item"><a class="page-link pag">3</a></li>
-                        <li class="page-item"><a class="page-link next">Next</a></li>
-                    </ul>
-                </nav>
+    </div>
+
+
+
+    <!-- Main content -->
+    <div class="main-content container">
+
+
+        <div id="searchPopup" class="search-popup">
+            <div class="search-popup-content">
+                <input type="text" id="searchInput" placeholder="Search..." />
+                <div id="searchResults"></div>
+                <button id="closeSearchPopup" class="btn btn-sm btn-danger mt-2">Close</button>
             </div>
-            
-            <div id="page-text">
-                
+        </div>
+
+        <h1 class="text-center" id="book-header">{{ book.name }}</h1>
+        <p id="book_id">{{ book.id }}</p>
+        <button class="btn btn-primary" style="margin-left: 80%;" id="bookmark">bookmark</button>
+        <div class="d-flex justify-content-center page-nav" id="pg1">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link prev">Previous</a></li>
+                    <li class="page-item"><a class="page-link pag">1</a></li>
+                    <li class="page-item"><a class="page-link pag">2</a></li>
+                    <li class="page-item"><a class="page-link pag">3</a></li>
+                    <li class="page-item"><a class="page-link next">Next</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div id="page-text" hidden>
+
+
+        </div>
+        <div id="text-layout"></div>
+        <div class="d-flex justify-content-center page-nav">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link prev">Previous</a></li>
+                    <li class="page-item"><a class="page-link pag2">1</a></li>
+                    <li class="page-item"><a class="page-link pag2">2</a></li>
+                    <li class="page-item"><a class="page-link pag2">3</a></li>
+                    <li class="page-item"><a class="page-link next">Next</a></li>
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+</div>
+<div id="spinner-overlay" class="overlay">
+    <div id="spinner-container" class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+<!-- Modal Save New Note-->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div id="alert-container"></div>
+
+    <div class="modal-dialog">
+        <div class="modal-content" style="padding: 1%;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="NoteModalLabel">New Note</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <label for="note-title">Title</label>
+            <div class="input-group mb-3">
+
+                <input type="text" class="form-control" aria-label="Default"
+                    aria-describedby="inputGroup-sizing-default" id="note-title">
 
             </div>
-            <div class="d-flex justify-content-center page-nav">
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination">
-                        <li class="page-item"><a class="page-link prev">Previous</a></li>
-                        <li class="page-item"><a class="page-link pag2">1</a></li>
-                        <li class="page-item"><a class="page-link pag2">2</a></li>
-                        <li class="page-item"><a class="page-link pag2">3</a></li>
-                        <li class="page-item"><a class="page-link next">Next</a></li>
-                    </ul>
-                </nav>
-            </div>
+            <label for="note-data">Description</label>
+            <textarea class="form-control" aria-label="With textarea" id="note-data"></textarea>
 
+            <div class="modal-footer" id="m-footer">
+
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="save-note">Save changes</button>
+
+
+            </div>
         </div>
     </div>
-    <div id="spinner-overlay" class="overlay">
-        <div id="spinner-container" class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
-    <!-- Modal Save New Note-->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" >
-        <div id="alert-container"></div>
-
-        <div class="modal-dialog">
-            <div class="modal-content" style="padding: 1%;">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="NoteModalLabel">New Note</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <label for="note-title">Title</label>
-                <div class="input-group mb-3">
-
-                    <input type="text" class="form-control" aria-label="Default"
-                        aria-describedby="inputGroup-sizing-default" id="note-title">
-
-                </div>
-                <label for="note-data">Description</label>
-                <textarea class="form-control" aria-label="With textarea" id="note-data"></textarea>
-
-                <div class="modal-footer" id="m-footer">
-
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="save-note">Save changes</button>
-
-
-                </div>
-            </div>
-        </div>
-    </div>
+</div>
 {% else %}
 <div>
     <h2>You aren't supposed to be here!</h2>

@@ -14,19 +14,6 @@
     opacity: 1 !important;
   }
 
-  .read_cols {
-    column-count: 2;
-    column-gap: 20px;
-    /* Adjust the space between columns */
-    column-width: 300px;
-    /* Set a minimum width for each column */
-    word-wrap: break-word;
-    /* Wrap long words to the next line */
-    word-break: break-all;
-    /* Break words at arbitrary points if necessary */
-    hyphens: auto;
-    /* Allow hyphenation */
-  }
 
   .vertical-line {
     display: inline-block;
@@ -36,7 +23,7 @@
   }
 
   .word {
-    padding: 1%;
+    padding: .5%;
     display: inline-block;
     /* Ensures proper alignment in columns */
   }
@@ -116,6 +103,58 @@ overflow-y: scroll;
 }
 .tab-pane.active {
   display: block;
+}
+
+.corner-icon {
+    position: relative;
+    top: 0px;
+    right: -97%;
+    background-color: #28a745; /* Bootstrap success green */
+    color: white;
+    border-radius: 0px 0px 0px 18px;
+    width: 60px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.search-popup {
+  display: none;
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 20px;
+  width: 300px;
+  z-index: 2000;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+}
+
+.search-popup-content input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+#searchResults {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.search-result-item {
+  padding: 6px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #ddd;
+}
+.search-result-item:hover {
+  background-color: #f0f0f0;
 }
 
 
