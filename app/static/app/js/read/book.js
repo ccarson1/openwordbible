@@ -1,5 +1,6 @@
 class Book {
-    constructor(
+    constructor({
+        id,
         name,
         language,
         date,
@@ -15,7 +16,8 @@ class Book {
         image = "book_images/default.jpg",
         book_file = null,
         is_published = false
-    ) {
+    }) {
+        this.id = id;
         this.name = name;
         this.language = language;
         this.date = date;

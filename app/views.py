@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 
-from api.models import Profile
+from api.models import BookFormat, Profile
 from api.models import Book
 import json
 
@@ -22,7 +22,7 @@ def read(request, id):
     book = get_object_or_404(Book, id=id)
 
     # Optionally convert to a list of dictionaries for the template
-    books_data = []
+    #books_data = []
     print(book.book_file)
     book_json = None
     if book.book_file and book.book_file.name:
@@ -33,8 +33,9 @@ def read(request, id):
                 book_json = json.loads(content) 
         except Exception as e:
             print(f"Error reading file for book {book.name}: {e}")
+
     
-    books_data.append({
+    books_data = {
         "id": book.id,
         "name": book.name,
         "language": book.language.name if book.language else None,
@@ -48,9 +49,9 @@ def read(request, id):
         "rights": book.rights,
         "publisher": book.publisher,
         "image_url": book.image.url if book.image else None,
-        "content": book_json,
-    })
-
+        "content": book_json["published_book"],
+    }
+    
     profile = None
     if user.is_authenticated:
         try:
@@ -58,7 +59,16 @@ def read(request, id):
         except Profile.DoesNotExist:
             profile = None
 
-    return render(request, 'read.html', {'profile': profile, 'book': books_data[0]})
+    book_format = None
+    if user.is_authenticated:
+        book_format = BookFormat.objects.filter(book=book, user=user).first()
+
+    print(book_format)
+    return render(request, 'read.html', {
+        'profile': profile,
+        'book': books_data,
+        'book_format': book_format
+    })
 
 
 def profile(request):

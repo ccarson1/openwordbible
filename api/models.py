@@ -45,8 +45,8 @@ class Bookmark(models.Model):
 class BookFormat(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="bookformats")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bookformats")
-    words = models.IntegerField()
-    columns = models.PositiveSmallIntegerField(choices=[(i, str(i)) for i in range(1, 5)])
+    words = models.IntegerField(default=500)
+    columns = models.PositiveSmallIntegerField(choices=[(i, str(i)) for i in range(1, 5)], default=1)
     font = models.CharField(max_length=25, blank=True, null=True)
     font_size = models.PositiveSmallIntegerField(default=1)
     color = models.CharField(max_length=50, default="black")

@@ -146,11 +146,8 @@ function loadBookmark() {
 
 window.onload = (event) => {
 
-    console.log(current_book);
-    let t = current_book.content;
-    console.log(t);
-    document.getElementById("page-text").innerText = "";
-    document.getElementById("page-text").innerHTML = t;
+    let t = document.getElementById("page-text").innerHTML;
+    
 
     
     // loadBookmark();

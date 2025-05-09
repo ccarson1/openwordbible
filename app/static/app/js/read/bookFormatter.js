@@ -2,11 +2,11 @@ class BookFormatter{
     constructor(
         book,
         user,
-        words,
-        columns,
-        font,
-        font_size,
-        color
+        words = 300,
+        columns = 1,
+        font = 'None',
+        font_size = 1,
+        color = "black"
     ){
         this.book = book;
         this.user = user;

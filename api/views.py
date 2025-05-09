@@ -21,7 +21,7 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib import messages
-from .models import Profile, Note
+from .models import BookFormat, Profile, Note
 import os
 import PyPDF2
 from rest_framework import status
@@ -336,3 +336,59 @@ class PublishBook(APIView):
 
 
         return Response({"error": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
+    
+
+
+class LoadBook(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        book_id = request.data.get("id")
+        print(f"The Book id is {book_id}")
+        if not book_id:
+            return Response({"error": "Book ID is required."}, status=400)
+
+        book = get_object_or_404(Book, id=book_id)
+
+        book_json = None
+        if book.book_file and book.book_file.name:
+            try:
+                with book.book_file.open('rb') as file:
+                    content = file.read().decode('utf-8')
+                    book_json = json.loads(content)
+            except Exception as e:
+                return Response({"error": f"Failed to read book file: {str(e)}"}, status=500)
+
+        books_data = {
+            "id": book.id,
+            "name": book.name,
+            "language": book.language.name if book.language else None,
+            "date": book.date,
+            "religion": book.religion.name if book.religion else None,
+            "authors": book.authors,
+            "denomination": book.denomination,
+            "translator": book.translator,
+            "book_id": book.book_id,
+            "description": book.description,
+            "rights": book.rights,
+            "publisher": book.publisher,
+            "image_url": book.image.url if book.image else None,
+            "content": book_json["published_book"] if book_json else None,
+        }
+
+        book_format = BookFormat.objects.filter(book=book, user=user).first()
+        format_data = {
+            "words": book_format.words,
+            "columns": book_format.columns,
+            "font": book_format.font,
+            "font_size": book_format.font_size,
+            "color": book_format.color,
+        } if book_format else None
+
+        return Response({
+            "book": books_data,
+            "book_format": format_data,
+        })
+                
