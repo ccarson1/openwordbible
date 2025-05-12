@@ -11,32 +11,38 @@
 {% csrf_token %}
 <h1>Books</h1>
 <div class="content">
-    
+
     {% for book in books %}
-    <div class="books-container">
-        <div class="book-item">
-            <h4>{{ book.name }}</h4>
-            <p>Date: {{ book.date }}</p>
-            <p>Religion: {{ book.religion }}</p>
-            <a href="">Read</a>
-            <a href="">Edit</a>
-            <div>
-                
-                <label for="publish-{{ book.id }}">Publish</label>
-                <input 
-                    type="checkbox" 
-                    id="publish-{{ book.id }}" 
-                    name="publish-{{ book.id }}"
-                    onchange="updatePublishStatus('{{ book.id }}')"
-                    {% if book.is_published %}checked{% endif %}
-                    
-                >
+    <div class="accordion books-container" id="accordion-{{ book.id }}">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading-{{ book.id }}">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapse-{{ book.id }}" aria-expanded="false"
+                    aria-controls="collapse-{{ book.id }}">
+                    {{ book.name }}
+                </button>
+            </h2>
+            <div id="collapse-{{ book.id }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ book.id }}"
+                data-bs-parent="#accordion-{{ book.id }}">
+                <div class="accordion-body">
+                    <p><strong>Date:</strong> {{ book.date }}</p>
+                    <p><strong>Religion:</strong> {{ book.religion }}</p>
+                    <a href="#">Read</a> |
+                    <a href="#">Edit</a>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" id="publish-{{ book.id }}"
+                            onchange="updatePublishStatus('{{ book.id }}')" {% if book.is_published %}checked{% endif %}>
+                        <label class="form-check-label" for="publish-{{ book.id }}">
+                            Publish
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     {% endfor %}
-    
-    
+
+
 </div>
 
 {% endblock %}

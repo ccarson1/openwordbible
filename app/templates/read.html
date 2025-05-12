@@ -3,15 +3,18 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static '/app/css/read/read.css' %}">
+
 <script src="{% static '/app/js/read/book.js' %}" defer></script>
 <script src="{% static '/app/js/read/bookFormatter.js' %}" defer></script>
-<script src="{% static '/app/js/read/bible.js' %}" defer></script>
+
 <script src="{% static '/app/js/read/loadBook.js' %}" defer></script>
+<script src="{% static '/app/js/read/bible.js' %}" defer></script>
 <script src="{% static '/app/js/read/bookmark.js' %}" defer></script>
 <script src="{% static '/app/js/read/note.js' %}" defer></script>
 <script src="{% static '/app/js/read/utilities.js' %}" defer></script>
 <script src="{% static '/app/js/read/validators.js' %}" defer></script>
 <script src="{% static '/app/js/read/textCompare.js' %}" defer></script>
+<script src="{% static '/app/js/read/updateLayout.js' %}" defer></script>
 
 {% endblock %}
 
@@ -50,10 +53,13 @@
 <div class="corner-icon" id="openSearchPopup">
     <i class="bi bi-plus-lg"></i>
 </div>
+
 <div class="d-flex">
+
     <!-- Sidebar -->
     <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white"
-        style="width: 380px; border-right: 1px solid black; padding: 1%;">
+         id="side-menu">
+
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" id="index-tab" data-bs-toggle="tab" data-target="#index-container"
@@ -151,22 +157,31 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="cols" class="form-label">Columns</label>
-                        <input type="number" class="form-control" id="cols" name="columns" required>
+                        <input type="number" class="form-control" id="cols" name="columns"
+                            value="{{ book_format.columns }}" required>
                     </div>
                     <div class="col-md-6">
                         <label for="wordsPerPage" class="form-label">Words Per Page</label>
-                        <input type="number" class="form-control" id="wordsPerPage" name="words_per_page" required>
+                        <input type="number" class="form-control" id="wordsPerPage" name="wordsPerPage"
+                            value={{book_format.words}} required>
                     </div>
                     <div class="col-md-6">
                         <label for="font" class="form-label">Font</label>
-                        <input type="text" class="form-control" id="font" name="font" required>
+                        <input type="text" class="form-control" id="font" name="font" value={{book_format.font}}
+                            required>
                     </div>
                     <div class="col-md-6">
                         <label for="color" class="form-label">Color</label>
-                        <input type="text" class="form-control" id="color" name="color" required>
+                        <input type="text" class="form-control" id="color" name="color" value={{book_format.color}}
+                            required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="fontSize" class="form-label">Font Size</label>
+                        <input type="number" class="form-control" id="fontSize" name="fontSize" value={{book_format.font_size}}
+                            required>
                     </div>
                     <div class="col-12 text-center mt-3">
-                        <button type="submit" class="btn btn-primary">Apply Layout</button>
+                        <button type="submit" class="btn btn-primary" id="btn-apply-layout">Apply Layout</button>
                     </div>
                 </div>
             </form>
@@ -175,7 +190,9 @@
 
 
     </div>
-
+    <div   id="side-menu-btn">
+        <i class="bi bi-list"></i>
+    </div>
 
 
     <!-- Main content -->
@@ -223,6 +240,7 @@
         </div>
 
     </div>
+
 </div>
 <div id="spinner-overlay" class="overlay">
     <div id="spinner-container" class="spinner-border text-primary" role="status">

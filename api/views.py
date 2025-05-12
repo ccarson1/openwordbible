@@ -392,11 +392,51 @@ class LoadBook(APIView):
             "book_format": format_data,
         })
     
+class UpdateLayout(APIView):
+
+    def post(self, request, *args, **kwargs):
+        print(request.data)
+        format_data = ''
+        print(request.user.id)
+
+        columns = request.data.get("columns")
+        words_per_page = request.data.get("wordsPerPage")
+        textFont = request.data.get("font")
+        textColor = request.data.get("color")
+        fontSize = request.data.get("fontSize")
+        book_id = request.data.get("id")
+
+        book = get_object_or_404(Book, id=book_id)
+
+        book_format = BookFormat.objects.filter(book=book).first()
+
+        if not book_format:
+            return Response({"error": "BookFormat not found"}, status=404)
+        print(words_per_page)
+        book_format.columns = int(columns)
+        book_format.words = int(words_per_page)
+        book_format.font = textFont
+        book_format.color = textColor
+        book_format.font_size = int(fontSize)
+        book_format.save()
+
+        return Response({
+            "message": "Layout updated successfully",
+            "book_format": {
+                "columns": book_format.columns,
+                "words_per_page": book_format.words,
+                "font": book_format.font,
+                "color": book_format.color,
+                "font_size": book_format.font_size
+            }
+        })
+    
 
 class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = ['id', 'name']
+
     
 @api_view(['GET'])
 def search_books(request):
@@ -409,5 +449,7 @@ def search_books(request):
 
     serializer = BookSerializer(books, many=True)
     return Response(serializer.data)
+
+
 
                 

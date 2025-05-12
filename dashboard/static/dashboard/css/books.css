@@ -5,29 +5,16 @@
     padding: 20px;
     background-color: #fff;
     display: flex;
-    flex-wrap: wrap;
-}
-h1{
-    position: absolute;
-    margin-left: 50%;
-    margin-top: 10px;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 .books-container {
-    
-    gap: 2%;
-     /* wrap onto multiple lines if needed */
-    margin: 2%;
-    padding: 2%;
-    width: 400px;
+    width: 100%;
 }
 
-.book-item {
-    border: 1px solid black;
-    padding: 2%;
-    margin: 0;
-    flex: 1 1 500px; /* grow/shrink, minimum width 300px */
-    max-width: 500px; /* optional: limit max width */
-    min-height: 250px; /* set a fixed height if needed */
-    box-sizing: border-box;
+h1 {
+    position: absolute;
+    margin-left: 50%;
+    margin-top: 10px;
 }

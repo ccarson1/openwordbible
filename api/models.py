@@ -48,7 +48,7 @@ class BookFormat(models.Model):
     words = models.IntegerField(default=500)
     columns = models.PositiveSmallIntegerField(choices=[(i, str(i)) for i in range(1, 5)], default=1)
     font = models.CharField(max_length=25, blank=True, null=True)
-    font_size = models.PositiveSmallIntegerField(default=1)
+    font_size = models.PositiveSmallIntegerField(default=15, max_length=24)
     color = models.CharField(max_length=50, default="black")
 
 class Note(models.Model):

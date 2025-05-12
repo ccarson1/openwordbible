@@ -8,7 +8,7 @@
 //     books[b].addEventListener("click", function () {
 //         curr_book = b + 1;
 //         sendBookRequest(this.getAttribute("value"));
-        
+
 //         document.getElementById("btn-new-note").disabled = false;
 //         document.getElementsByClassName("page-nav")[0].style.visibility = "visible";
 //         document.getElementsByClassName("page-nav")[1].style.visibility = "visible";
@@ -98,7 +98,7 @@
 
 //             setupStartPage();
 //             verses = load_page_array();
-            
+
 //             create_clickable_passages(verses);
 
 //             if(curr_book != book){
@@ -137,26 +137,58 @@
 //     return page_array;
 
 // }
+let pages = 0;
+let firstPage = 0;
 
-
-
-function create_word_layout(textArray){
-    let textLayout = document.getElementById("text-layout");
-    for(let w=0; w< 300; w++){
-        let newWord = document.createElement("div");
-        newWord.setAttribute("class", "word");
-        newWord.innerText = textArray[w];
-        document.getElementById("text-layout").append(newWord);
+function create_pages(array, chunkSize) {
+    const new_array = [];
+    for (let i = 0; i < array.length; i += chunkSize) {
+        new_array.push(array.slice(i, i + chunkSize));
     }
+    return new_array;
 }
+
+
+
+// function create_word_layout(textArray) {
+//     let textLayout = document.getElementById("text-layout");
+//     let wordsPerPage = parseInt(document.getElementById("wordsPerPage").value, 10);
+
+//     // Get paginated pages
+//     pages = create_pages(textArray, wordsPerPage);
+
+//     // Clear previous layout
+//     textLayout.innerHTML = "";
+
+//     // Show first page (you can change this to any page index)
+//     firstPage = pages[0]
+
+//     firstPage.forEach(word => {
+//         let newWord = document.createElement("div");
+//         newWord.setAttribute("class", "word");
+//         newWord.innerText = word;
+//         textLayout.append(newWord);
+//     });
+
+//     console.log(`Total pages: ${pages.length}`);
+// }
+
 window.onload = (event) => {
 
     let pageText = document.getElementById("page-text").innerText;
     console.log(pageText);
     let textArray = pageText.split(" ");
+    let cols = document.getElementById("cols").value;
+    let textColor = document.getElementById("color").value;
+    let fontSize = document.getElementById("fontSize").value;
+    console.log(`Font Size is ${fontSize}`);
+    document.getElementById("text-layout").style.display = "block";
+    document.getElementById("text-layout").style.color = textColor;
+    document.getElementById("text-layout").style.fontSize =  `${fontSize}px`;
+    document.getElementById("text-layout").style.columnCount = cols;
     console.log(textArray);
     create_word_layout(textArray);
-    
+
 
 }
 

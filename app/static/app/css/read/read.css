@@ -15,15 +15,16 @@
   }
 
 
-  .vertical-line {
+  /* .vertical-line {
     display: inline-block;
     border-left: 1px solid #ccc;
     margin: 0 10px;
     height: 125px;
-  }
+  } */
 
   .word {
     padding: .5%;
+
     display: inline-block;
     /* Ensures proper alignment in columns */
   }
@@ -56,9 +57,9 @@
     margin: 3%;
   }
 
-  .page-nav{
+  /* .page-nav{
     visibility: hidden;
-  }
+  } */
 
   #spinner-container {
     position: fixed;
@@ -157,4 +158,25 @@ overflow-y: scroll;
   background-color: #f0f0f0;
 }
 
+#text-layout {
+    column-count: 2;
+    column-gap: 2rem;
+    padding: 1rem;
+}
 
+#side-menu{
+  width: 380px;
+  border-right: 
+  1px solid black; 
+  padding: 1%;
+  transition: .6s;
+}
+#side-menu-btn{
+  padding: 1%;
+  text-align: center;
+  font-size: 2.2rem;
+  margin: 1%;
+}
+#side-menu-btn:hover{
+  opacity: .5;
+}
