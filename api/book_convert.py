@@ -35,7 +35,44 @@ class ConvertBook():
 
         return book_data
     
+
+    
+    
     def convert_from_pdf(self, file):
+        reader = PyPDF2.PdfReader(file)
+
+        def clean_title(raw_title):
+            # If it's a byte string, decode it
+            if isinstance(raw_title, bytes):
+                raw_title = raw_title.decode('utf-8', errors='ignore')
+            # Strip null characters and whitespace
+            return raw_title.replace('\x00', '').strip()
+
+        def get_outline(reader):
+            try:
+                outlines = reader.outline
+            except AttributeError:
+                outlines = reader.get_outlines()
+
+            book_outline = []
+            for item in outlines:
+                if isinstance(outlines, list):
+                    if isinstance(item, list):
+                        for title in item:
+                            cleaned_title = clean_title(title.title)
+                            print(type(cleaned_title))
+                            print(f"- {cleaned_title} (Page: {reader.get_destination_page_number(title) + 1})")
+                            book_outline.append({"title": cleaned_title, "page": reader.get_destination_page_number(title) + 1})
+                    else:
+                        cleaned_item = clean_title(item.title)
+                        print(type(cleaned_item))
+                        print(f"- {cleaned_item} (Page: {reader.get_destination_page_number(item) + 1})")
+                        book_outline.append({"title": f"{cleaned_item}", "page": f"{reader.get_destination_page_number(item) + 1}"})
+            print(reader)
+            return book_outline
+        
+        book_outline = get_outline(reader)
+
         book_text = []
         with pdfplumber.open(file) as pdf:
             for page in pdf.pages:
@@ -45,6 +82,7 @@ class ConvertBook():
         book_data = {
             'title': '',
             'author': '',
+            'book_outline': book_outline,
             'content': book_text,
             'identifier':'',
             'publisher' : '',

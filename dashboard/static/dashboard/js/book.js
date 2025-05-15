@@ -10,6 +10,7 @@ class Book{
         this.total_pages;
         this.partition_text;
         this.matches = [];
+        this.outline;
         
     }
 
@@ -330,5 +331,11 @@ class Book{
     }
     get_partitionText(){
         return this.partitionText;
+    }
+    set_outline(outline= this.book_data['uploaded-file']['book_outline']){
+        this.outline = outline;
+    }
+    get_outline(){
+        return this.outline;
     }
 }

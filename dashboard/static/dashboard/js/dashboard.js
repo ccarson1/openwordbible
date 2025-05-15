@@ -117,6 +117,7 @@ document.getElementById("convert-book").addEventListener("click", function () {
         current_page = page_pile.get_current_page();
         page_pile.set_end_page();
         page_pile.set_content_pages();
+        page_pile.outline_container();
         //page_pile.fill_form();
         hideSpinner();
         update_page_numbers();
