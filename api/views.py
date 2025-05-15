@@ -378,7 +378,23 @@ class LoadBook(APIView):
             "content": book_json["published_book"] if book_json else None,
         }
 
-        book_format = BookFormat.objects.filter(book=book, user=user).first()
+        book_format, created = BookFormat.objects.get_or_create(
+            book=book,
+            user=user,
+            defaults={
+                "words": 300,
+                "columns": 1,
+                "font": "Arial",
+                "font_size": 14,
+                "color": "#000000",
+            }
+        )
+
+        if created == True:
+            print(f"New format object has been created for {book.name} with id {book.id}")
+        else:
+            print(f"Book format id: {book_format.id}")
+
         format_data = {
             "words": book_format.words,
             "columns": book_format.columns,

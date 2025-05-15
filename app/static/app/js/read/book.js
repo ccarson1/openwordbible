@@ -5,7 +5,7 @@ class Book {
         language,
         date,
         religion,
-        content,
+        content = null,
         authors = null,
         denomination = null,
         translator = null,
