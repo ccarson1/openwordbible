@@ -1,73 +1,74 @@
 .sidebar {
-    width: 280px;
+  width: 280px;
 
-  }
+}
 
-  .main-content {
-    flex-grow: 1;
-    padding: 20px;
-  }
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+}
 
-  .nav-link:hover{
-    color: #75b798 !important;
+.nav-link:hover {
+  color: #75b798 !important;
 
-    opacity: 1 !important;
-  }
+  opacity: 1 !important;
+}
 
 
-  /* .vertical-line {
+/* .vertical-line {
     display: inline-block;
     border-left: 1px solid #ccc;
     margin: 0 10px;
     height: 125px;
   } */
 
-  .word {
-    padding: .5%;
+.word {
+  padding: .5%;
 
-    display: inline-block;
-    /* Ensures proper alignment in columns */
-  }
+  display: inline-block;
+  /* Ensures proper alignment in columns */
+}
 
-  .word:hover {
-    background-color: rgba(90, 136, 204, 0.795);
-    border-radius: 5px;
-  }
+.word:hover {
+  background-color: rgba(90, 136, 204, 0.795);
+  border-radius: 5px;
+}
 
-  .passage {
-    padding: 1%;
-    display: inline-block;
-    /* Ensures proper alignment in columns */
-  }
+.passage {
+  padding: 1%;
+  display: inline-block;
+  /* Ensures proper alignment in columns */
+}
 
-  .passage:hover {
-    background-color: rgba(90, 136, 204, 0.795);
-    border-radius: 5px;
-  }
+.passage:hover {
+  background-color: rgba(90, 136, 204, 0.795);
+  border-radius: 5px;
+}
 
-  h1 {
-    margin-top: 5%;
-    margin-bottom: 3%;
-  }
-  .nav-link:hover{
-      opacity: 5%;
-  }
+h1 {
+  margin-top: 5%;
+  margin-bottom: 3%;
+}
 
-  #btn-new-note{
-    margin: 3%;
-  }
+.nav-link:hover {
+  opacity: 5%;
+}
 
-  /* .page-nav{
+#btn-new-note {
+  margin: 3%;
+}
+
+/* .page-nav{
     visibility: hidden;
   } */
 
-  #spinner-container {
-    position: fixed;
-    top: 50%;   
-    left: 50%;
-  
-    z-index: 1050;
-    display: none;  
+#spinner-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+
+  z-index: 1050;
+  display: none;
 }
 
 .overlay {
@@ -76,51 +77,58 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  background-color: rgba(0, 0, 0, 0.5);
+  /* Semi-transparent black */
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  display: none; /* Hidden by default */
+  display: none;
+  /* Hidden by default */
 }
 
-#search-results{
+#search-results {
   height: 150vh;
   overflow-y: hidden;
 
 }
-#search-results:hover{
-overflow-y: scroll;
+
+#search-results:hover {
+  overflow-y: scroll;
 }
-#search-container{
+
+#search-container {
   display: none;
 }
-.header-page{
+
+.header-page {
   margin-left: 50%;
 }
 
 .tab-pane {
   display: none;
 }
+
 .tab-pane.active {
   display: block;
 }
 
 .corner-icon {
-    position: relative;
-    top: 0px;
-    right: -97%;
-    background-color: #28a745; /* Bootstrap success green */
-    color: white;
-    border-radius: 0px 0px 0px 18px;
-    width: 60px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 1000;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: relative;
+  top: 0px;
+  right: -97%;
+  background-color: #28a745;
+  /* Bootstrap success green */
+  color: white;
+  border-radius: 0px 0px 0px 18px;
+  width: 60px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .search-popup {
@@ -154,29 +162,38 @@ overflow-y: scroll;
   cursor: pointer;
   border-bottom: 1px solid #ddd;
 }
+
 .search-result-item:hover {
   background-color: #f0f0f0;
 }
 
 #text-layout {
-    column-count: 2;
-    column-gap: 2rem;
-    padding: 1rem;
+  column-count: 2;
+  column-gap: 2rem;
+  padding: 1rem;
 }
 
-#side-menu{
+#book-index {
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+#side-menu {
   width: 380px;
-  border-right: 
-  1px solid black; 
+  border-right:
+    1px solid black;
   padding: 1%;
   transition: .6s;
+
 }
-#side-menu-btn{
+
+#side-menu-btn {
   padding: 1%;
   text-align: center;
   font-size: 2.2rem;
   margin: 1%;
 }
-#side-menu-btn:hover{
+
+#side-menu-btn:hover {
   opacity: .5;
 }

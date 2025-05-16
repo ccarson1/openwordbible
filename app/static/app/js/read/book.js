@@ -15,7 +15,8 @@ class Book {
         publisher = null,
         image = "book_images/default.jpg",
         book_file = null,
-        is_published = false
+        is_published = false,
+        book_index = null
     }) {
         this.id = id;
         this.name = name;
@@ -33,6 +34,7 @@ class Book {
         this.image = image;
         this.book_file = book_file;
         this.is_published = is_published;
+        this.book_index = book_index
     }
 
     // Example method

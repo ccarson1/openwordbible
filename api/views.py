@@ -253,6 +253,7 @@ class PublishBook(APIView):
             book_publisher = request.data.get("book_publisher")
             book_language_id = request.data.get("book_language")
             book_image = request.FILES.get("book_image")
+            book_index = request.data.get("book_index")
 
             # Get Language and Religion objects by ID
             try:
@@ -279,6 +280,7 @@ class PublishBook(APIView):
             print("book_publisher:", book_publisher)
             print("book_language_id:", book_language_id)
             print("book_image:", book_image)
+            print("book_index", book_index)
 
             if book_religion_id and book_religion_id.lower() != "none":
                 try:
@@ -304,7 +306,7 @@ class PublishBook(APIView):
 
             try:
                 with open(file_path, 'w', encoding='utf-8') as f:
-                    json.dump({'published_book': published_book}, f, indent=4, ensure_ascii=False)
+                    json.dump({'published_book': published_book, 'book_index': book_index}, f, indent=4, ensure_ascii=False)
                 
                 # Reopen the file as a Django File to assign to FileField
                 with open(file_path, 'rb') as f:

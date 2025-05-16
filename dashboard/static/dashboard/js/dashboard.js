@@ -7,6 +7,12 @@ let textPreview = document.getElementById("text-preview");
 let activeTabText = 'TXT';
 let page_pile;
 
+let formated_book = {
+    "content": [
+
+    ]
+}
+
 
 function set_page_numbers() {
     let pages = document.getElementsByClassName("page-container");
@@ -21,6 +27,25 @@ function update_page_numbers() {
         document.getElementsByClassName("curr-page")[i].innerText = current_page;
         document.getElementsByClassName("total-pages")[i].innerText = page_pile.get_book_data()['uploaded-file']['content'].length;
     }
+}
+
+function collect_index() {
+    let chapters = document.getElementsByClassName('outline-element');
+    newIndex = [];
+
+    for (let x = 0; x < chapters.length; x++) {
+        let header = chapters[x].children[0].value;
+        let page = chapters[x].children[1].value;
+
+        newIndex.push(
+            {
+                "header": header,
+                "page": page
+            }
+        )
+    }
+
+    return newIndex
 }
 
 document.getElementById("btn-reset-page-numbers").addEventListener("click", function () {
@@ -89,40 +114,40 @@ document.getElementById("convert-book").addEventListener("click", function () {
             "X-CSRFToken": csrftoken,
         }
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
 
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log(data);
-        page_pile.set_book_data(data);
-        page_pile.set_book_array();
-        page_pile.set_content();
-        if (activeTabText == 'TXT') {
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data);
+            page_pile.set_book_data(data);
+            page_pile.set_book_array();
+            page_pile.set_content();
+            if (activeTabText == 'TXT') {
 
-            page_pile.populate_preview_text();
-        }
-        else if (activeTabText == 'EPUB') {
-            preview_content = document.getElementById("text-preview");
-            preview_content.innerText = page_pile.get_content();
-        }
-        else if (activeTabText == 'PDF') {
-            preview_content = document.getElementById("text-preview");
-            preview_content.innerText = page_pile.get_content();
-        }
+                page_pile.populate_preview_text();
+            }
+            else if (activeTabText == 'EPUB') {
+                preview_content = document.getElementById("text-preview");
+                preview_content.innerText = page_pile.get_content();
+            }
+            else if (activeTabText == 'PDF') {
+                preview_content = document.getElementById("text-preview");
+                preview_content.innerText = page_pile.get_content();
+            }
 
-        current_page = page_pile.get_current_page();
-        page_pile.set_end_page();
-        page_pile.set_content_pages();
-        page_pile.outline_container();
-        //page_pile.fill_form();
-        hideSpinner();
-        update_page_numbers();
+            current_page = page_pile.get_current_page();
+            page_pile.set_end_page();
+            page_pile.set_content_pages();
+            page_pile.outline_container();
+            //page_pile.fill_form();
+            hideSpinner();
+            update_page_numbers();
 
-    })
+        })
 });
 
 
@@ -177,7 +202,21 @@ document.getElementById("btn-add-page").addEventListener("click", function () {
 document.getElementById("btn-add-all-page").addEventListener("click", function () {
     content_pages = page_pile.get_content_pages();
     console.log(content_pages);
-    for (let c = 0; c < content_pages.length; c++) {
+
+
+    for (let x = 0; x < page_pile.outline.length - 1; x++) {
+        start = parseInt(page_pile.outline[x]['page']) - 1
+        end = parseInt(page_pile.outline[x + 1]['page']) - 1
+        formated_book.content.push(
+            {
+                "chapter": page_pile.outline[x]['title'],
+                "pages": page_pile.content_pages.slice(start, end)
+            }
+        )
+    }
+
+    
+    for (let c = 0; c < formated_book.content.length; c++) {
         if (activeTabText == "EPUB") {
             typeof (content_pages)
             page_pile.populate_preview_pages(content_pages[c].join(" "));
@@ -187,8 +226,11 @@ document.getElementById("btn-add-all-page").addEventListener("click", function (
             page_pile.populate_preview_pages(content_pages[0]);
         }
         else if (activeTabText == "PDF") {
-            page_pile.populate_preview_pages(content_pages[c]);
+            page_pile.populate_preview_pages(c);
+            
         }
+
+
     }
     document.getElementById("total-preview-pages").innerText = `Pages: ${document.getElementsByClassName("page-container").length}`
 
@@ -210,23 +252,25 @@ document.getElementById("add-partition").addEventListener("click", function () {
 
 document.getElementById("btn-upload-page").addEventListener("click", function () {
     showSpinner();
-    let pages_to_upload = document.getElementsByClassName("page-container");
-    let pages_array = [];
-    for (let p = 0; p < pages_to_upload.length; p++) {
+    // let pages_to_upload = document.getElementsByClassName("page-container");
+    // let pages_array = [];
+    // for (let p = 0; p < pages_to_upload.length; p++) {
 
-        pages_array.push(pages_to_upload[p].textContent)
-    }
+    //     pages_array.push(pages_to_upload[p].textContent)
+    // }
     //console.log(pages_array);
 
     book_image = document.getElementById("input-book-cover");
-
+    book_index = collect_index();
     book_data = new FormData();
-    if(book_image.files.length > 0){
+    if (book_image.files.length > 0) {
         book_data.append("book_image", book_image.files[0]);
-    }else{
+    } else {
         console.error("No file selected");
     }
-    book_data.append("published_book", JSON.stringify(pages_array));
+    let published_book = JSON.stringify(formated_book);
+
+    book_data.append("published_book", JSON.stringify(formated_book));
     book_data.append("book_name", document.getElementById('book-name').value);
     book_data.append("book_date", document.getElementById('input-book-date').value);
     book_data.append("book_language", document.getElementById('input-book-lang').value);
@@ -238,9 +282,11 @@ document.getElementById("btn-upload-page").addEventListener("click", function ()
     book_data.append("book_description", document.getElementById("input-book-des").value);
     book_data.append("book_rights", document.getElementById("book-right").value);
     book_data.append("book_publisher", document.getElementById("book-pub").value);
+    book_data.append("book_index", JSON.stringify(book_index));
 
 
-    console.log(JSON.stringify(pages_array))
+
+    //console.log(JSON.stringify(pages_array))
     fetch("/api/publish-book/", {
         method: "POST",
         body: book_data,
@@ -248,16 +294,19 @@ document.getElementById("btn-upload-page").addEventListener("click", function ()
             "X-CSRFToken": csrftoken,
         }
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        .then(response => {
+            if (!response.ok) {
+                hideSpinner();
+                throw new Error(`HTTP error! status: ${response.status}`);
 
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log(data)
-    })
-    hideSpinner();
+            }
+            return response.json();
+        })
+        .then(data => {
+            hideSpinner();
+            console.log(data)
+            alert(data['message'])
+        })
+
 });
 

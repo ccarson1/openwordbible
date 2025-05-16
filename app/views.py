@@ -46,6 +46,7 @@ def read(request, id):
         "publisher": book.publisher,
         "image_url": book.image.url if book.image else None,
         "content": book_json["published_book"] if book_json else None,
+        "book_index": book_json["book_index"] if book_json else None,
     }
 
     profile = None
@@ -88,9 +89,16 @@ def read(request, id):
     request.session["books_data"] = books_data
     request.session["book_format"] = book_format_data
 
+    print(books_data['book_index'])
+    print(type(books_data['book_index']))
+    book_index = json.loads(books_data['book_index'])
+    # book_index_json = json.dumps(book_index) 
+
     return render(request, 'read.html', {
         'profile': profile,
         'book': books_data,
+        'book_content': books_data['content'],
+        'book_index': book_index,
         'book_format': book_format_data
     })
 

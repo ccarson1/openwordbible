@@ -260,33 +260,50 @@ class Book{
         });
     }
 
-    populate_preview_pages(page_content){
-        let wordsPerPage = document.getElementById("input-words-per-page").value;
-        if (parseInt(wordsPerPage) > 0) {
-            let page_array = page_pile.get_conversion(page_content, wordsPerPage)
-            for (let x = 0; x < page_array.length; x++) {
-                let page_count = document.getElementById("page-list").children.length;
-                let newPageContainer = document.createElement("div");
-                newPageContainer.setAttribute("class", "page-container");
-                let newPage = document.createElement("div");
-                newPage.setAttribute("class", "page-list-item");
-                newPage.innerText = page_array[x]
+    populate_preview_pages(c){
+
+        let page_list = document.getElementById("page-list");
+        let newChapter = document.createElement("div");
+        newChapter.textContent = formated_book.content[c]['chapter'];
+        newChapter.setAttribute("class", "page-container");
+
+        for (let p = 0; p < formated_book.content[c]['pages'].length; p++) {
+            let newPage = document.createElement("div");
+            newPage.textContent = formated_book.content[c]['pages'][p]
+            newPage.setAttribute("class", "page-list-item");
+            newChapter.appendChild(newPage);
+        }
+        newChapter.addEventListener("click", () => {
+            this.createEditorPopup(newChapter);
+        });
+        page_list.appendChild(newChapter);
+
+        // let wordsPerPage = document.getElementById("input-words-per-page").value;
+        // if (parseInt(wordsPerPage) > 0) {
+        //     let page_array = page_pile.get_conversion(page_content, wordsPerPage)
+        //     for (let x = 0; x < page_array.length; x++) {
+        //         let page_count = document.getElementById("page-list").children.length;
+        //         let newPageContainer = document.createElement("div");
+        //         newPageContainer.setAttribute("class", "page-container");
+        //         let newPage = document.createElement("div");
+        //         newPage.setAttribute("class", "page-list-item");
+        //         newPage.innerText = page_array[x]
                 
-                let pageNumber = document.createElement("div");
-                pageNumber.innerText = x;
-                pageNumber.setAttribute("class", "page-number");
-                newPageContainer.appendChild(newPage);
-                newPageContainer.appendChild(pageNumber);
-                newPageContainer.addEventListener("click", ()=> {
-                    this.createEditorPopup(newPageContainer);
-                });
-                document.getElementById("page-list").appendChild(newPageContainer);
-            }
-        }
-        else{
-            alert("You must enter Words per page");
+        //         let pageNumber = document.createElement("div");
+        //         pageNumber.innerText = x;
+        //         pageNumber.setAttribute("class", "page-number");
+        //         newPageContainer.appendChild(newPage);
+        //         newPageContainer.appendChild(pageNumber);
+        //         newPageContainer.addEventListener("click", ()=> {
+        //             this.createEditorPopup(newPageContainer);
+        //         });
+        //         document.getElementById("page-list").appendChild(newPageContainer);
+        //     }
+        // }
+        // else{
+        //     alert("You must enter Words per page");
     
-        }
+        // }
     }
 
     set_book_data(book_data){
