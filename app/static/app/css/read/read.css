@@ -168,9 +168,13 @@ h1 {
 }
 
 #text-layout {
-  column-count: 2;
+    column-count: 2;
   column-gap: 2rem;
   padding: 1rem;
+  max-width: 100%;
+  box-sizing: border-box; 
+  overflow-wrap: break-word;
+  word-break: break-word; 
 }
 
 #book-index {
@@ -196,4 +200,15 @@ h1 {
 
 #side-menu-btn:hover {
   opacity: .5;
+}
+
+.container, .main-content {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+#current_page{
+  width: 80px;
+  padding: .5%;
+  margin: 0;
 }

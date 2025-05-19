@@ -226,7 +226,8 @@ function renderPage(pageIndex) {
         textLayout.appendChild(newWord);
     });
 
-    currentPageIndex = pageIndex;
+    currentPageIndex = parseInt(pageIndex);
+    document.getElementById("current_page").value = currentPageIndex + 1
     updatePaginationUI();
 }
 
@@ -235,44 +236,63 @@ function updatePaginationUI() {
 
     pagButtons.forEach((btn, index) => {
         btn.classList.remove("active");
-        if (index === currentPageIndex) {
+        if (index === (currentPageIndex % 3)) {
             btn.classList.add("active");
         }
+        
     });
 }
 
 function setupPaginationControls() {
-    const paginationContainers = [document.querySelectorAll(".pag"), document.querySelectorAll(".pag2")];
+    const pagButtons = document.querySelectorAll(".pag");
+    const pagButtons2 = document.querySelectorAll(".pag2");
 
-    // Clear existing paginations
-    paginationContainers.forEach(containerSet => {
-        containerSet.forEach((btn, index) => {
-            btn.innerText = index + 1;
-            btn.style.display = index < pages.length ? "inline-block" : "none";
+    const allPagButtons = [pagButtons, pagButtons2];
 
-            btn.onclick = () => {
-                renderPage(index);
-            };
+    const totalPages = pages.length;
+    const pageGroup = Math.floor(currentPageIndex / 3);
+    const startIndex = pageGroup * 3;
+
+    allPagButtons.forEach(buttonSet => {
+        buttonSet.forEach((btn, index) => {
+            const pageNum = startIndex + index + 1;
+
+            if (pageNum <= totalPages) {
+                btn.innerText = pageNum;
+                btn.style.display = "inline-block";
+                btn.onclick = () => {
+                    renderPage(pageNum - 1);
+                    setupPaginationControls();
+                };
+
+                btn.classList.toggle("active", currentPageIndex === (pageNum - 1));
+            } else {
+                btn.style.display = "none";
+            }
         });
     });
 
+    // Prev buttons
     document.querySelectorAll(".page-link.prev").forEach(btn => {
         btn.onclick = () => {
             if (currentPageIndex > 0) {
-                renderPage(currentPageIndex - 1);
+                renderPage(--currentPageIndex);
+                setupPaginationControls();
             }
         };
     });
 
+    // Next buttons
     document.querySelectorAll(".page-link.next").forEach(btn => {
         btn.onclick = () => {
-            if (currentPageIndex < pages.length - 1) {
-                console.log(pages[currentPageIndex])
-                renderPage(currentPageIndex + 1);
+            if (currentPageIndex < totalPages - 1) {
+                renderPage(++currentPageIndex);
+                setupPaginationControls();
             }
         };
     });
 }
+
 
 // Modify this function
 function create_word_layout(textArray) {
@@ -286,5 +306,15 @@ function create_word_layout(textArray) {
 
     console.log(`Total pages: ${pages.length}`);
 }
+
+
+document.getElementById("current_page").addEventListener("keydown", function(event){
+    if(event.key === "Enter"){
+        console.log(`Page selection entered ${this.value}`);
+        currentPageIndex = this.value - 1;
+        renderPage(parseInt(currentPageIndex));
+        setupPaginationControls();
+    }
+});
 
 

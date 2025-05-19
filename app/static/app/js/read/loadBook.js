@@ -176,7 +176,6 @@ function create_pages(array, chunkSize) {
 window.onload = (event) => {
 
     let pageText = document.getElementById("page-text").innerText;
-    console.log(pageText);
     let textArray = pageText.split(" ");
     let cols = document.getElementById("cols").value;
     let textColor = document.getElementById("color").value;
