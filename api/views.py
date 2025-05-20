@@ -268,7 +268,7 @@ class PublishBook(APIView):
             print(book_religion_id)
             #print(published_book)
             print("book_name:", book_name)
-            #print("published_book:", published_book)
+            print("published_book:", published_book)
             print("book_date:", book_date)
             print("book_religion_id:", book_religion_id)
             print("book_denom:", book_denom)

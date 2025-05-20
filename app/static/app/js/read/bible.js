@@ -214,12 +214,23 @@
 let currentPageIndex = 0;
 
 function renderPage(pageIndex) {
+    console.log(`Page Index: ${pageIndex}`)
     const textLayout = document.getElementById("text-layout");
     textLayout.innerHTML = ""; // Clear existing
+    document.getElementById("chapter-header").innerText = current_book.content['content'][current_book.current_chapter]['chapter']
 
-    
+    current_book.current_page = currentPageIndex
+    console.log(`Current Chapter ${current_book.current_chapter}`);
+    console.log(`Current Page: ${current_book.current_page}/${currentPageIndex}`)
+    // console.log(current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page])
+    if(current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page].length > 0){
+        pages = current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page].split(/\s+/);
+    }
+    else{
+        pages = [];
+    }
 
-    pages[pageIndex].forEach(word => {
+    pages.forEach(word => {
         let newWord = document.createElement("div");
         newWord.className = "word";
         newWord.innerText = word;
@@ -227,12 +238,13 @@ function renderPage(pageIndex) {
     });
 
     currentPageIndex = parseInt(pageIndex);
-    document.getElementById("current_page").value = currentPageIndex + 1
+    document.getElementById("current_page").value = (currentPageIndex + 1) + current_book.content['content'][current_book.current_chapter]['start']
     updatePaginationUI();
 }
 
 function updatePaginationUI() {
     const pagButtons = document.querySelectorAll(".page-link.pag, .page-link.pag2");
+
 
     pagButtons.forEach((btn, index) => {
         btn.classList.remove("active");
@@ -258,7 +270,7 @@ function setupPaginationControls() {
             const pageNum = startIndex + index + 1;
 
             if (pageNum <= totalPages) {
-                btn.innerText = pageNum;
+                btn.innerText = pageNum + current_book.content['content'][current_book.current_chapter]['start'];
                 btn.style.display = "inline-block";
                 btn.onclick = () => {
                     renderPage(pageNum - 1);
@@ -279,14 +291,27 @@ function setupPaginationControls() {
                 renderPage(--currentPageIndex);
                 setupPaginationControls();
             }
+            else{
+                --current_book.current_chapter;
+                currentPageIndex = current_book.content['content'][current_book.current_chapter]['length']-1
+                console.log()
+                renderPage(currentPageIndex);
+                setupPaginationControls();
+            }
         };
     });
 
     // Next buttons
     document.querySelectorAll(".page-link.next").forEach(btn => {
         btn.onclick = () => {
-            if (currentPageIndex < totalPages - 1) {
+            if (currentPageIndex < current_book.content['content'][current_book.current_chapter]['length']-1) {
                 renderPage(++currentPageIndex);
+                setupPaginationControls();
+            }
+            else{
+                ++current_book.current_chapter;
+                currentPageIndex = 0
+                renderPage(currentPageIndex);
                 setupPaginationControls();
             }
         };
@@ -297,7 +322,9 @@ function setupPaginationControls() {
 // Modify this function
 function create_word_layout(textArray) {
     let wordsPerPage = parseInt(document.getElementById("wordsPerPage").value, 10);
-    pages = create_pages(textArray, wordsPerPage);
+    //pages = create_pages(textArray, wordsPerPage);
+    console.log(textArray);
+    pages = textArray;
 
     if (pages.length > 0) {
         renderPage(0);
@@ -307,13 +334,44 @@ function create_word_layout(textArray) {
     console.log(`Total pages: ${pages.length}`);
 }
 
+function page_search(index){
+    index--;
+    console.log(`Chapter before: ${current_book.current_chapter}`)
+    console.log(`Current: ${index}`)
+    console.log(`Start: ${current_book.content['content'][current_book.current_chapter]['start']}`)
+    console.log(`End: ${current_book.content['content'][current_book.current_chapter]['end']}`)
+    for(let p=0; p<current_book.content['content'].length; p++){
+        console.log(`${current_book.content['content'][current_book.current_chapter]['start']} <= ${index} : ${current_book.content['content'][current_book.current_chapter]['start'] <= currentPageIndex}`)
+        console.log(`${current_book.content['content'][current_book.current_chapter]['end']} > ${index} : ${current_book.content['content'][current_book.current_chapter]['end'] > currentPageIndex}`)
+        // if(current_book.content['content'][current_book.current_chapter]['start'] <= index && current_book.content['content'][current_book.current_chapter]['end'] > currentPageIndex){
+        //     break;
+        // }
+        if(current_book.content['content'][current_book.current_chapter]['start'] > index ){
+            --current_book.current_chapter;
+        }
+        else if(current_book.content['content'][current_book.current_chapter]['end'] <= index && (current_book.current_chapter + 1) != current_book.content['content'].length){
+            ++current_book.current_chapter;
+        }
+
+        
+    }
+    
+    console.log(`Current Chapter ${current_book.current_chapter}`);
+    console.log(`Current Page: ${current_book.content['content'][current_book.current_chapter]['start']}/${index}`)
+    currentPageIndex = (parseInt(index) - current_book.content['content'][current_book.current_chapter]['start']);
+    console.log(`This page is ${currentPageIndex}`);
+    current_book.current_page = currentPageIndex;
+    renderPage(parseInt(currentPageIndex));
+    setupPaginationControls();
+}
+
 
 document.getElementById("current_page").addEventListener("keydown", function(event){
     if(event.key === "Enter"){
         console.log(`Page selection entered ${this.value}`);
-        currentPageIndex = this.value - 1;
-        renderPage(parseInt(currentPageIndex));
-        setupPaginationControls();
+        currentPageIndex = this.value;
+        page_search(currentPageIndex)
+        
     }
 });
 

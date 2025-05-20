@@ -76,7 +76,7 @@ class ConvertBook():
         book_text = []
         with pdfplumber.open(file) as pdf:
             for page in pdf.pages:
-                text = page.extract_text()
+                text = page.extract_text(layout=True)
                 book_text.append(text)
 
         book_data = {

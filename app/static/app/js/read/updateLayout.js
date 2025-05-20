@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let bookId = document.getElementById("book_id").innerText;
     data["id"] = parseInt(bookId);
+    console.log(parseInt(bookId));
+    console.log(data["id"]);
 
     fetch("/api/update-layout/", {
       method: "POST",

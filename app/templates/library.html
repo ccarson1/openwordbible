@@ -25,8 +25,10 @@
                 {% endif %}
                 <div class="book-info">
                     <p>{{ book.name }}</p>
-                    <p>Date: {{ book.date }}</p>
-                    <p>Religion: {{ book.religion }}</p>
+                    <small style="font-size: .7rem;">Date: {{ book.date }}</small>
+                    <small style="font-size: .7rem;">Religion: {{ book.religion }}</small>
+                    <small style="font-size: .7rem;">Author: {{ book.authors }}</small>
+                    <small style="font-size: .7rem;">Translator: {{ book.translator }}</small>
                 </div>
             </div>
         </a>

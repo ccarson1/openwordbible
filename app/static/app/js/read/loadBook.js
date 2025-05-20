@@ -174,12 +174,23 @@ function create_pages(array, chunkSize) {
 // }
 
 window.onload = (event) => {
+    console.log(`The content type is ${typeof(current_book["content"])}`);
+    let book_content = JSON.parse(current_book["content"])
+    
 
-    let pageText = document.getElementById("page-text").innerText;
-    let textArray = pageText.split(" ");
+    current_book.content = book_content
+    current_book.callTotalPages();
+    console.log(current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page]);
+
+    let pageText = current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page];
+    console.log(`Current Chapter is ${current_book.current_chapter}`)
+    console.log(`Current Page: ${current_book.current_page}`)
+    let textArray = pageText.split(/\s+/);
+
     let cols = document.getElementById("cols").value;
     let textColor = document.getElementById("color").value;
     let fontSize = document.getElementById("fontSize").value;
+
     console.log(`Font Size is ${fontSize}`);
     document.getElementById("text-layout").style.display = "block";
     document.getElementById("text-layout").style.color = textColor;

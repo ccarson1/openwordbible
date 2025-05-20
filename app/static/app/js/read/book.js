@@ -16,7 +16,10 @@ class Book {
         image = "book_images/default.jpg",
         book_file = null,
         is_published = false,
-        book_index = null
+        book_index = null,
+        current_page = 0,
+        total_pages = 0,
+        current_chapter = 0
     }) {
         this.id = id;
         this.name = name;
@@ -34,11 +37,29 @@ class Book {
         this.image = image;
         this.book_file = book_file;
         this.is_published = is_published;
-        this.book_index = book_index
+        this.book_index = book_index;
+        this.current_page = current_page;
+        this.total_pages = total_pages;
+        this.current_chapter = current_chapter;
     }
 
     // Example method
     isReadyToPublish() {
         return !!this.name && !!this.book_file && this.is_published;
+    }
+
+    callTotalPages(){
+        let total_pages = 0
+        // console.log(this.content['content'][0])
+        for(let x=0; x<this.content['content'].length; x++){
+            //console.log(this.content['content'][x]["pages"]);
+
+            for(let y=0; y<this.content['content'][x]["pages"].length; y++){
+                // console.log(this.content['content'][x]["pages"][y])
+                total_pages ++;
+            }
+        }
+
+        this.total_pages = total_pages;
     }
 }

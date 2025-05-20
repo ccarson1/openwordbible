@@ -207,10 +207,14 @@ document.getElementById("btn-add-all-page").addEventListener("click", function (
     for (let x = 0; x < page_pile.outline.length - 1; x++) {
         start = parseInt(page_pile.outline[x]['page']) - 1
         end = parseInt(page_pile.outline[x + 1]['page']) - 1
+        chapter_pages = page_pile.content_pages.slice(start, end)
         formated_book.content.push(
             {
                 "chapter": page_pile.outline[x]['title'],
-                "pages": page_pile.content_pages.slice(start, end)
+                "pages": chapter_pages,
+                "start": start,
+                "end": end,
+                "length": chapter_pages.length
             }
         )
     }
