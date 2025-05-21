@@ -181,7 +181,7 @@ window.onload = (event) => {
     current_book.content = book_content
     current_book.callTotalPages();
     console.log(current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page]);
-
+    document.getElementById('total-pages').innerText = current_book.total_pages + 1;
     let pageText = current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page];
     console.log(`Current Chapter is ${current_book.current_chapter}`)
     console.log(`Current Page: ${current_book.current_page}`)

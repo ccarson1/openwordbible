@@ -330,7 +330,7 @@ function create_word_layout(textArray) {
         renderPage(0);
         setupPaginationControls();
     }
-
+    
     console.log(`Total pages: ${pages.length}`);
 }
 
