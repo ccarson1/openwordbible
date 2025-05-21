@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 import tempfile
 import PyPDF2
 import pdfplumber
-import fitz
 from pdfminer.high_level import extract_text
 from io import BytesIO
 
