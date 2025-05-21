@@ -269,7 +269,7 @@ class Book{
 
         for (let p = 0; p < formated_book.content[c]['pages'].length; p++) {
             let newPage = document.createElement("div");
-            newPage.textContent = formated_book.content[c]['pages'][p]
+            newPage.textContent = formated_book.content[c]['pages'][p];
             newPage.setAttribute("class", "page-list-item");
             newChapter.appendChild(newPage);
         }

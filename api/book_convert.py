@@ -4,6 +4,9 @@ from bs4 import BeautifulSoup
 import tempfile
 import PyPDF2
 import pdfplumber
+import fitz
+from pdfminer.high_level import extract_text
+from io import BytesIO
 
 class ConvertBook():
     
@@ -73,11 +76,27 @@ class ConvertBook():
         
         book_outline = get_outline(reader)
 
+        file.seek(0)  # rewind to start
+        file_stream = BytesIO(file.read())
+        
+        # sanity check for PDF magic bytes
+        if not file_stream.getvalue().startswith(b'%PDF'):
+            raise ValueError("Uploaded file is not a valid PDF")
+        
+        reader = PyPDF2.PdfReader(file_stream)
         book_text = []
-        with pdfplumber.open(file) as pdf:
-            for page in pdf.pages:
-                text = page.extract_text(layout=True)
-                book_text.append(text)
+        for page in reader.pages:
+            text = page.extract_text()
+            if text:
+                book_text.append(text.strip())
+
+        # with pdfplumber.open(file) as pdf:
+        #     for page in pdf.pages:
+        #         text = page.extract_text(layout=True)
+        #         book_text.append(text)
+        # doc = fitz.open(stream=BytesIO(file.read()), filetype="pdf")
+        # print(doc.page_count)
+        # print(doc[0].get_text())
 
         book_data = {
             'title': '',

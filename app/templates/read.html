@@ -149,7 +149,7 @@
 
         <h1 class="text-center" id="book-header">{{ book.name }}</h1>
         <p id="book_id" hidden>{{ book.id }}</p>
-        <span style="display: flex;"><input type="number" id="current_page" class="form-control" value=1><h4 style="padding: .7%;">/571</h4></span>
+        <span style="display: flex;"><input type="number" id="current_page" class="form-control" value=1><h4 style="padding: .7%;">/{{ book.content }}</h4></span>
         <button class="btn btn-primary" style="margin-left: 80%;" id="bookmark">bookmark</button>
         <div class="d-flex justify-content-center page-nav" id="pg1">
             <nav aria-label="Page navigation example">

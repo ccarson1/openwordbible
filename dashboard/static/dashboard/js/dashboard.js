@@ -203,23 +203,39 @@ document.getElementById("btn-add-all-page").addEventListener("click", function (
     content_pages = page_pile.get_content_pages();
     console.log(content_pages);
 
-
-    for (let x = 0; x < page_pile.outline.length - 1; x++) {
-        start = parseInt(page_pile.outline[x]['page']) - 1
-        end = parseInt(page_pile.outline[x + 1]['page']) - 1
-        chapter_pages = page_pile.content_pages.slice(start, end)
+    let chapters = 2
+    if (page_pile.outline.length > 0) {
+        for (let x = 0; x < page_pile.outline.length - 1; x++) {
+            start = parseInt(page_pile.outline[x]['page']) - 1
+            end = parseInt(page_pile.outline[x + 1]['page']) - 1
+            chapter_pages = page_pile.content_pages.slice(start, end)
+            formated_book.content.push(
+                {
+                    "chapter": page_pile.outline[x]['title'],
+                    "pages": chapter_pages,
+                    "start": start,
+                    "end": end,
+                    "length": chapter_pages.length
+                }
+            )
+        }
+    }
+    else {
         formated_book.content.push(
             {
-                "chapter": page_pile.outline[x]['title'],
-                "pages": chapter_pages,
-                "start": start,
-                "end": end,
-                "length": chapter_pages.length
+                "chapter": page_pile.book_data['uploaded-file']['title'],
+                "pages": [page_pile.content],
+                "start": 0,
+                "end": 1,
+                "length": page_pile.book_data['uploaded-file'].content.length
             }
         )
     }
 
-    
+
+
+
+
     for (let c = 0; c < formated_book.content.length; c++) {
         if (activeTabText == "EPUB") {
             typeof (content_pages)
@@ -231,7 +247,7 @@ document.getElementById("btn-add-all-page").addEventListener("click", function (
         }
         else if (activeTabText == "PDF") {
             page_pile.populate_preview_pages(c);
-            
+
         }
 
 
