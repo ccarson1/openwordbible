@@ -1,6 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.conf import settings
-from api.models import Book, Language, Religion
+from api.models import Book, Language, Religion, Profile 
 from django.http import JsonResponse
 
 import os
@@ -23,7 +23,24 @@ def analytics(request):
     return render(request, "analytics.html")
 
 def settings_view(request):
-    return render(request, "settings.html")
+    user = request.user
+    profile, created = Profile.objects.get_or_create(user=user)
+
+    if request.method == 'POST':
+        profile_image = request.FILES.get('profile_image')
+        if profile_image:
+            profile.profile_image = profile_image
+            profile.save()
+
+        
+
+        return redirect('dashboard:settings_view')
+
+    context = {
+        'user_settings': profile,
+    }
+    return render(request, "settings.html", context)
+
 
 # def books(request):
 #     json_file_path = os.path.join(settings.MEDIA_ROOT, "books/test_book.json")
