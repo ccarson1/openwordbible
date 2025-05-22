@@ -48,6 +48,8 @@ function collect_index() {
     return newIndex
 }
 
+
+
 document.getElementById("btn-reset-page-numbers").addEventListener("click", function () {
     set_page_numbers();
 });
@@ -144,8 +146,10 @@ document.getElementById("convert-book").addEventListener("click", function () {
             page_pile.set_content_pages();
             page_pile.outline_container();
             //page_pile.fill_form();
+            page_pile.initiate_outline();
             hideSpinner();
             update_page_numbers();
+
 
         })
 });
@@ -231,6 +235,8 @@ document.getElementById("btn-add-all-page").addEventListener("click", function (
             }
         )
     }
+
+
 
 
 
@@ -328,5 +334,9 @@ document.getElementById("btn-upload-page").addEventListener("click", function ()
             alert(data['message'])
         })
 
+});
+
+document.getElementById("add-outline-element").addEventListener("click", function(){
+    
 });
 
