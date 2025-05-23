@@ -4,7 +4,7 @@
 {% block extra_head %}
 <script src="{% static '/app/js/profile/profile.js' %}" defer></script>
 
-
+<link rel="stylesheet" href="{% static '/app/css/profile/settings.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -81,6 +81,53 @@
         </div> -->
         <button id="btnSendData" type="submit" class="btn btn-primary">Update</button>
     </div>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+    
+        <h3>Account Settings</h3>
+        <label for="username">Username:</label>
+        <input type="text" name="username" value="{{ request.user.username }}" required>
+        
+        <label for="email">Email:</label>
+        <input type="email" name="email" value="{{ request.user.email }}" required>
+    
+        <label for="password">New Password:</label>
+        <input type="password" name="password">
+    
+        <h3>Reading Preferences</h3>
+        <label for="translation">Preferred Bible Translation:</label>
+        <select name="translation">
+            <option value="KJV" {% if user_settings.translation == 'KJV' %}selected{% endif %}>King James Version (KJV)</option>
+            <option value="NIV" {% if user_settings.translation == 'NIV' %}selected{% endif %}>New International Version (NIV)</option>
+            <option value="ESV" {% if user_settings.translation == 'ESV' %}selected{% endif %}>English Standard Version (ESV)</option>
+        </select>
+    
+        <label for="font_size">Font Size:</label>
+        <select name="font_size">
+            <option value="small" {% if user_settings.font_size == 'small' %}selected{% endif %}>Small</option>
+            <option value="medium" {% if user_settings.font_size == 'medium' %}selected{% endif %}>Medium</option>
+            <option value="large" {% if user_settings.font_size == 'large' %}selected{% endif %}>Large</option>
+        </select>
+    
+        <label for="dark_mode">Dark Mode:</label>
+        <input type="checkbox" name="dark_mode" {% if user_settings.dark_mode %}checked{% endif %}>
+    
+        <h3>Notifications</h3>
+        <label for="daily_verse">Daily Verse Notifications:</label>
+        <input type="checkbox" name="daily_verse" {% if user_settings.daily_verse %}checked{% endif %}>
+    
+        <label for="reading_reminder">Reading Reminders:</label>
+        <input type="checkbox" name="reading_reminder" {% if user_settings.reading_reminder %}checked{% endif %}>
+    
+        <h3>Progress Tracking</h3>
+        <label for="track_reading">Enable Reading Progress Tracking:</label>
+        <input type="checkbox" name="track_reading" {% if user_settings.track_reading %}checked{% endif %}>
+    
+        <label for="reset_progress">Reset Progress:</label>
+        <input type="checkbox" name="reset_progress">
+    
+        <button type="submit">Save Changes</button>
+    </form>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

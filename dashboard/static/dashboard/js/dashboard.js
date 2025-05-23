@@ -346,7 +346,29 @@ document.getElementById("btn-upload-page").addEventListener("click", function ()
 document.getElementById("add-outline-element").addEventListener("click", function(){
     let newElementTitle = document.getElementById("new-element-title").value;
     let newElementValue = document.getElementById("new-element-value").value;
+
+    let offset_page = page_pile.book_data['uploaded-file'].offest_page
+    let active_page = parseInt(newElementValue);
+    for(x=0; x<offset_page.length; x++){
+        console.log(`Adjusting the page's offset ${active_page} : ${offset_page[x]['offset']}`)
+        if(active_page <= offset_page[x]['page']){
+            console.log(`Adjusting the page's offset ${active_page} : ${offset_page[x]['offset']}`)
+            if(active_page == 1){
+                newElementValue = 1
+            }
+            else{
+                newElementValue = (active_page - offset_page[x]['offset']);
+            }
+            
+            break;
+        }
+    }
+
+
     console.log(`Adding Outline ${newElementTitle} with value ${newElementValue}`);
-    page_pile.outline.push({title: newEle, page: '45'})
+    page_pile.outline.push({title: newElementTitle, page: newElementValue})
+    page_pile.clear_outline();
+    document.getElementById("new-element-title").value = "";
+    document.getElementById("new-element-value").value = "";
 });
 

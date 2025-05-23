@@ -50,7 +50,12 @@ class ConvertBook():
             # Strip null characters and whitespace
             return raw_title.replace('\x00', '').strip()
 
-        def get_outline(reader):
+        def get_outline(reader, offset_page):
+
+
+
+            
+
             try:
                 outlines = reader.outline
             except AttributeError:
@@ -64,17 +69,15 @@ class ConvertBook():
                             cleaned_title = clean_title(title.title)
                             print(type(cleaned_title))
                             print(f"- {cleaned_title} (Page: {reader.get_destination_page_number(title) + 1})")
-                            book_outline.append({"title": cleaned_title, "page": reader.get_destination_page_number(title) + 1})
+                            book_outline.append({"title": cleaned_title, "page": (reader.get_destination_page_number(title) + 1)})
                     else:
                         cleaned_item = clean_title(item.title)
                         print(type(cleaned_item))
                         print(f"- {cleaned_item} (Page: {reader.get_destination_page_number(item) + 1})")
-                        book_outline.append({"title": f"{cleaned_item}", "page": f"{reader.get_destination_page_number(item) + 1}"})
+                        book_outline.append({"title": f"{cleaned_item}", "page": f"{(reader.get_destination_page_number(item) + 1)}"})
             print(reader)
             return book_outline
         
-        book_outline = get_outline(reader)
-
         file.seek(0)  # rewind to start
         file_stream = BytesIO(file.read())
         
@@ -84,10 +87,20 @@ class ConvertBook():
         
         reader = PyPDF2.PdfReader(file_stream)
         book_text = []
-        for page in reader.pages:
+        offset_page = []
+        count = 0
+        for index, page in enumerate(reader.pages):
             text = page.extract_text()
             if text:
                 book_text.append(text.strip())
+            else:
+                offset_page.append({'offset': count, 'page': index})
+                count += 1
+                
+        
+        book_outline = get_outline(reader, offset_page)
+
+        
 
         # with pdfplumber.open(file) as pdf:
         #     for page in pdf.pages:
@@ -107,7 +120,8 @@ class ConvertBook():
             'rights': '',
             'coverage' : '',
             'date': '',
-            'description': ''
+            'description': '',
+            'offest_page': offset_page
         }
 
         return book_data

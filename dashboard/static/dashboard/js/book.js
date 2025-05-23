@@ -11,6 +11,7 @@ class Book{
         this.partition_text;
         this.matches = [];
         this.outline;
+        this.offest_page
         
     }
 
@@ -354,5 +355,11 @@ class Book{
     }
     get_outline(){
         return this.outline;
+    }
+    set_offest_page(offest_page = this.book_array["offset_page"]){
+        this.offest_page = offest_page;
+    }
+    get_offset_page(){
+        return this.offest_page;
     }
 }
