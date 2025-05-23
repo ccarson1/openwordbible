@@ -98,6 +98,13 @@ document.getElementById("convert-book").addEventListener("click", function () {
     formData.append("book-file", book_file.files[0])
     formData.append("book-type", activeTabText)
 
+    document.getElementById("add-partition").disabled = false;
+    document.getElementById("add-outline-element").disabled = false;
+    document.getElementById("btn-add-all-page").disabled = false;
+    document.getElementById("btn-add-page").disabled = false;
+    document.getElementById("btn-reset-page-numbers").disabled = false;
+    document.getElementById("btn-upload-page").disabled = false;
+
     if (activeTabText == 'TXT') {
         page_pile = new Txtpub(book_file.files[0]);
     }
@@ -337,6 +344,9 @@ document.getElementById("btn-upload-page").addEventListener("click", function ()
 });
 
 document.getElementById("add-outline-element").addEventListener("click", function(){
-    
+    let newElementTitle = document.getElementById("new-element-title").value;
+    let newElementValue = document.getElementById("new-element-value").value;
+    console.log(`Adding Outline ${newElementTitle} with value ${newElementValue}`);
+    page_pile.outline.push({title: newEle, page: '45'})
 });
 

@@ -256,7 +256,7 @@
                     </select>
                     <label for="">Delimiter</label>
                     <input type="text" id="search-input" style="width: 50%;">
-                    <button class="btn btn-primary" id="add-partition">Add</button>
+                    <button class="btn btn-primary" id="add-partition" disabled>Add</button>
                 </div>
             </div>
 
@@ -269,8 +269,11 @@
 
             <div class="collapse2" id="collapseForm2">
                 <div class="card card-body">
-                    <div id="outline-container"></div>
-                    <button class="btn btn-success" id="add-outline-element">
+                    <div id="outline-container">
+                    </div>
+                    <span class="outline-element"><input type="text" style="width: 60%;" id="new-element-title"><input type="text" style="width: 15%;" id="new-element-value"></span>
+
+                    <button class="btn btn-success" id="add-outline-element" disabled>
 
                             <i class="bi bi-plus-lg"></i>
 
@@ -298,10 +301,10 @@
                 <button class="btn-pre-next">next</button>
             </div>
             <div>
-                <button class="btn btn-primary" id="btn-add-all-page">Add All</button>
-                <button class="btn btn-primary" id="btn-add-page">+ Add</button>
-                <button class="btn btn-primary" id="btn-reset-page-numbers">Reset Page Numbers</button>
-                <button class="btn btn-success" id="btn-upload-page">Upload</button>
+                <button class="btn btn-primary" id="btn-add-all-page" disabled>Add All</button>
+                <button class="btn btn-primary" id="btn-add-page" disabled>+ Add</button>
+                <button class="btn btn-primary" id="btn-reset-page-numbers" disabled>Reset Page Numbers</button>
+                <button class="btn btn-success" id="btn-upload-page" disabled>Upload</button>
 
             </div>
             <div id="total-preview-pages">Pages:</div>
