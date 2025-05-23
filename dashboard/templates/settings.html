@@ -1,60 +1,92 @@
-{% extends 'dashbase.html' %}
-{% load static %}
+from django.shortcuts import render
+from django.conf import settings
+from api.models import Book, Language, Religion, UserSettings
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 
-{% block extra_head_dash %}
-<link rel="stylesheet" href="{% static '/dashboard/css/settings.css' %}">
-{% endblock %}
+import os
+import json
 
-{% block content %}
-{% csrf_token %}
-<h2>Settings</h2>
 
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
+def dashboard(request):
 
-    <h3>Account Settings</h3>
-    <label for="username">Username:</label>
-    <input type="text" name="username" value="{{ request.user.username }}" required>
+    languages = Language.objects.all()
+    religions = Religion.objects.all()
+
+    context = {
+        "languages": languages,
+        "religions": religions
+    }
+
+    return render(request, "dashboard.html", context)
+
+
+def analytics(request):
+    return render(request, "analytics.html")
+
+
+@login_required
+def settings_view(request):
+    user_settings, created = UserSettings.objects.get_or_create(user=request.user)
+
+    if request.method == "POST":
+        request.user.username = request.POST.get("username", request.user.username)
+        request.user.email = request.POST.get("email", request.user.email)
+
+        if request.POST.get("password"):
+            request.user.set_password(request.POST.get("password"))
+
+        request.user.save()
+
+        if 'profile_image' in request.FILES:
+            user_settings.profile_image = request.FILES['profile_image']
+
+        user_settings.translation = request.POST.get("translation", user_settings.translation)
+        user_settings.font_size = request.POST.get("font_size", user_settings.font_size)
+        user_settings.dark_mode = bool(request.POST.get("dark_mode"))
+        user_settings.daily_verse = bool(request.POST.get("daily_verse"))
+        user_settings.reading_reminder = bool(request.POST.get("reading_reminder"))
+        user_settings.track_reading = bool(request.POST.get("track_reading"))
+
+        if request.POST.get("reset_progress"):
+            user_settings.reading_progress = {}
+
+        user_settings.save()
+
+    return render(request, "settings.html", {"user_settings": user_settings})
+
+
+# def books(request):
+#     json_file_path = os.path.join(settings.MEDIA_ROOT, "books/test_book.json")
+#     print(os.path.exists(json_file_path))
+#     # Read JSON file
+#     try:
+#         with open(json_file_path, "r", encoding="utf-8") as file:
+#             books_data = json.load(file)  # Load JSON data
+#             print(books_data['book_name'])
+#     except FileNotFoundError:
+#         books_data = {"error": "File not found"}
     
-    <label for="email">Email:</label>
-    <input type="email" name="email" value="{{ request.user.email }}" required>
+#     return render(request, "books.html", {"books": books_data})
 
-    <label for="password">New Password:</label>
-    <input type="password" name="password">
 
-    <h3>Reading Preferences</h3>
-    <label for="translation">Preferred Bible Translation:</label>
-    <select name="translation">
-        <option value="KJV" {% if user_settings.translation == 'KJV' %}selected{% endif %}>King James Version (KJV)</option>
-        <option value="NIV" {% if user_settings.translation == 'NIV' %}selected{% endif %}>New International Version (NIV)</option>
-        <option value="ESV" {% if user_settings.translation == 'ESV' %}selected{% endif %}>English Standard Version (ESV)</option>
-    </select>
+def books(request):
+    # Query all books
+    book_objects = Book.objects.all()
 
-    <label for="font_size">Font Size:</label>
-    <select name="font_size">
-        <option value="small" {% if user_settings.font_size == 'small' %}selected{% endif %}>Small</option>
-        <option value="medium" {% if user_settings.font_size == 'medium' %}selected{% endif %}>Medium</option>
-        <option value="large" {% if user_settings.font_size == 'large' %}selected{% endif %}>Large</option>
-    </select>
+    # Optionally convert to a list of dictionaries for the template
+    books_data = []
 
-    <label for="dark_mode">Dark Mode:</label>
-    <input type="checkbox" name="dark_mode" {% if user_settings.dark_mode %}checked{% endif %}>
+    return render(request, "books.html", {"books": book_objects})
 
-    <h3>Notifications</h3>
-    <label for="daily_verse">Daily Verse Notifications:</label>
-    <input type="checkbox" name="daily_verse" {% if user_settings.daily_verse %}checked{% endif %}>
 
-    <label for="reading_reminder">Reading Reminders:</label>
-    <input type="checkbox" name="reading_reminder" {% if user_settings.reading_reminder %}checked{% endif %}>
-
-    <h3>Progress Tracking</h3>
-    <label for="track_reading">Enable Reading Progress Tracking:</label>
-    <input type="checkbox" name="track_reading" {% if user_settings.track_reading %}checked{% endif %}>
-
-    <label for="reset_progress">Reset Progress:</label>
-    <input type="checkbox" name="reset_progress">
-
-    <button type="submit">Save Changes</button>
-</form>
-
-{% endblock %}
+def update_publish_status(request, book_id):
+    if request.method == 'POST':
+        try:
+            book = Book.objects.get(pk=book_id)
+            book.is_published = not book.is_published
+            book.save()
+            return JsonResponse({'success': True, 'is_published': book.is_published})
+        except Book.DoesNotExist:
+            return JsonResponse({'error': 'Book not found'}, status=404)
+    return JsonResponse({'error': 'Invalid method'}, status=405)
