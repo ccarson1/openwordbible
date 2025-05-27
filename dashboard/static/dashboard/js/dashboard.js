@@ -216,9 +216,15 @@ document.getElementById("btn-add-all-page").addEventListener("click", function (
 
     let chapters = 2
     if (page_pile.outline.length > 0) {
-        for (let x = 0; x < page_pile.outline.length - 1; x++) {
+        for (let x = 0; x < page_pile.outline.length; x++) {
             start = parseInt(page_pile.outline[x]['page']) - 1
-            end = parseInt(page_pile.outline[x + 1]['page']) - 1
+            if ((x + 1) > page_pile.outline.length -1 ) {
+                end = page_pile.content_pages.length;
+            }
+            else {
+                end = parseInt(page_pile.outline[x + 1]['page']) - 1
+
+            } 
             chapter_pages = page_pile.content_pages.slice(start, end)
             formated_book.content.push(
                 {
@@ -242,12 +248,6 @@ document.getElementById("btn-add-all-page").addEventListener("click", function (
             }
         )
     }
-
-
-
-
-
-
 
     for (let c = 0; c < formated_book.content.length; c++) {
         if (activeTabText == "EPUB") {
@@ -343,30 +343,30 @@ document.getElementById("btn-upload-page").addEventListener("click", function ()
 
 });
 
-document.getElementById("add-outline-element").addEventListener("click", function(){
+document.getElementById("add-outline-element").addEventListener("click", function () {
     let newElementTitle = document.getElementById("new-element-title").value;
     let newElementValue = document.getElementById("new-element-value").value;
 
     let offset_page = page_pile.book_data['uploaded-file'].offest_page
     let active_page = parseInt(newElementValue);
-    for(x=0; x<offset_page.length; x++){
+    for (x = 0; x < offset_page.length; x++) {
         console.log(`Adjusting the page's offset ${active_page} : ${offset_page[x]['offset']}`)
-        if(active_page <= offset_page[x]['page']){
+        if (active_page <= offset_page[x]['page']) {
             console.log(`Adjusting the page's offset ${active_page} : ${offset_page[x]['offset']}`)
-            if(active_page == 1){
+            if (active_page == 1) {
                 newElementValue = 1
             }
-            else{
+            else {
                 newElementValue = (active_page - offset_page[x]['offset']);
             }
-            
+
             break;
         }
     }
 
 
     console.log(`Adding Outline ${newElementTitle} with value ${newElementValue}`);
-    page_pile.outline.push({title: newElementTitle, page: newElementValue})
+    page_pile.outline.push({ title: newElementTitle, page: newElementValue })
     page_pile.clear_outline();
     document.getElementById("new-element-title").value = "";
     document.getElementById("new-element-value").value = "";

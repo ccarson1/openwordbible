@@ -31,6 +31,7 @@ def read(request, id):
         except Exception as e:
             print(f"Error reading file for book {book.name}: {e}")
 
+    print(book_json)
     books_data = {
         "id": book.id,
         "name": book.name,
@@ -89,9 +90,11 @@ def read(request, id):
     request.session["books_data"] = books_data
     request.session["book_format"] = book_format_data
 
-    print(books_data['book_index'])
-    print(type(books_data['book_index']))
+    # print(books_data['book_index'])
+    # print(type(books_data['book_index']))
     book_index = json.loads(books_data['book_index'])
+    # print(books_data['book_index'])
+    # print(books_data['book_index'][0])
     # book_index_json = json.dumps(book_index) 
 
     return render(request, 'read.html', {
