@@ -214,6 +214,19 @@ document.getElementById("btn-add-all-page").addEventListener("click", function (
     content_pages = page_pile.get_content_pages();
     console.log(content_pages);
 
+    function split_page(pages){
+        for(let p=0; p<pages.length; p++){
+            pages[p] = pages[p].replace(/\n/g, ' ')
+            pages[p] = pages[p].split(page_pile.sentRegex);
+
+            
+            // for(let s=0; s<pages[p].length; s++){
+            //     pages[p][s] = pages[p][s].split(/\s+/)
+            // }
+        }
+        return pages;
+    }
+
     let chapters = 2
     if (page_pile.outline.length > 0) {
         for (let x = 0; x < page_pile.outline.length; x++) {
@@ -226,6 +239,9 @@ document.getElementById("btn-add-all-page").addEventListener("click", function (
 
             } 
             chapter_pages = page_pile.content_pages.slice(start, end)
+            ////////////////////////slice here///////////////////////////
+            chapter_pages = split_page(chapter_pages);
+
             formated_book.content.push(
                 {
                     "chapter": page_pile.outline[x]['title'],
@@ -271,15 +287,17 @@ document.getElementById("btn-add-all-page").addEventListener("click", function (
 
 document.getElementById("add-partition").addEventListener("click", function () {
     showSpinner();
-    let search = document.getElementById("search-input").value;
-    let content = document.getElementById("text-preview").value;
+    let content = document.getElementById("text-preview").innerText;
     let label = document.getElementById("label-input").value;
-    let custom_regex = document.getElementById("input-custom");
-    console.log(custom_regex.checked);
-    let partition_regex = page_pile.generateRegexFromText(search, custom_regex.checked);
-    console.log(partition_regex)
-    partition = page_pile.partitionText(content, label, partition_regex);
+    let delimiter = document.getElementById("search-input").value;
 
+    const partition = page_pile.partitionText(content, label, delimiter);
+    
+    if(partition.errorMessage){
+        alert(partition.errorMessage);
+    }
+
+    console.log(partition);
     hideSpinner();
 });
 
@@ -370,5 +388,13 @@ document.getElementById("add-outline-element").addEventListener("click", functio
     page_pile.clear_outline();
     document.getElementById("new-element-title").value = "";
     document.getElementById("new-element-value").value = "";
+});
+
+document.getElementById("label-input").addEventListener("change", function(){
+    let label = document.getElementById("label-input").value;
+
+    if(label == 'sentence'){
+        document.getElementById("search-input").value = '(?<=[.!?])\\s+(?=[A-Z\\[])';
+    }
 });
 

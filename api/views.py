@@ -281,6 +281,13 @@ class PublishBook(APIView):
             print("book_language_id:", book_language_id)
             print("book_image:", book_image)
             print("book_index", book_index)
+            print("This is the Published book")
+            print(published_book)
+
+            #################################This is where you will pass the book data to the machine learning process#########################################
+            test = json.loads(published_book)
+            print(test['content'][0]['pages'][1])
+            ###################################################################################################################################################
 
             if book_religion_id and book_religion_id.lower() != "none":
                 try:

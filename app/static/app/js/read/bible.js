@@ -214,6 +214,7 @@
 let currentPageIndex = 0;
 
 function renderPage(pageIndex) {
+    let temppage = []
     console.log(`Page Index: ${pageIndex}`)
     const textLayout = document.getElementById("text-layout");
     textLayout.innerHTML = ""; // Clear existing
@@ -224,13 +225,17 @@ function renderPage(pageIndex) {
     console.log(`Current Page: ${current_book.current_page}/${currentPageIndex}`)
     // console.log(current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page])
     if (current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page].length > 0) {
-        pages = current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page].split(/\s+/);
+        let sentences = current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page];
+        for(let n=0; n<sentences.length; n++){
+            temppage = temppage.concat(current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page][n].split(/\s+/));
+
+        }
     }
     else {
-        pages = [];
+        temppage = [];
     }
-
-    pages.forEach(word => {
+    console.log(temppage);
+    temppage.forEach(word => {
         let newWord = document.createElement("div");
         newWord.className = "word";
         newWord.innerText = word;

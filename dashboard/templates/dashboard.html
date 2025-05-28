@@ -240,27 +240,9 @@
                 </div> -->
 
             </div>
-            <div id="regex-container">
-                <div>
-                    <label for="input-custom">Custom Regex</label>
-                    <input type="checkbox" name="input-custom" id="input-custom">
-                </div>
-                <div>
-                    <!-- <label for="chapter-input">Chapter</label>
-                    <input type="text" id="chapter-input"> -->
-                    <label for="label-input">Label</label>
-                    <select id="label-input">
-                        <option value="label1">Chapter</option>
-                        <option value="label2">Section</option>
-                        <option value="label3">Sentence</option>
-                    </select>
-                    <label for="">Delimiter</label>
-                    <input type="text" id="search-input" style="width: 50%;">
-                    <button class="btn btn-primary" id="add-partition" disabled>Add</button>
-                </div>
-            </div>
 
-            <h3>Table of Contents</h3>
+
+            <h3 class="mt-3">Table of Contents</h3>
             <button class="btn btn-primary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForm2"
                 aria-expanded="false" aria-controls="collapseForm2">
                 Outline
@@ -271,35 +253,62 @@
                 <div class="card card-body">
                     <div id="outline-container">
                     </div>
-                    <span class="new-outline-element"><input type="text" style="width: 60%;" id="new-element-title"><input type="text" style="width: 15%;" id="new-element-value"></span>
+                    <span class="new-outline-element"><input type="text" style="width: 60%;"
+                            id="new-element-title"><input type="text" style="width: 15%;" id="new-element-value"></span>
 
                     <button class="btn btn-success" id="add-outline-element" disabled>
 
-                            <i class="bi bi-plus-lg"></i>
+                        <i class="bi bi-plus-lg"></i>
 
                     </button>
                 </div>
             </div>
-            <div>
-                <button class="btn-pre-back">back</button>
-                <span>
-                    <span class="curr-page">0</span>/
-                    <span class="total-pages">0</span>
-                </span>
-                <button class="btn-pre-next">next</button>
+
+
+            <div id="regex-container" class="card card-body mt-3">
+                <h3>Custom Regex</h3>
+                <div>
+                    <label for="input-custom">Initialize Regex</label>
+                    <input type="checkbox" name="input-custom" id="input-custom">
+                </div>
+                <div>
+                    <!-- <label for="chapter-input">Chapter</label>
+                    <input type="text" id="chapter-input"> -->
+                    <label for="label-input">Label</label>
+                    <select id="label-input">
+                        <option value="chapter">Chapter</option>
+                        <option value="page">Page</option>
+                        <option value="sentence">Sentence</option>
+                        <option value="word">Word</option>
+                    </select>
+                    <label for="">Delimiter</label>
+                    <input type="text" id="search-input" style="width: 50%;">
+                    <button class="btn btn-primary" id="add-partition" disabled>Test</button>
+                    <button class="btn btn-primary" id="add-all-partitions" disabled>Process</button>
+                </div>
+
+                <div>
+                    <button class="btn-pre-back">back</button>
+                    <span>
+                        <span class="curr-page">0</span>/
+                        <span class="total-pages">0</span>
+                    </span>
+                    <button class="btn-pre-next">next</button>
+                </div>
+
+                <div>
+                    <div name="text-preview" id="text-preview" class="preview-content"></div>
+                </div>
+                <div>
+                    <button class="btn-pre-back">back</button>
+                    <span>
+                        <span class="curr-page">0</span>/
+                        <span class="total-pages">0</span>
+                    </span>
+                    <button class="btn-pre-next">next</button>
+                </div>
             </div>
 
-            <div>
-                <textarea name="text-preview" id="text-preview" class="preview-content"></textarea>
-            </div>
-            <div>
-                <button class="btn-pre-back">back</button>
-                <span>
-                    <span class="curr-page">0</span>/
-                    <span class="total-pages">0</span>
-                </span>
-                <button class="btn-pre-next">next</button>
-            </div>
             <div>
                 <button class="btn btn-primary" id="btn-add-all-page" disabled>Add All</button>
                 <button class="btn btn-primary" id="btn-add-page" disabled>+ Add</button>
