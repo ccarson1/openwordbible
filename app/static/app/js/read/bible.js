@@ -227,20 +227,30 @@ function renderPage(pageIndex) {
     if (current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page].length > 0) {
         let sentences = current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page];
         for(let n=0; n<sentences.length; n++){
-            temppage = temppage.concat(current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page][n].split(/\s+/));
+            let newSent = document.createElement("span");
+            newSent.setAttribute("class", "sentPartition");
+            let tempSent = current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page][n].split(/\s+/);
+            for(let w=0; w<tempSent.length; w++){
+                let newWord = document.createElement("div");
+                newWord.className = "word";
+                newWord.innerText = tempSent[w];
+                newSent.appendChild(newWord);
+            }
 
+            //temppage = temppage.concat(current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page][n].split(/\s+/));
+            textLayout.appendChild(newSent);
         }
     }
     else {
         temppage = [];
     }
-    console.log(temppage);
-    temppage.forEach(word => {
-        let newWord = document.createElement("div");
-        newWord.className = "word";
-        newWord.innerText = word;
-        textLayout.appendChild(newWord);
-    });
+    // console.log(temppage);
+    // temppage.forEach(word => {
+    //     let newWord = document.createElement("div");
+    //     newWord.className = "word";
+    //     newWord.innerText = word;
+    //     textLayout.appendChild(newWord);
+    // });
 
     currentPageIndex = parseInt(pageIndex);
     document.getElementById("current_page").value = (currentPageIndex + 1) + current_book.content['content'][current_book.current_chapter]['start']

@@ -185,7 +185,7 @@ window.onload = (event) => {
     let pageText = current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page];
     console.log(`Current Chapter is ${current_book.current_chapter}`)
     console.log(`Current Page: ${current_book.current_page}`)
-    let textArray = pageText.split(/\s+/);
+    let textArray = pageText;
 
     let cols = document.getElementById("cols").value;
     let textColor = document.getElementById("color").value;
