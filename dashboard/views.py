@@ -1,4 +1,4 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.conf import settings
 from api.models import Book, Language, Religion, Profile 
 from django.http import JsonResponse
@@ -54,6 +54,33 @@ def settings_view(request):
 #         books_data = {"error": "File not found"}
     
 #     return render(request, "books.html", {"books": books_data})
+
+
+def annotations(request, book_id):
+    book = get_object_or_404(Book, pk=book_id)
+
+    # Attempt to read and parse the JSON file
+    try:
+        with open(book.book_file.path, 'r', encoding='utf-8') as f:
+            content = json.load(f)
+    except FileNotFoundError:
+        content = {'error': 'File not found'}
+    except json.JSONDecodeError:
+        content = {'error': 'Invalid JSON format'}
+
+    if request.method == 'POST':
+        return JsonResponse({
+            'success': True,
+            'book_id': book.id,
+            'book_name': book.name,
+            'content': content
+        })
+
+    return render(request, "annotations.html", {
+        "book": book,
+        "content": content
+    })
+
 
 def books(request):
     # Query all books

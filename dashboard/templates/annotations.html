@@ -1,0 +1,24 @@
+{% extends 'dashbase.html' %}
+{% load static %}
+{% block extra_head_dash %}
+<link rel="stylesheet" href="{% static '/dashboard/css/books.css' %}">
+<script src="{% static 'dashboard/js/updateBookStatus.js' %}" defer></script>
+
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+
+
+<!-- Add annotations logic here -->
+<h1>Annotations for: {{ book.name }}</h1>
+<div style="display: block; margin-left: 20%; padding-right: 10%;">
+    
+    <p style=" margin-top: 10%;"><strong>Date:</strong> {{ book.date }}</p>
+    <p style=" margin-top: 10%;"><strong>Religion:</strong> {{ book.religion }}</p>
+    <!-- <textarea name="" id="" style="width: 100%; height: 100vh; margin-top: 10%;">{{ content }}</textarea> -->
+    <div>
+        {{ content }}
+    </div>
+</div>
+{% endblock %}
