@@ -63,6 +63,10 @@ def annotations(request, book_id):
     try:
         with open(book.book_file.path, 'r', encoding='utf-8') as f:
             content = json.load(f)
+            content = json.loads(content['published_book'])
+            content = content['content']
+            
+            print(content)
     except FileNotFoundError:
         content = {'error': 'File not found'}
     except json.JSONDecodeError:

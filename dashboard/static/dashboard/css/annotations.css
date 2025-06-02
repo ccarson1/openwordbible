@@ -1,0 +1,21 @@
+#annotations-container {
+
+    width: 100%;
+    /* text-wrap: wrap; ← remove this; not valid for flex children */
+}
+
+.word {
+    margin: 0.2%;
+    padding: 0.3%;
+    white-space: nowrap; /* REMOVE this if you want long words to wrap */
+    display: inline-block; /* ensures proper wrapping in flex */
+
+}
+/* .sent{
+    transition: .3s;
+} */
+.sent:hover {
+    background-color: rgb(147, 188, 212);
+    border-radius: 8px;
+    transition: .3s;
+}

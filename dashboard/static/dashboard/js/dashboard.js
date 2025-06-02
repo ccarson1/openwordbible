@@ -241,7 +241,16 @@ document.getElementById("btn-add-all-page").addEventListener("click", function (
             chapter_pages = page_pile.content_pages.slice(start, end)
             ////////////////////////slice here///////////////////////////
             chapter_pages = split_page(chapter_pages);
-
+            // page_labels = {}
+            // for(let x=0; x<chapter_pages.length; x++){
+            //     page_labels.push(
+            //         {
+            //             "labels": [],
+            //             "content": chapter_pages
+            //         }
+            //     )
+            // }
+            console.log(`Chapter Pages: ${chapter_pages}`)
             formated_book.content.push(
                 {
                     "chapter": page_pile.outline[x]['title'],
@@ -320,6 +329,7 @@ document.getElementById("btn-upload-page").addEventListener("click", function ()
         console.error("No file selected");
     }
     let published_book = JSON.stringify(formated_book);
+    console.log(formated_book)
 
     book_data.append("published_book", JSON.stringify(formated_book));
     book_data.append("book_name", document.getElementById('book-name').value);
@@ -337,7 +347,6 @@ document.getElementById("btn-upload-page").addEventListener("click", function ()
 
 
 
-    //console.log(JSON.stringify(pages_array))
     fetch("/api/publish-book/", {
         method: "POST",
         body: book_data,

@@ -27,6 +27,7 @@ import PyPDF2
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from .book_convert import ConvertBook
+from .annotations import Annotation
 from .models import Book, Religion, Language 
 from django.core.files import File
 import os
@@ -197,6 +198,8 @@ class UploadBook(APIView):
     permission_classes = [IsAuthenticated]  
     
     def post(self, request, *args, **kwargs):
+
+        annotation = Annotation()
         
         user = request.user
         
@@ -205,7 +208,7 @@ class UploadBook(APIView):
 
         
         if user.is_authenticated:
-        
+            annotation.print_tensorflow_version()
             file = request.FILES.get("book-file")
             book_type = request.data.get("book-type")
             print(f"The file uploaded was {file.name}")
@@ -287,6 +290,8 @@ class PublishBook(APIView):
             #################################This is where you will pass the book data to the machine learning process#########################################
             test = json.loads(published_book)
             print(test['content'][0]['pages'][1])
+
+            #Annotation.print_tensorflow_version()
             ###################################################################################################################################################
 
             if book_religion_id and book_religion_id.lower() != "none":
