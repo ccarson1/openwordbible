@@ -50,11 +50,11 @@ class Book {
 
     callTotalPages(){
         let total_pages = 0
-        // console.log(this.content['content'][0])
-        for(let x=0; x<this.content['content'].length; x++){
+        console.log(this.content)
+        for(let x=0; x<this.content.length; x++){
             //console.log(this.content['content'][x]["pages"]);
 
-            for(let y=0; y<this.content['content'][x]["pages"].length; y++){
+            for(let y=0; y<this.content[x]["pages"].length; y++){
                 // console.log(this.content['content'][x]["pages"][y])
                 total_pages ++;
             }

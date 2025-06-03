@@ -21,7 +21,7 @@ function renderNextBatch() {
     for (let i = currentIndex; i < end; i++) {
         let sentenceDiv = document.createElement('div');
         sentenceDiv.className = 'sent';
-        let words = sentencesList[i].split(" ");
+        let words = sentencesList[i]['text'].split(" ");
         for (let wordText of words) {
             let word = document.createElement('span');
             word.className = 'word';

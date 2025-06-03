@@ -218,18 +218,18 @@ function renderPage(pageIndex) {
     console.log(`Page Index: ${pageIndex}`)
     const textLayout = document.getElementById("text-layout");
     textLayout.innerHTML = ""; // Clear existing
-    document.getElementById("chapter-header").innerText = current_book.content['content'][current_book.current_chapter]['chapter']
-
+    document.getElementById("chapter-header").innerText = current_book.content[current_book.current_chapter]['chapter']
+    //current_book.content[0] = JSON.parse(current_book.content)
     current_book.current_page = currentPageIndex
     console.log(`Current Chapter ${current_book.current_chapter}`);
     console.log(`Current Page: ${current_book.current_page}/${currentPageIndex}`)
     // console.log(current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page])
-    if (current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page].length > 0) {
-        let sentences = current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page];
+    if (current_book.content[current_book.current_chapter]['pages'][current_book.current_page].length > 0) {
+        let sentences = current_book.content[current_book.current_chapter]['pages'][current_book.current_page];
         for(let n=0; n<sentences.length; n++){
             let newSent = document.createElement("span");
             newSent.setAttribute("class", "sentPartition");
-            let tempSent = current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page][n].split(/\s+/);
+            let tempSent = current_book.content[current_book.current_chapter]['pages'][current_book.current_page][n]['text'].split(/\s+/);
             for(let w=0; w<tempSent.length; w++){
                 let newWord = document.createElement("div");
                 newWord.className = "word";
@@ -237,7 +237,7 @@ function renderPage(pageIndex) {
                 newSent.appendChild(newWord);
             }
 
-            //temppage = temppage.concat(current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page][n].split(/\s+/));
+            temppage = temppage.concat(current_book.content[current_book.current_chapter]['pages'][current_book.current_page][n]['text'].split(/\s+/));
             textLayout.appendChild(newSent);
         }
     }
@@ -253,7 +253,7 @@ function renderPage(pageIndex) {
     // });
 
     currentPageIndex = parseInt(pageIndex);
-    document.getElementById("current_page").value = (currentPageIndex + 1) + current_book.content['content'][current_book.current_chapter]['start']
+    document.getElementById("current_page").value = (currentPageIndex + 1) + current_book.content[current_book.current_chapter]['start']
     updatePaginationUI();
 }
 
@@ -285,7 +285,7 @@ function setupPaginationControls() {
             const pageNum = startIndex + index + 1;
 
             if (pageNum <= totalPages) {
-                btn.innerText = pageNum + current_book.content['content'][current_book.current_chapter]['start'];
+                btn.innerText = pageNum + current_book.content[current_book.current_chapter]['start'];
                 btn.style.display = "inline-block";
                 btn.onclick = () => {
                     renderPage(pageNum - 1);
@@ -309,7 +309,7 @@ function setupPaginationControls() {
             else {
                 if (current_book.current_chapter > 0) {
                     --current_book.current_chapter;
-                    currentPageIndex = current_book.content['content'][current_book.current_chapter]['length'] - 1
+                    currentPageIndex = current_book.content[current_book.current_chapter]['length'] - 1
                     console.log()
                     renderPage(currentPageIndex);
                     setupPaginationControls();
@@ -323,12 +323,12 @@ function setupPaginationControls() {
     // Next buttons
     document.querySelectorAll(".page-link.next").forEach(btn => {
         btn.onclick = () => {
-            if (currentPageIndex < current_book.content['content'][current_book.current_chapter]['length'] - 1) {
+            if (currentPageIndex < current_book.content[current_book.current_chapter]['length'] - 1) {
                 renderPage(++currentPageIndex);
                 setupPaginationControls();
             }
             else {
-                if (current_book.current_chapter < current_book['content'].content.length -1) {
+                if (current_book.current_chapter < current_book.content.length -1) {
                     ++current_book.current_chapter;
                     currentPageIndex = 0
                     renderPage(currentPageIndex);
@@ -360,18 +360,18 @@ function page_search(index) {
     index--;
     console.log(`Chapter before: ${current_book.current_chapter}`)
     console.log(`Current: ${index}`)
-    console.log(`Start: ${current_book.content['content'][current_book.current_chapter]['start']}`)
-    console.log(`End: ${current_book.content['content'][current_book.current_chapter]['end']}`)
-    for (let p = 0; p < current_book.content['content'].length; p++) {
-        console.log(`${current_book.content['content'][current_book.current_chapter]['start']} <= ${index} : ${current_book.content['content'][current_book.current_chapter]['start'] <= currentPageIndex}`)
-        console.log(`${current_book.content['content'][current_book.current_chapter]['end']} > ${index} : ${current_book.content['content'][current_book.current_chapter]['end'] > currentPageIndex}`)
+    console.log(`Start: ${current_book.content[current_book.current_chapter]['start']}`)
+    console.log(`End: ${current_book.content[current_book.current_chapter]['end']}`)
+    for (let p = 0; p < current_book.content.length; p++) {
+        console.log(`${current_book.content[current_book.current_chapter]['start']} <= ${index} : ${current_book.content[current_book.current_chapter]['start'] <= currentPageIndex}`)
+        console.log(`${current_book.content[current_book.current_chapter]['end']} > ${index} : ${current_book.content[current_book.current_chapter]['end'] > currentPageIndex}`)
         // if(current_book.content['content'][current_book.current_chapter]['start'] <= index && current_book.content['content'][current_book.current_chapter]['end'] > currentPageIndex){
         //     break;
         // }
-        if (current_book.content['content'][current_book.current_chapter]['start'] > index) {
+        if (current_book.content[current_book.current_chapter]['start'] > index) {
             --current_book.current_chapter;
         }
-        else if (current_book.content['content'][current_book.current_chapter]['end'] <= index && (current_book.current_chapter + 1) != current_book.content['content'].length) {
+        else if (current_book.content[current_book.current_chapter]['end'] <= index && (current_book.current_chapter + 1) != current_book.content.length) {
             ++current_book.current_chapter;
         }
 
@@ -379,8 +379,8 @@ function page_search(index) {
     }
 
     console.log(`Current Chapter ${current_book.current_chapter}`);
-    console.log(`Current Page: ${current_book.content['content'][current_book.current_chapter]['start']}/${index}`)
-    currentPageIndex = (parseInt(index) - current_book.content['content'][current_book.current_chapter]['start']);
+    console.log(`Current Page: ${current_book.content[current_book.current_chapter]['start']}/${index}`)
+    currentPageIndex = (parseInt(index) - current_book.content[current_book.current_chapter]['start']);
     console.log(`This page is ${currentPageIndex}`);
     current_book.current_page = currentPageIndex;
     renderPage(parseInt(currentPageIndex));

@@ -271,7 +271,7 @@ class PublishBook(APIView):
             print(book_religion_id)
             #print(published_book)
             print("book_name:", book_name)
-            print("published_book:", published_book)
+            #print("published_book:", published_book)
             print("book_date:", book_date)
             print("book_religion_id:", book_religion_id)
             print("book_denom:", book_denom)
@@ -285,12 +285,23 @@ class PublishBook(APIView):
             print("book_image:", book_image)
             print("book_index", book_index)
             print("This is the Published book")
-            print(published_book)
+            #print(published_book)
 
             #################################This is where you will pass the book data to the machine learning process#########################################
             test = json.loads(published_book)
             print(test['content'][0]['pages'][1])
-
+            for cha in range(len(test['content'])):
+                for s in range(len(test['content'][cha]['pages'])):
+                    sentences = []
+                    for c in test['content'][cha]['pages'][s]:
+                        #print(c.split(" "))
+                        spaces = len(c.split(" "))
+                        sentence = {
+                            "labels": ['O ']*spaces,
+                            "text": c
+                        }
+                        sentences.append(sentence)
+                    test['content'][cha]['pages'][s] = sentences
             #Annotation.print_tensorflow_version()
             ###################################################################################################################################################
 
@@ -318,7 +329,7 @@ class PublishBook(APIView):
 
             try:
                 with open(file_path, 'w', encoding='utf-8') as f:
-                    json.dump({'published_book': published_book, 'book_index': book_index}, f, indent=4, ensure_ascii=False)
+                    json.dump({'published_book': test, 'book_index': book_index}, f, indent=4, ensure_ascii=False)
                 
                 # Reopen the file as a Django File to assign to FileField
                 with open(file_path, 'rb') as f:

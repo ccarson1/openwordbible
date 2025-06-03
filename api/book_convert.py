@@ -5,12 +5,19 @@ import tempfile
 import PyPDF2
 import pdfplumber
 from pdfminer.high_level import extract_text
+from pdfminer.layout import LAParams
 from io import BytesIO
+import spacy
 
 class ConvertBook():
     
     def __init__(self):
-        pass
+        self.nlp = spacy.load("en_core_web_sm")
+
+    
+    def fix_text_with_spacy(self, text):
+        doc = self.nlp(text)
+        return ' '.join([token.text for token in doc])
     
     def convert_from_text(self, file):
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
@@ -85,14 +92,24 @@ class ConvertBook():
         if not file_stream.getvalue().startswith(b'%PDF'):
             raise ValueError("Uploaded file is not a valid PDF")
         
-        reader = PyPDF2.PdfReader(file_stream)
+        laparams = LAParams(
+        line_margin=0.5,       # tweak this (default is 0.5)
+        word_margin=0.1,       # reduce or increase to control word spacing (default 0.1)
+        char_margin=2.0        # increase this if characters are too close
+        )
+
+        
+        full_text = extract_text(file_stream, laparams=laparams)
+        pages = full_text.split('\f')
+        
         book_text = []
         offset_page = []
         count = 0
-        for index, page in enumerate(reader.pages):
-            text = page.extract_text()
-            if text:
-                book_text.append(text.strip())
+
+        for index, page_text in enumerate(pages):
+            page_text = page_text.strip()
+            if page_text:
+                book_text.append(page_text)
             else:
                 offset_page.append({'offset': count, 'page': index})
                 count += 1

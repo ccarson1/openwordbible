@@ -175,17 +175,22 @@ function create_pages(array, chunkSize) {
 
 window.onload = (event) => {
     console.log(`The content type is ${typeof(current_book["content"])}`);
-    let book_content = JSON.parse(current_book["content"])
+    let book_content = current_book['content']
     
 
     current_book.content = book_content
     current_book.callTotalPages();
-    console.log(current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page]);
+    console.log(current_book.content[current_book.current_chapter]['pages'][current_book.current_page]);
     document.getElementById('total-pages').innerText = current_book.total_pages + 1;
-    let pageText = current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page];
+    let textArray = current_book.content[current_book.current_chapter]['pages'][current_book.current_page];
+    let pageText = []
+    for(let a=0; a<textArray.length; a++){
+        console.log(textArray[a]['text']);
+        pageText.push(textArray[a]['text'])
+    }
     console.log(`Current Chapter is ${current_book.current_chapter}`)
     console.log(`Current Page: ${current_book.current_page}`)
-    let textArray = pageText;
+    
 
     let cols = document.getElementById("cols").value;
     let textColor = document.getElementById("color").value;
@@ -196,8 +201,8 @@ window.onload = (event) => {
     document.getElementById("text-layout").style.color = textColor;
     document.getElementById("text-layout").style.fontSize =  `${fontSize}px`;
     document.getElementById("text-layout").style.columnCount = cols;
-    console.log(textArray);
-    create_word_layout(textArray);
+    console.log(pageText);
+    create_word_layout(pageText);
 
 
 }

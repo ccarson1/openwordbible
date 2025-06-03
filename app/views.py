@@ -31,7 +31,26 @@ def read(request, id):
         except Exception as e:
             print(f"Error reading file for book {book.name}: {e}")
 
-    print(book_json)
+    ######################Needs moved to PublishBook in api views.py###################################################
+    # test = json.loads(book_json['published_book'])
+    # #print(test['content'][0]['pages'][1])
+    # for cha in range(len(test['content'])):
+    #     for s in range(len(test['content'][cha]['pages'])):
+    #         sentences = []
+    #         for c in test['content'][cha]['pages'][s]:
+    #             #print(c.split(" "))
+    #             sentence = {
+    #                 "labels": [],
+    #                 "text": c
+    #             }
+    #             sentences.append(sentence)
+    #         test['content'][cha]['pages'][s] = sentences
+            #print(test['content'][cha]['pages'][s])
+#######################################################################################################################
+
+    # print(type(book_json["published_book"]))
+    # print(type(str(test)))
+
     books_data = {
         "id": book.id,
         "name": book.name,
@@ -46,8 +65,9 @@ def read(request, id):
         "rights": book.rights,
         "publisher": book.publisher,
         "image_url": book.image.url if book.image else None,
-        "content": book_json["published_book"] if book_json else None,
+        "content": book_json['published_book']['content'] if book_json else None,
         "book_index": book_json["book_index"] if book_json else None,
+        
     }
 
     profile = None
@@ -86,9 +106,6 @@ def read(request, id):
                 "font_size": book_format_obj.font_size,
                 "color": book_format_obj.color,
             }
-
-    request.session["books_data"] = books_data
-    request.session["book_format"] = book_format_data
 
     # print(books_data['book_index'])
     # print(type(books_data['book_index']))
