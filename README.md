@@ -20,7 +20,7 @@ Docker Setup of the OpenWordBible Web Application
    ```
 
 
-Guilines for the NER dataset
+Guidelines for the NER dataset
 
 **Labels**
 ```bash
