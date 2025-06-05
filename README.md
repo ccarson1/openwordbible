@@ -19,6 +19,37 @@ Docker Setup of the OpenWordBible Web Application
       docker rm <container_id>
    ```
 
+Running Application Locally
+
+1. **Requirements**
+   Python 3.11.2 is needed to allow tensorflow to install
+
+2. **Create a Python Environment**
+   ```Bash
+      python -m venv env
+   ```
+
+3. **Start Python Environment**
+   ```Bash
+      env\Scripts\activate
+   ```
+
+4. **Install dependencies**
+   ```Bash
+      pip install -r requirements.txt
+   ```
+
+5. **Run Django Application**
+   ```Bash
+      python manage.py runserver
+   ```
+
+6. **Test Application**
+   Go to [http://](http://localhost:8000/) location in the browser
+ 
+   
+
+
 
 Guidelines for the NER dataset
 

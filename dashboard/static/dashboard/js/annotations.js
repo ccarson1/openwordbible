@@ -5,6 +5,7 @@ const annotationsContainer = document.getElementById("annotations-container");
 let batchSize = 100; // sentences per batch
 let currentIndex = 0;
 let sentencesList = [];
+let modifiedWords = [];
 
 // Flatten all sentences first
 for (let a = 0; a < content.length; a++) {
@@ -14,6 +15,8 @@ for (let a = 0; a < content.length; a++) {
         }
     }
 }
+
+
 
 // Function to render a batch
 function renderNextBatch() {
@@ -41,8 +44,11 @@ function renderNextBatch() {
                         if (all_instances.checked) {
                             w.style.backgroundColor = "yellow";
                             word_count++;
-                            console.log(`Sentence Index: ${Array.from(w.parentNode.parentNode.children).indexOf(w.parentNode)}`);
-                            console.log(`Word Index: ${Array.from(w.parentNode.children).indexOf(w)}`);
+                            sent_index = Array.from(w.parentNode.parentNode.children).indexOf(w.parentNode)
+                            word_index = Array.from(w.parentNode.children).indexOf(w)
+                            console.log(`Sentence Index: ${sent_index}`);
+                            console.log(`Word Index: ${word_index}`);
+                            modifiedWords.push([sent_index, word_index])
                         }
                     } else {
                         w.style.backgroundColor = "white";
@@ -77,5 +83,8 @@ document.getElementById("add-btn").addEventListener('click', function () {
     let word = document.getElementById('target-word').value;
     let label = document.getElementById('word-label').value;
     console.log(`Word: ${word}, Label: ${label}`);
+    // for(let w = 0; w<modifiedWords.length; w++){
+    //     content
+    // }
 
 });
