@@ -45,7 +45,7 @@ Running Application Locally
    ```
 
 6. **Test Application**
-   Go to [http://(http://localhost:8000/)] location in the browser
+   Go to [http://localhost:8000/](http://localhost:8000/) location in the browser
  
    
 
