@@ -22,7 +22,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib import messages
 from .models import BookFormat, Profile, Note
-import os
+
 import PyPDF2
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -30,8 +30,7 @@ from .book_convert import ConvertBook
 from .annotations import Annotation
 from .models import Book, Religion, Language 
 from django.core.files import File
-import os
-import json
+
 from rest_framework import serializers
 from rest_framework.decorators import api_view
 
@@ -295,12 +294,14 @@ class PublishBook(APIView):
                     sentences = []
                     for c in test['content'][cha]['pages'][s]:
                         #print(c.split(" "))
-                        spaces = len(c.split(" "))
-                        sentence = {
-                            "labels": ['O ']*spaces,
-                            "text": c
-                        }
-                        sentences.append(sentence)
+                        temp_sentences = re.split(r'(?<=[.!?]) +', c)
+                        for x in temp_sentences:
+                            spaces = len(x.split(" "))
+                            sentence = {
+                                "labels": ['O ']*spaces,
+                                "text": x
+                            }
+                            sentences.append(sentence)
                     test['content'][cha]['pages'][s] = sentences
             #Annotation.print_tensorflow_version()
             ###################################################################################################################################################
@@ -472,6 +473,28 @@ class UpdateLayout(APIView):
             }
         })
     
+class UpdateAnnotation(APIView):
+
+    def post(self, request, *args, **kwargs):
+        content = request.data.get("content")
+        path = request.data.get("path")
+        print(path)
+        #print(content[0]["pages"][0])
+
+        if not path:
+            return Response({"error": "Missing file path"}, status=400)
+
+        print(f"Received path: {path}")
+
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            data['published_book']['content'] = content
+
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+
+
+        return Response({"message": "Annotation update was successful"})
 
 class BookSerializer(serializers.ModelSerializer):
     class Meta:

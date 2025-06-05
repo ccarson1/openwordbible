@@ -81,7 +81,10 @@ def annotations(request, book_id):
         })
 
     return render(request, "annotations.html", {
-        "book": book,
+        "book": {
+            "id": book.id,
+            "path": book.book_file.path
+        },
         "content": content
     })
 
