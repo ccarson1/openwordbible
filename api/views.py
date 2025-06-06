@@ -207,7 +207,7 @@ class UploadBook(APIView):
 
         
         if user.is_authenticated:
-            annotation.print_tensorflow_version()
+            #annotation.print_tensorflow_version()
             file = request.FILES.get("book-file")
             book_type = request.data.get("book-type")
             print(f"The file uploaded was {file.name}")
@@ -298,7 +298,7 @@ class PublishBook(APIView):
                         for x in temp_sentences:
                             spaces = len(x.split(" "))
                             sentence = {
-                                "labels": ['O ']*spaces,
+                                "labels": ['O']*spaces,
                                 "text": x
                             }
                             sentences.append(sentence)

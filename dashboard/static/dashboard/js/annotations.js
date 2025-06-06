@@ -56,28 +56,26 @@ function renderNextBatch() {
 
                     word.addEventListener('click', function () {
                         document.getElementById("target-word").value = this.innerText;
-
+                        document.getElementById('word-label').value = content[a].pages[b][c].labels[6]
 
                         let word_count = 0;
 
 
 
                         for (let w of div_words) {
+
                             if (w.innerText === this.innerText) {
+                                sent_index = Array.from(w.parentNode.parentNode.children).indexOf(w.parentNode)
+                                word_index = Array.from(w.parentNode.children).indexOf(w)
+                                sent = w.parentNode.parentNode.children[sent_index]
+                                page_index = sent.parentNode.id;
+                                chapter_index = sent.parentNode.parentNode.id;
+                                document.getElementById('word-label').value = content[chapter_index].pages[page_index][sent_index].labels[word_index]
                                 if (all_instances.checked) {
 
                                     w.style.backgroundColor = "yellow";
                                     word_count++;
-                                    sent_index = Array.from(w.parentNode.parentNode.children).indexOf(w.parentNode)
-                                    word_index = Array.from(w.parentNode.children).indexOf(w)
-                                    sent = w.parentNode.parentNode.children[sent_index]
-                                    page_index = sent.parentNode.id;
-                                    chapter_index = sent.parentNode.parentNode.id;
-                                    console.log(`Chapter Index: ${chapter_index}`)
-                                    console.log(`Page Index: ${page_index}`)
-                                    console.log(`Sentence Index: ${sent_index}`);
-                                    console.log(`Sentence ID: ${sents[sent_index].id}`);
-                                    console.log(`Word Index: ${word_index}`);
+
                                     modifiedWords.push([chapter_index, page_index, sent_index, word_index])
 
 
@@ -85,6 +83,8 @@ function renderNextBatch() {
                             } else {
                                 w.style.backgroundColor = "white";
                             }
+
+
                         }
 
                         document.getElementById('word-count').innerText = word_count;
@@ -96,11 +96,7 @@ function renderNextBatch() {
                         sent = this.parentNode.parentNode.children[sent_index]
                         page_index = sent.parentNode.id;
                         chapter_index = sent.parentNode.parentNode.id;
-                        console.log(`Chapter Index: ${chapter_index}`)
-                        console.log(`Page Index: ${page_index}`)
-                        console.log(`Sentence Index: ${sent_index}`);
-                        console.log(`Sentence ID: ${sents[sent_index].id}`);
-                        console.log(`Word Index: ${word_index}`);
+
                         modifiedWords.push([chapter_index, page_index, sent_index, word_index])
                     });
 
@@ -130,6 +126,7 @@ renderNextBatch();
 document.getElementById("add-btn").addEventListener('click', function () {
     let word = document.getElementById('target-word').value;
     let label = document.getElementById('word-label').value;
+
     console.log(`Word: ${word}, Label: ${label}`);
     for (let m = 0; m < modifiedWords.length; m++) {
 
@@ -149,9 +146,9 @@ document.getElementById("save-btn").addEventListener("click", function () {
     fetch("/api/update-annotation/", {
         method: "POST",
         body: JSON.stringify({
-             content: content,
-             path: book.path
-            }),
+            content: content,
+            path: book.path
+        }),
         headers: {
             "Content-Type": "application/json",
             "X-CSRFToken": csrftoken,

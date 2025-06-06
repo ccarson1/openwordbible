@@ -37,6 +37,7 @@ Running Application Locally
 4. **Install dependencies**
    ```Bash
       pip install -r requirements.txt
+      python -m spacy download en_core_web_sm
    ```
 
 5. **Run Django Application**
@@ -62,7 +63,7 @@ Guidelines for the NER dataset
    B-/I-geo      Geographical     Non-political location (e.g. "Nile") 
    B-/I-gpe      Geo-Political    Countries, cities, etc.              
    B-/I-nat      Natural Object   Natural things (e.g. "Amazon River") 
-   B-/I-org      Organization     Corporations, agencies, etc.         
+   B-/I-org      Organization     Corporations, agencies, etc. (e.g., "Federalist Party", "Romans","Soviets", "Catholic Church")         
    B-/I-per      Person           People names                         
    B-/I-tim      Time Expression  Dates, times                         
    O             Outside          Not a named entity                   
