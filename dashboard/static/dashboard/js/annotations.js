@@ -75,7 +75,7 @@ function renderNextBatch() {
 
                                     w.style.backgroundColor = "yellow";
                                     word_count++;
-
+                                    
                                     modifiedWords.push([chapter_index, page_index, sent_index, word_index])
 
 

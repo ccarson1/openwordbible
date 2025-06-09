@@ -198,7 +198,7 @@ class UploadBook(APIView):
     
     def post(self, request, *args, **kwargs):
 
-        annotation = Annotation()
+        
         
         user = request.user
         
@@ -287,23 +287,8 @@ class PublishBook(APIView):
             #print(published_book)
 
             #################################This is where you will pass the book data to the machine learning process#########################################
-            test = json.loads(published_book)
-            print(test['content'][0]['pages'][1])
-            for cha in range(len(test['content'])):
-                for s in range(len(test['content'][cha]['pages'])):
-                    sentences = []
-                    for c in test['content'][cha]['pages'][s]:
-                        #print(c.split(" "))
-                        temp_sentences = re.split(r'(?<=[.!?]) +', c)
-                        for x in temp_sentences:
-                            spaces = len(x.split(" "))
-                            sentence = {
-                                "labels": ['O']*spaces,
-                                "text": x
-                            }
-                            sentences.append(sentence)
-                    test['content'][cha]['pages'][s] = sentences
-            #Annotation.print_tensorflow_version()
+            annotation = Annotation()
+            test = annotation.initiate_annotations(published_book)
             ###################################################################################################################################################
 
             if book_religion_id and book_religion_id.lower() != "none":
