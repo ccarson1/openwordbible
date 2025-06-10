@@ -5,6 +5,7 @@ from django.http import JsonResponse
 
 import os
 import json
+import csv
 
 
 def dashboard(request):
@@ -21,6 +22,9 @@ def dashboard(request):
 
 def analytics(request):
     return render(request, "analytics.html")
+
+
+
 
 def settings_view(request):
     user = request.user
@@ -87,6 +91,9 @@ def annotations(request, book_id):
         },
         "content": content
     })
+
+
+
 
 
 def books(request):

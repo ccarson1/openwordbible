@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import ProfileAPIView, LoadBookmarkAPIView, UploadBook, PublishBook, LoadBook, search_books, UpdateLayout, UpdateAnnotation
+from .views import ProfileAPIView, LoadBookmarkAPIView, UploadBook, PublishBook, LoadBook, search_books, UpdateLayout, UpdateAnnotation, ExportDataset
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -15,5 +15,6 @@ urlpatterns = [
    path('update-layout/', UpdateLayout.as_view(), name='update-layout'),
    path('update-annotation/', UpdateAnnotation.as_view(), name='update-annotation'),
    path('search-books/', search_books, name='search_books'),
+   path('export-dataset/', ExportDataset.as_view(), name='export-dataset'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

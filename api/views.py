@@ -7,9 +7,12 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.conf import settings
 import os
+import io
+import csv
+from django.http import StreamingHttpResponse
 
 from django.contrib.auth.models import User
 from api.models import Profile
@@ -498,6 +501,72 @@ def search_books(request):
 
     serializer = BookSerializer(books, many=True)
     return Response(serializer.data)
+
+
+class ExportDataset(APIView):
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+
+        if user.is_authenticated:
+            file_path = request.data.get("file_path")
+            if not file_path:
+                return Response({"error": "file_path is required"}, status=400)
+
+            return self.export_to_CSV(file_path)
+
+    def export_to_CSV(self, file_path):
+        with open("media\\" + file_path, 'r', encoding='utf-8') as file:
+            content = json.load(file)
+
+        labels = []
+        sentences = []
+        file_name = file_path.split("\\")
+        file_name = file_name[-1]
+
+        for x in content['published_book']['content']:
+            for y in x['pages']:
+                for sent in y:
+                    for z in sent['labels']:
+                        if z != 'O ' and z != 'O':
+                            temp_labels = ' '.join(sent['labels'])
+                            labels.append(temp_labels)
+                            sentences.append(sent['text'])
+                            break
+        
+        reconstructed = []
+        current_word = ""
+        current_label = ""
+
+        for token, label in zip(sentences, labels):
+            if token.startswith("##"):
+                current_word += token[2:]
+            else:
+                if current_word:
+                    reconstructed.append((current_word, current_label))
+                current_word = token
+                current_label = label
+
+        if current_word:
+            reconstructed.append((current_word, current_label))
+
+        # Write to in-memory buffer
+        buffer = io.StringIO()
+        writer = csv.writer(buffer)
+        writer.writerow(["word", "label"])
+        writer.writerows(reconstructed)
+
+        # Prepare the buffer for reading
+        buffer.seek(0)
+        response = StreamingHttpResponse(
+            buffer,
+            content_type='text/csv'
+        )
+        print(file_name)
+        response['Content-Disposition'] = 'attachment; filename="'+ file_name +'.csv"'
+        return response
 
 
 

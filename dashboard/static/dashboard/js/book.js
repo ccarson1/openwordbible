@@ -58,6 +58,8 @@ class Book {
         return chunks;
     }
 
+    
+
     get_conversion(page_content, wordsPerPage) {
         let words = this.split_words(page_content);
         let page_array = this.splitTextIntoChunks(words, wordsPerPage);
@@ -66,85 +68,21 @@ class Book {
     }
 
 
-
-    // generateRegexFromText(text) {
-    //     // Escape special regex characters except for '|'
-    //     let escapedText = text.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-
-    //     // Replace digit sequences with a flexible digit matcher
-    //     let regexPattern = escapedText.replace(/\d+/g, '\\d+');
-
-    //     // Modify pattern to match delimiters
-    //     let regex = new RegExp(`(?=(${regexPattern}))`);
-
-    //     return regex;
-    // }
-
     generateRegexFromText(text, custom_regex) {
 
-        // if(custom_regex == true){
-        //     console.log(`The custom regex is ${custom_regex}`)
-        //     return text;
-        // }
-        // else{
-        //     // Escape special regex characters except for '|'
-        //     let escapedText = text.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-
-        //     // Replace digit sequences with a flexible digit matcher allowing an optional '?'
-        //     let regexPattern = escapedText.replace(/\d+\?/g, '\\d+\\?').replace(/\d+/g, '\\d+');
-
-        //     // Modify pattern to match delimiters
-        //     let regex = new RegExp(`(?=(${regexPattern}))`);
-
-        //     return regex;
-        // }
         return text
 
 
     }
 
     populate_preview_text(content = this.get_content()) {
-        //content = content.split(/\s+/);
-        // console.log(`The regex is: ${this.get_partitionText()}`);
-        // //content = content.split(this.get_partitionText());
-        // console.log(content);
 
         let preview_text = document.getElementById("text-preview");
         preview_text.innerText = content;
-        // let temp_string = '';
-        // content.forEach(t => {
-        //     let wordDiv = document.createElement("div");
-        //     wordDiv.innerText = t;
-        //     wordDiv.setAttribute("class", "test-item");
-        //     preview_text.appendChild(wordDiv);
-        // });
+
     }
 
-    // partitionText(text, regex){
 
-    //     // for(let t=0; t<content.length;t++){
-    //     //     if(partition.test(content[t].innerText)){
-    //     //         content[t].className = "test-item-par"
-    //     //     }else{
-    //     //         content[t].className = "test-item"
-    //     //     }
-    //     // }
-    //     console.log(partition)
-    //     console.log(content)
-    //     let split_content = content.split(partition);
-    //     console.log(split_content)
-    //     let preview_text = document.getElementById("text-preview");
-    //     preview_text.innerText = '';
-    //     let temp_string = '';
-    //     split_content.forEach(t => {
-    //         let wordDiv = document.createElement("div");
-    //         wordDiv.innerText = t;
-    //         wordDiv.setAttribute("class", "test-item");
-    //         preview_text.appendChild(wordDiv);
-    //     });
-
-
-    // }
 
     partitionText(text, label, delimiter) {
         console.log(delimiter);
@@ -152,7 +90,7 @@ class Book {
         try {
             const regex = new RegExp(delimiter, "g");
 
-            if(label == 'sentence'){
+            if (label == 'sentence') {
                 console.log(label)
                 this.sentRegex = regex;
             }
@@ -285,32 +223,7 @@ class Book {
         });
         page_list.appendChild(newChapter);
 
-        // let wordsPerPage = document.getElementById("input-words-per-page").value;
-        // if (parseInt(wordsPerPage) > 0) {
-        //     let page_array = page_pile.get_conversion(page_content, wordsPerPage)
-        //     for (let x = 0; x < page_array.length; x++) {
-        //         let page_count = document.getElementById("page-list").children.length;
-        //         let newPageContainer = document.createElement("div");
-        //         newPageContainer.setAttribute("class", "page-container");
-        //         let newPage = document.createElement("div");
-        //         newPage.setAttribute("class", "page-list-item");
-        //         newPage.innerText = page_array[x]
 
-        //         let pageNumber = document.createElement("div");
-        //         pageNumber.innerText = x;
-        //         pageNumber.setAttribute("class", "page-number");
-        //         newPageContainer.appendChild(newPage);
-        //         newPageContainer.appendChild(pageNumber);
-        //         newPageContainer.addEventListener("click", ()=> {
-        //             this.createEditorPopup(newPageContainer);
-        //         });
-        //         document.getElementById("page-list").appendChild(newPageContainer);
-        //     }
-        // }
-        // else{
-        //     alert("You must enter Words per page");
-
-        // }
     }
 
     set_book_data(book_data) {

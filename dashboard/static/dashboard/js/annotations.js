@@ -1,4 +1,3 @@
-const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 const annotationsContainer = document.getElementById("annotations-container");
 
 

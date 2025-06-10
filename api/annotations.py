@@ -90,9 +90,44 @@ class Annotation():
         return reconstructed
     
 
-    def export_to_CSV(self):
+    def export_to_CSV(self, file_path):
+
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = json.load(file)
+
+        labels = []
+        sentences = []
+
+        for x in content['published_book']['content']:
+            for y in x['pages']:
+                for sent in y:
+                    for z in sent['labels']:
+                        if z != 'O ' and z != 'O':
+                            temp_labels = ' '.join(sent['labels'])
+                            labels.append(temp_labels)
+                            sentences.append(sent['text'])
+                            print(temp_labels)
+                            print(sent['text'])
+                            break
         
-        reconstructed = self.interpret_prediction()
+        # Reconstruct words and align labels
+        reconstructed = []
+        current_word = ""
+        current_label = ""
+
+        for token, label in zip(sentences, labels):
+            if token.startswith("##"):
+                current_word += token[2:]
+            else:
+                if current_word:  # Save previous word
+                    reconstructed.append((current_word, current_label))
+                current_word = token
+                current_label = label
+        # Add final token
+        if current_word:
+            reconstructed.append((current_word, current_label))
+
+
         output_dir = "media/datasets"
         os.makedirs(output_dir, exist_ok=True)
 
