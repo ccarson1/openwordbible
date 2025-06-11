@@ -312,14 +312,6 @@ document.getElementById("add-partition").addEventListener("click", function () {
 
 document.getElementById("btn-upload-page").addEventListener("click", function () {
     showSpinner();
-    // let pages_to_upload = document.getElementsByClassName("page-container");
-    // let pages_array = [];
-    // for (let p = 0; p < pages_to_upload.length; p++) {
-
-    //     pages_array.push(pages_to_upload[p].textContent)
-    // }
-    //console.log(pages_array);
-
     book_image = document.getElementById("input-book-cover");
     book_index = collect_index();
     book_data = new FormData();
