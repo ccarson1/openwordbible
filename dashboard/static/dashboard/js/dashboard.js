@@ -399,3 +399,54 @@ document.getElementById("label-input").addEventListener("change", function(){
     }
 });
 
+
+document.getElementById("btn-annotate-page").addEventListener("click", function(){
+    showSpinner();
+    book_image = document.getElementById("input-book-cover");
+    book_index = collect_index();
+    book_data = new FormData();
+    if (book_image.files.length > 0) {
+        book_data.append("book_image", book_image.files[0]);
+    } else {
+        console.error("No file selected");
+    }
+    let published_book = JSON.stringify(formated_book);
+    console.log(formated_book)
+
+    book_data.append("published_book", JSON.stringify(formated_book));
+    book_data.append("book_name", document.getElementById('book-name').value);
+    book_data.append("book_date", document.getElementById('input-book-date').value);
+    book_data.append("book_language", document.getElementById('input-book-lang').value);
+    book_data.append("book_religion", document.getElementById('book-religion').value);
+    book_data.append("book_denom", document.getElementById("input-book-denom").value);
+    book_data.append("book_author", document.getElementById("input-book-author").value);
+    book_data.append("book_translator", document.getElementById("input-book-translator").value);
+    book_data.append("book_isbn", document.getElementById("input-book-isbn").value);
+    book_data.append("book_description", document.getElementById("input-book-des").value);
+    book_data.append("book_rights", document.getElementById("book-right").value);
+    book_data.append("book_publisher", document.getElementById("book-pub").value);
+    book_data.append("book_index", JSON.stringify(book_index));
+
+    console.log(book_data);
+
+    fetch("http://127.0.0.1:5001/process", {
+        method: "POST",
+        body: book_data,
+        headers: {
+            "X-CSRFToken": csrftoken,
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                hideSpinner();
+                throw new Error(`HTTP error! status: ${response.status}`);
+
+            }
+            return response.json();
+        })
+        .then(data => {
+            hideSpinner();
+            console.log(data)
+            alert(data['message'])
+        })
+});

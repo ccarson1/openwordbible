@@ -69,24 +69,27 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
     
-# class Word(models.Model):
-#     text = models.CharField(max_length=100)
+class Word(models.Model):
+    text = models.CharField(max_length=100)
 
-#     def __str__(self):
-#         return self.text
+    def __str__(self):
+        return self.text
     
-# class Label(models.Model):
-#     text = models.CharField(max_length=100, unique=True)
+class Label(models.Model):
+    text = models.CharField(max_length=100, unique=True)
     
-#     def __str__(self):
-#         return self.text
+    def __str__(self):
+        return self.text
     
 
-# class Annotation(models.Model):
-#     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="annotations")
-#     chapter = models.IntegerField(default=0)
-#     page = models.IntegerField(default=0)
-#     sentence = models.IntegerField(default=0)
-#     word_index = models.IntegerField(default=0)
-#     text = models.ForeignKey(Word, on_delete=models.CASCADE)
-#     label = models.ForeignKey(Label, on_delete=models.CASCADE)
+class Annotation(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="annotations")
+    chapter = models.IntegerField(default=0)
+    page = models.IntegerField(default=0)
+    sentence = models.IntegerField(default=0)
+    word_index = models.IntegerField(default=0)
+    text = models.ForeignKey(Word, on_delete=models.CASCADE)
+    label = models.ForeignKey(Label, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'Text: {self.text} | Label: {self.label}'

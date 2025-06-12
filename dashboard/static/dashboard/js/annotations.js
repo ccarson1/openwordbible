@@ -146,7 +146,8 @@ document.getElementById("save-btn").addEventListener("click", function () {
         method: "POST",
         body: JSON.stringify({
             content: content,
-            path: book.path
+            path: book.path,
+            id: book.id,
         }),
         headers: {
             "Content-Type": "application/json",

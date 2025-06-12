@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.conf import settings
-from api.models import Book, Language, Religion, Profile 
+from api.models import Book, Language, Religion, Profile, Annotation, Word, Label
 from django.http import JsonResponse
 
 import os
@@ -21,7 +21,24 @@ def dashboard(request):
     return render(request, "dashboard.html", context)
 
 def analytics(request):
-    return render(request, "analytics.html")
+
+    annotations = Annotation.objects.all().select_related("text", "label", "book")
+    data = []
+
+    for ann in annotations:
+        data.append({
+            "book_id": ann.book.id,
+            "chapter": ann.chapter,
+            "page": ann.page,
+            "sentence": ann.sentence,
+            "word_index": ann.word_index,
+            "word": ann.text.text,
+            "label": ann.label.text,
+        })
+
+
+
+    return render(request, "analytics.html", {"annotations": data})
 
 
 

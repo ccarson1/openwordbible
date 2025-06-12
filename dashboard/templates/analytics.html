@@ -8,11 +8,12 @@
 
 {% block content %}
 {% csrf_token %}
+{{ annotations|json_script:"annotations" }}
 <h2>Analytics</h2>
 
 <div class="main-chart-container">
     <div class="chart-container">
-        <h3>Books Read by Users</h3>
+        <h3>Words Labeled</h3>
         <canvas id="booksChart"></canvas>
     </div>
     
@@ -23,6 +24,23 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 <script>
+    const annotations = JSON.parse(document.getElementById("annotations").textContent);
+
+    labels = [];
+    counts = [];
+    for(let a=0; a<annotations.length; a++){
+        if(labels.includes(annotations[a]['label'])){
+            index = labels.indexOf(annotations[a]['label']);
+            counts[index]++;
+        }
+        else{
+            labels.push(annotations[a]['label']);
+            counts.push(1);
+        }
+        
+    }
+    console.log(labels);
+    console.log(counts);
     document.addEventListener("DOMContentLoaded", function() {
         var ctx1 = document.getElementById('booksChart').getContext('2d');
         var ctx2 = document.getElementById('wordsChart').getContext('2d');
@@ -34,10 +52,10 @@
         new Chart(ctx1, {
             type: 'bar',
             data: {
-                labels: usernames,
+                labels: labels,
                 datasets: [{
-                    label: 'Books Read',
-                    data: bookCounts,
+                    label: 'Words Labeled',
+                    data: counts,
                     backgroundColor: 'rgba(0, 123, 255, 0.6)',
                     borderColor: 'rgba(0, 123, 255, 1)',
                     borderWidth: 1

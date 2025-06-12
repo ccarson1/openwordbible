@@ -30,9 +30,10 @@ import PyPDF2
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from .book_convert import ConvertBook
-from .annotations import Annotation
-from .models import Book, Religion, Language 
+# from .annotations import Annotation
+from .models import Book, Religion, Language, Word, Label, Annotation
 from django.core.files import File
+from django.db import transaction
 
 from rest_framework import serializers
 from rest_framework.decorators import api_view
@@ -290,8 +291,8 @@ class PublishBook(APIView):
             #print(published_book)
 
             #################################This is where you will pass the book data to the machine learning process#########################################
-            annotation = Annotation()
-            test = annotation.initiate_annotations(published_book)
+            # annotation = Annotation()
+            # test = annotation.initiate_annotations(published_book)
             ###################################################################################################################################################
 
             if book_religion_id and book_religion_id.lower() != "none":
@@ -318,7 +319,7 @@ class PublishBook(APIView):
 
             try:
                 with open(file_path, 'w', encoding='utf-8') as f:
-                    json.dump({'published_book': test, 'book_index': book_index}, f, indent=4, ensure_ascii=False)
+                    json.dump({'published_book': published_book, 'book_index': book_index}, f, indent=4, ensure_ascii=False)
                 
                 # Reopen the file as a Django File to assign to FileField
                 with open(file_path, 'rb') as f:
@@ -466,8 +467,44 @@ class UpdateAnnotation(APIView):
     def post(self, request, *args, **kwargs):
         content = request.data.get("content")
         path = request.data.get("path")
+        book_id = request.data.get("id")
         print(path)
         #print(content[0]["pages"][0])
+
+        try:
+            book = Book.objects.get(pk=book_id)
+        except Book.DoesNotExist:
+            return Response({"error": "Book not found"}, status=404)
+
+        with transaction.atomic():  # ensures all or nothing is saved
+            for chapter_index, chapter in enumerate(content):
+                for page_index, page in enumerate(chapter['pages']):
+                    for sentence_index, sentence in enumerate(page):  # each sentence
+                        words = sentence['text'].split(" ")
+                        labels = sentence['labels']
+                        
+                        if len(words) != len(labels):
+                            continue  # Skip inconsistent entries
+                        
+                        for word_index, (word_text, label_text) in enumerate(zip(words, labels)):
+
+                            if label_text == "O":
+                                continue
+
+                            # Save/get Word
+                            word_obj, _ = Word.objects.get_or_create(text=word_text)
+                            # Save/get Label
+                            label_obj, _ = Label.objects.get_or_create(text=label_text)
+                            # Save Annotation
+                            Annotation.objects.create(
+                                book=book,
+                                chapter=chapter_index,
+                                page=page_index,
+                                sentence=sentence_index,
+                                word_index=word_index,
+                                text=word_obj,
+                                label=label_obj
+                            )
 
         if not path:
             return Response({"error": "Missing file path"}, status=400)
