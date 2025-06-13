@@ -323,7 +323,7 @@ document.getElementById("btn-upload-page").addEventListener("click", function ()
     let published_book = JSON.stringify(formated_book);
     console.log(formated_book)
 
-    book_data.append("published_book", JSON.stringify(formated_book));
+    book_data.append("published_book", published_book);
     book_data.append("book_name", document.getElementById('book-name').value);
     book_data.append("book_date", document.getElementById('input-book-date').value);
     book_data.append("book_language", document.getElementById('input-book-lang').value);
@@ -447,6 +447,7 @@ document.getElementById("btn-annotate-page").addEventListener("click", function(
         .then(data => {
             hideSpinner();
             console.log(data)
+            formated_book = data['published_book'];
             alert(data['message'])
         })
 });

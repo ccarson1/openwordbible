@@ -91,5 +91,10 @@ class Annotation(models.Model):
     text = models.ForeignKey(Word, on_delete=models.CASCADE)
     label = models.ForeignKey(Label, on_delete=models.CASCADE)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['text', 'label'], name='unique_annotation_text_label')
+        ]
+
     def __str__(self):
         return f'Text: {self.text} | Label: {self.label}'

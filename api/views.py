@@ -288,7 +288,7 @@ class PublishBook(APIView):
             print("book_image:", book_image)
             print("book_index", book_index)
             print("This is the Published book")
-            #print(published_book)
+            print(published_book)
 
             #################################This is where you will pass the book data to the machine learning process#########################################
             # annotation = Annotation()
@@ -319,7 +319,7 @@ class PublishBook(APIView):
 
             try:
                 with open(file_path, 'w', encoding='utf-8') as f:
-                    json.dump({'published_book': published_book, 'book_index': book_index}, f, indent=4, ensure_ascii=False)
+                    json.dump({'published_book': json.loads(published_book), 'book_index': book_index}, f, indent=4, ensure_ascii=False)
                 
                 # Reopen the file as a Django File to assign to FileField
                 with open(file_path, 'rb') as f:
