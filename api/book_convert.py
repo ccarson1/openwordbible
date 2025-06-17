@@ -3,21 +3,22 @@ from ebooklib import epub
 from bs4 import BeautifulSoup
 import tempfile
 import PyPDF2
-import pdfplumber
+#import pdfplumber
 from pdfminer.high_level import extract_text
 from pdfminer.layout import LAParams
 from io import BytesIO
-import spacy
+# import spacy
 
 class ConvertBook():
     
     def __init__(self):
-        self.nlp = spacy.load("en_core_web_sm")
+        # self.nlp = spacy.load("en_core_web_sm")
+        pass
 
     
-    def fix_text_with_spacy(self, text):
-        doc = self.nlp(text)
-        return ' '.join([token.text for token in doc])
+    # def fix_text_with_spacy(self, text):
+    #     doc = self.nlp(text)
+    #     return ' '.join([token.text for token in doc])
     
     def convert_from_text(self, file):
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:

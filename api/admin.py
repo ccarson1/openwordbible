@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Language, Religion, Book, Note, Profile, Bookmark, BookFormat, Word, Label, Annotation
+from .models import Language, Religion, Book, Note, Profile, Bookmark, BookFormat, Word, Label, Annotation, Sentence
 
 admin.site.register(Language)
 admin.site.register(Religion)
@@ -11,3 +11,4 @@ admin.site.register(BookFormat)
 admin.site.register(Word)
 admin.site.register(Label)
 admin.site.register(Annotation)
+admin.site.register(Sentence)

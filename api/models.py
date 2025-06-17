@@ -82,12 +82,19 @@ class Label(models.Model):
         return self.text
     
 
-class Annotation(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="annotations")
+class Sentence(models.Model):
+    text = models.CharField(max_length=500)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="sentences")
     chapter = models.IntegerField(default=0)
     page = models.IntegerField(default=0)
-    sentence = models.IntegerField(default=0)
+    sentence_index = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f'ID:{self.id} | {self.text}'
+
+class Annotation(models.Model):
     word_index = models.IntegerField(default=0)
+    sentence = models.ForeignKey(Sentence, on_delete=models.CASCADE)
     text = models.ForeignKey(Word, on_delete=models.CASCADE)
     label = models.ForeignKey(Label, on_delete=models.CASCADE)
 
@@ -98,3 +105,5 @@ class Annotation(models.Model):
 
     def __str__(self):
         return f'Text: {self.text} | Label: {self.label}'
+    
+

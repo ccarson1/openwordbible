@@ -77,11 +77,12 @@ body.dark-mode canvas {
     height: 100vh;
 }
 .main-chart-container {
-    width: 100%;
+    width: 80%;
     display: flex;
     flex-direction: column;
     gap: 2rem;
     padding: 1rem;
+    margin-left: 10%;
 }
 
 .chart-container {

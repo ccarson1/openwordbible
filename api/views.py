@@ -15,7 +15,7 @@ import csv
 from django.http import StreamingHttpResponse
 
 from django.contrib.auth.models import User
-from api.models import Profile
+
 
 
 from rest_framework.response import Response
@@ -31,7 +31,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from .book_convert import ConvertBook
 # from .annotations import Annotation
-from .models import Book, Religion, Language, Word, Label, Annotation
+from .models import Book, Religion, Language, Word, Label, Annotation, Profile, Sentence
 from django.core.files import File
 from django.db import transaction
 
@@ -476,34 +476,41 @@ class UpdateAnnotation(APIView):
         except Book.DoesNotExist:
             return Response({"error": "Book not found"}, status=404)
 
-        with transaction.atomic():  # ensures all or nothing is saved
+        with transaction.atomic():
             for chapter_index, chapter in enumerate(content):
                 for page_index, page in enumerate(chapter['pages']):
-                    for sentence_index, sentence in enumerate(page):  # each sentence
+                    for sentence_index, sentence in enumerate(page):
                         words = sentence['text'].split(" ")
                         labels = sentence['labels']
-                        
+
                         if len(words) != len(labels):
                             continue  # Skip inconsistent entries
-                        
+
+                        # Create and save the Sentence
+                        sentence_obj = Sentence.objects.create(
+                            text=sentence['text'],
+                            book=book,
+                            chapter=chapter_index,
+                            page=page_index,
+                            sentence_index=sentence_index
+                        )
+
                         for word_index, (word_text, label_text) in enumerate(zip(words, labels)):
-
                             if label_text == "O":
-                                continue
+                                continue  # Skip non-entity labels
 
-                            # Save/get Word
+                            # Get or create the Word and Label
                             word_obj, _ = Word.objects.get_or_create(text=word_text)
-                            # Save/get Label
                             label_obj, _ = Label.objects.get_or_create(text=label_text)
-                            # Save Annotation
-                            Annotation.objects.create(
-                                book=book,
-                                chapter=chapter_index,
-                                page=page_index,
-                                sentence=sentence_index,
-                                word_index=word_index,
+
+                            # Prevent duplicate Annotation
+                            annotation, created = Annotation.objects.get_or_create(
                                 text=word_obj,
-                                label=label_obj
+                                label=label_obj,
+                                defaults={
+                                    'word_index': word_index,
+                                    'sentence': sentence_obj
+                                }
                             )
 
         if not path:
