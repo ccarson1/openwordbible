@@ -22,15 +22,15 @@ def dashboard(request):
 
 def analytics(request):
 
-    annotations = Annotation.objects.all().select_related("text", "label", "book")
+    annotations = Annotation.objects.select_related("sentence__book", "text", "label")
     data = []
 
     for ann in annotations:
         data.append({
-            "book_id": ann.book.id,
-            "chapter": ann.chapter,
-            "page": ann.page,
-            "sentence": ann.sentence,
+            "book_id": ann.sentence.book.id,
+            "chapter": ann.sentence.chapter,
+            "page": ann.sentence.page,
+            "sentence": ann.sentence.text,
             "word_index": ann.word_index,
             "word": ann.text.text,
             "label": ann.label.text,
