@@ -9,6 +9,7 @@
 {% block content %}
 {% csrf_token %}
 {{ annotations|json_script:"annotations" }}
+{{ pos|json_script:"pos" }}
 <h2>Analytics</h2>
 
 <div class="main-chart-container">
@@ -19,13 +20,15 @@
     </div>
     <button class="btn btn-primary">Export CSV</button>
     <div class="chart-container">
-        <h3>Words Read by Users</h3>
+        <h3>Parts of Speech Labels</h3>
         <canvas id="wordsChart"></canvas>
     </div>
+    <button class="btn btn-primary">Export CSV</button>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 <script>
     const annotations = JSON.parse(document.getElementById("annotations").textContent);
+    const pos = JSON.parse(document.getElementById("pos").textContent);
 
     labels = [];
     counts = [];
@@ -39,6 +42,19 @@
             counts.push(1);
         }
         
+    }
+
+    pos_labels = [];
+    pos_counts = [];
+    for(let p=0; p<pos.length; p++){
+        if(pos_labels.includes(pos[p]['label'])){
+            index = pos_labels.indexOf(pos[p]['label']);
+            pos_counts[index]++;
+        }
+        else{
+            pos_labels.push(pos[p]['label']);
+            pos_counts.push(1);
+        }
     }
 
 
@@ -74,12 +90,12 @@
         });
 
         new Chart(ctx2, {
-            type: 'bar',
+            type: 'line',
             data: {
-                labels: usernames,
+                labels: pos_labels,
                 datasets: [{
-                    label: 'Words Read',
-                    data: wordCounts,
+                    label: 'Parts of Speech Labels',
+                    data: pos_counts,
                     backgroundColor: 'rgba(40, 167, 69, 0.6)',
                     borderColor: 'rgba(40, 167, 69, 1)',
                     borderWidth: 1

@@ -37,16 +37,18 @@ def analytics(request):
         })
 
     pos_data = []
-    pos = POSLabel.objects.all()
+    pos = POSLabel.objects.select_related("sentence__book", "text", "label")
 
     for p in pos:
+
         pos_data.append({
-            "label": p.label
+            "label": p.label.text
         })
+    print(pos_data)
 
 
 
-    return render(request, "analytics.html", {"annotations": data})
+    return render(request, "analytics.html", {"annotations": data, "pos": pos_data})
 
 
 
