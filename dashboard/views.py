@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.conf import settings
-from api.models import Book, Language, Religion, Profile, Annotation, Word, Label
+from api.models import Book, Language, Religion, Profile, Annotation, Word, Label, POSLabel
 from django.http import JsonResponse
 
 import os
@@ -34,6 +34,14 @@ def analytics(request):
             "word_index": ann.word_index,
             "word": ann.text.text,
             "label": ann.label.text,
+        })
+
+    pos_data = []
+    pos = POSLabel.objects.all()
+
+    for p in pos:
+        pos_data.append({
+            "label": p.label
         })
 
 

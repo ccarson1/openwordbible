@@ -5,6 +5,8 @@ let batchSize = 100; // sentences per batch
 let currentIndex = 0;
 let sentencesList = [];
 let modifiedWords = [];
+let lastClicked;
+let all_instances = document.getElementById("all-instances");
 
 // // Flatten all sentences first
 // for (let a = 0; a < content.length; a++) {
@@ -15,6 +17,23 @@ let modifiedWords = [];
 //     }
 // }
 
+all_instances.addEventListener("change", function(){
+    console.log(modifiedWords);
+    modifiedWords = [];
+    console.log(modifiedWords);
+
+    let div_words = document.getElementsByClassName("word");
+    for (let w of div_words){
+        w.style.backgroundColor = "rgba(0, 0, 0, 0)";
+    }
+    if(all_instances.checked == true){
+        console.log("Checking all instances.")
+    }
+    else{
+        console.log("Only checking a single instance.")
+    }
+    
+});
 
 function editAnnotation([chapter, page, sentence, word], label) {
     let newLabel = document.getElementById("word-label");
@@ -30,7 +49,7 @@ function editAnnotation([chapter, page, sentence, word], label) {
 // Function to render a batch
 function renderNextBatch() {
     //let end = Math.min(currentIndex + batchSize, sentencesList.length);
-    let all_instances = document.getElementById("all-instances");
+    
 
     let sents = document.getElementsByClassName("sent");
     for (let a = 0; a < content.length; a++) {
@@ -72,29 +91,42 @@ function renderNextBatch() {
                         console.log("Setting label to:", label);
 
 
+
                         let div_words = document.getElementsByClassName("word");
                         let count = 0;
-                        for (let w of div_words) {
-                            if (w.innerText === this.innerText) {
+                        if (document.getElementById("all-instances").checked) {
+                            for (let w of div_words) {
+                                if (w.innerText === this.innerText) {
 
-                                w.style.backgroundColor = "yellow";
-                                let w_sent = w.parentNode;
-                                let w_page = w_sent.parentNode;
-                                let w_chap = w_page.parentNode;
-                                let w_i = Array.from(w_sent.children).indexOf(w);
-                                let s_i = Array.from(w_page.children).indexOf(w_sent);
-                                let p_i = parseInt(w_page.id);
-                                let c_i = parseInt(w_chap.id);
+                                    let w_sent = w.parentNode;
+                                    let w_page = w_sent.parentNode;
+                                    let w_chap = w_page.parentNode;
+                                    let w_i = Array.from(w_sent.children).indexOf(w);
+                                    let s_i = Array.from(w_page.children).indexOf(w_sent);
+                                    let p_i = parseInt(w_page.id);
+                                    let c_i = parseInt(w_chap.id);
 
-                                if (document.getElementById("all-instances").checked) {
                                     w.style.backgroundColor = "yellow";
                                     count++;
                                     modifiedWords.push([c_i, p_i, s_i, w_i]);
-                                }
 
-                            } else {
-                                w.style.backgroundColor = "white";
+
+                                } else {
+                                    w.style.backgroundColor = "rgba(0, 0, 0, 0)";
+                                }
                             }
+                        }
+                        else {
+
+                                this.style.backgroundColor = "yellow";
+                                if(lastClicked != undefined){
+                                    lastClicked.style.backgroundColor = "rgba(0, 0, 0, 0)";
+                                }
+                                
+                                lastClicked = this;
+                                
+
+
                         }
                         document.getElementById("word-count").innerText = count;
 

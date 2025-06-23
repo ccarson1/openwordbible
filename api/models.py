@@ -17,7 +17,7 @@ class Book(models.Model):
     name = models.CharField(max_length=255)
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
     date = models.CharField(max_length=255, default=None)
-    religion = models.ForeignKey(Religion, on_delete=models.CASCADE)
+    religion = models.ForeignKey(Religion, on_delete=models.CASCADE,default=None, null=True, blank=True)
     authors = models.CharField(max_length=255, blank=True, null=True, default=None)
     denomination = models.CharField(max_length=255, blank=True, null=True,default=None)
     translator = models.CharField(max_length=255, blank=True, null=True,default=None)
@@ -70,14 +70,14 @@ class Profile(models.Model):
         return self.user.username
     
 class Word(models.Model):
-    text = models.CharField(max_length=100)
+    text = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.text
     
 class Label(models.Model):
     text = models.CharField(max_length=100, unique=True)
-    
+    type = models.CharField(max_length=50)
     def __str__(self):
         return self.text
     
@@ -101,6 +101,20 @@ class Annotation(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['text', 'label'], name='unique_annotation_text_label')
+        ]
+
+    def __str__(self):
+        return f'Text: {self.text} | Label: {self.label}'
+    
+class POSLabel(models.Model):
+    word_index = models.IntegerField(default=0)
+    sentence = models.ForeignKey(Sentence, on_delete=models.CASCADE)
+    text = models.ForeignKey(Word, on_delete=models.CASCADE)
+    label = models.ForeignKey(Label, on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['text', 'label'], name='unique_pos_text_label')
         ]
 
     def __str__(self):

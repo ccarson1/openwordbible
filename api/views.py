@@ -31,7 +31,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from .book_convert import ConvertBook
 # from .annotations import Annotation
-from .models import Book, Religion, Language, Word, Label, Annotation, Profile, Sentence
+from .models import Book, Religion, Language, Word, Label, Annotation, Profile, Sentence, POSLabel
 from django.core.files import File
 from django.db import transaction
 
@@ -295,14 +295,14 @@ class PublishBook(APIView):
             # test = annotation.initiate_annotations(published_book)
             ###################################################################################################################################################
 
-            if book_religion_id and book_religion_id.lower() != "none":
-                try:
-                    book_religion = Religion.objects.get(name=book_religion_id)
-                    religion_name = book_religion.name
-                except Religion.DoesNotExist:
-                    return Response({"error": "Religion not found"}, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                print("No religion provided or explicitly set to 'none'.")
+            # if book_religion_id and book_religion_id.lower() != "none":
+            #     try:
+            #         book_religion = Religion.objects.get(name=book_religion_id)
+            #         religion_name = book_religion.name
+            #     except Religion.DoesNotExist:
+            #         return Response({"error": "Religion not found"}, status=status.HTTP_400_BAD_REQUEST)
+            # else:
+            #     print("No religion provided or explicitly set to 'none'.")
 
             language_name = book_language.name
             print("Language Name:", language_name)
@@ -351,7 +351,7 @@ class PublishBook(APIView):
 
 
         return Response({"error": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
-    
+        return Response({"message": "Book saved successfully!", "book_id": 1}, status=status.HTTP_201_CREATED)
 
 
 class LoadBook(APIView):
@@ -482,6 +482,7 @@ class UpdateAnnotation(APIView):
                     for sentence_index, sentence in enumerate(page):
                         words = sentence['text'].split(" ")
                         labels = sentence['labels']
+                        pos = sentence['POS']
 
                         if len(words) != len(labels):
                             continue  # Skip inconsistent entries
@@ -495,13 +496,26 @@ class UpdateAnnotation(APIView):
                             sentence_index=sentence_index
                         )
 
-                        for word_index, (word_text, label_text) in enumerate(zip(words, labels)):
+                        
+
+                        for word_index, (word_text, label_text, pos_text) in enumerate(zip(words, labels, pos)):
+
+                             # Get or create the Word and Label
+                            word_obj, _ = Word.objects.get_or_create(text=word_text)
+                            label_obj, _ = Label.objects.get_or_create(text=label_text, type="NER")
+                            pos_obj, _ = Label.objects.get_or_create(text=pos_text, type="POS")
+
+                            poslabel, pos_created = POSLabel.objects.get_or_create(
+                                text=word_obj,
+                                label=pos_obj,
+                                defaults={
+                                    'word_index': word_index,
+                                    'sentence': sentence_obj
+                                }
+                            )
+
                             if label_text == "O":
                                 continue  # Skip non-entity labels
-
-                            # Get or create the Word and Label
-                            word_obj, _ = Word.objects.get_or_create(text=word_text)
-                            label_obj, _ = Label.objects.get_or_create(text=label_text)
 
                             # Prevent duplicate Annotation
                             annotation, created = Annotation.objects.get_or_create(

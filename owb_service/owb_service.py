@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from annotations import Annotation
+from app.annotations import Annotation
+from app.pos import POS
 import json
 
 app = Flask(__name__)
@@ -15,15 +16,20 @@ def process():
     book_index = request.form.get("book_index")
 
     print(published_book)
+
+    
     
     annotation = Annotation()
-    test = annotation.initiate_annotations(published_book)
+    ner_labeled = annotation.initiate_annotations(published_book)
+
+    pos = POS()
+    new_pos_labeled = pos.pos_label_process(ner_labeled)
 
     return jsonify({
         "message": "Processed multipart form data",
         "book_name": book_name,
         "book_author": book_author,
-        "published_book": test,
+        "published_book": new_pos_labeled,
         "book_index": book_index
     })
 
