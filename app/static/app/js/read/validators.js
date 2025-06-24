@@ -27,10 +27,10 @@ function validate_inputs() {
         return false;
     }
     
-    if (!textNumberRegex.test(data)) {
-        showAlert("Data must contain only text and numbers.", "danger");
-        return false;
-    }
+    // if (!textNumberRegex.test(data)) {
+    //     showAlert("Data must contain only text and numbers.", "danger");
+    //     return false;
+    // }
 
     
     return true;

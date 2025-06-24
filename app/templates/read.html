@@ -4,6 +4,7 @@
 {% block extra_head %}
 
 <link rel="stylesheet" href="{% static '/app/css/read/read.css' %}">
+<link rel="stylesheet" href="{% static '/app/css/read/highlighter.css' %}">
 
 <script src="{% static '/app/js/read/book.js' %}"></script>
 <script src="{% static '/app/js/read/bookFormatter.js' %}"></script>
@@ -16,6 +17,7 @@
 <script src="{% static '/app/js/read/validators.js' %}" defer></script>
 <script src="{% static '/app/js/read/textCompare.js' %}" defer></script>
 <script src="{% static '/app/js/read/updateLayout.js' %}" defer></script>
+<script src="{% static '/app/js/read/highlighter.js' %}" defer></script>
 
 {% endblock %}
 
@@ -61,7 +63,7 @@
                             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                             {{ chapter.header }}
                             <span class="badge bg-primary rounded-pill">Page {{ chapter.page }}</span>
-                    </div>
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -74,6 +76,23 @@
                     id="note-search">
                 <button class="btn btn-outline-success" id="btn-search-notes">Find</button>
             </form>
+            <div class="form-check form-switch mt-4">
+                <input class="form-check-input" type="checkbox" id="highlighterToggle"
+                    onchange="toggleHighlighted()" checked>
+                <label class="form-check-label small" for="highlighterToggle">Show Highlighted</label>
+                
+            </div>
+            <div class="dropdown mt-4">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="filterDropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-filter"></i>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                        <li><a class="dropdown-item" href="#">Filter by Date</a></li>
+                        <li><a class="dropdown-item" href="#">Filter by Name</a></li>
+                        <li><a class="dropdown-item" href="#">Filter by Color</a></li>
+                    </ul>
+                </div>
             <span class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
                 <svg class="bi me-2" width="30" height="24">
                     <use xlink:href="#bootstrap"></use>
@@ -149,7 +168,9 @@
 
         <h1 class="text-center" id="book-header">{{ book.name }}</h1>
         <p id="book_id" hidden>{{ book.id }}</p>
-        <span style="display: flex;"><input type="number" id="current_page" class="form-control" value=1><h4 style="padding: .7%;">/<span id="total-pages"></span> </h4></span>
+        <span style="display: flex;"><input type="number" id="current_page" class="form-control" value=1>
+            <h4 style="padding: .7%;">/<span id="total-pages"></span> </h4>
+        </span>
         <button class="btn btn-primary" style="margin-left: 80%;" id="bookmark">bookmark</button>
         <div class="d-flex justify-content-center page-nav" id="pg1">
             <nav aria-label="Page navigation example">
@@ -179,6 +200,18 @@
                 </ul>
             </nav>
         </div>
+        <div id="toolbar">
+        <div>
+            <span class="color-swatch" data-color="yellow" style="background: yellow;"></span>
+            <span class="color-swatch" data-color="lightgreen" style="background: lightgreen;"></span>
+            <span class="color-swatch" data-color="lightblue" style="background: lightblue;"></span>
+            <span class="color-swatch" data-color="pink" style="background: pink;"></span>
+            <span class="toolbar-icon" id="save"><i class="bi bi-bookmark"></i></span>
+            <span class="toolbar-icon" id="copy"><i class="bi bi-clipboard"></i></span>
+            <span class="toolbar-icon" id="share"><i class="bi bi-share"></i></span>
+            <span class="toolbar-icon" id="undo"><i class="bi bi-arrow-counterclockwise"></i></span>
+        </div>
+    </div>
 
     </div>
 
@@ -254,4 +287,6 @@
     //document.getElementById("page-text").innerText = '{{ book.content }}'
 
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 {% endblock %}

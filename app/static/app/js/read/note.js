@@ -1,10 +1,10 @@
-class Note{
+class Note {
     constructor(
         book,
-        note, 
+        note,
         user,
         date
-    ){
+    ) {
         this.book = book;
         this.note = note;
         this.user = user;
@@ -42,11 +42,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         console.log(notes);
+        console.log(validate_inputs());
 
         if (validate_inputs() == true) {
-            notes.push({ "title": note_title, "book": curr_book, "data": note_data })
+            notes.push({ "title": note_title, "book": current_book.id, "data": note_data })
             //sends json to backend
-            save_notes(notes);
+            //save_notes(notes);
+
+            const action = selectedWords.map(word => ({
+                el: word,
+                prevColor: word.style.backgroundColor,
+                prevClasses: [...word.classList],
+            }));
+            historyStack.push(action);
+
+            selectedWords.forEach((word, i) => {
+                console.log(word);
+                word.classList.add(`note_${notes.length}`);
+
+                // if (i === 0) word.classList.add("start-marker");
+                // if (i === selectedWords.length - 1) word.classList.add("end-marker");
+            });
+
+            document.getElementById("note-title").value = "";
+            document.getElementById("note-data").value = "";
+            document.getElementById("NoteModalLabel").innerText = "New Note";
+
+            isCurrentHighlightSaved = true;
+            savedHighlights.push([...selectedWords]);
+            selectedWords = [];
+            hideToolbar();
             myModal.hide();
         }
 
