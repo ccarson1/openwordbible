@@ -1,13 +1,16 @@
+
 class Note {
     constructor(
         book,
-        note,
-        user,
+        title,
+        description,
+        el_class,
         date
     ) {
         this.book = book;
-        this.note = note;
-        this.user = user;
+        this.title = title;
+        this.description = description;
+        this.el_class = el_class;
         this.date = date;
     }
 }
@@ -21,6 +24,10 @@ notes = []
 var myModal = new bootstrap.Modal(document.getElementById('exampleModal'));
 
 document.addEventListener('DOMContentLoaded', function () {
+
+
+    loadNotes(current_book.id);
+
     // Get references to the modal and the trigger button
 
     var triggerButton = document.getElementById('btn-new-note');
@@ -45,24 +52,37 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log(validate_inputs());
 
         if (validate_inputs() == true) {
-            notes.push({ "title": note_title, "book": current_book.id, "data": note_data })
-            //sends json to backend
-            //save_notes(notes);
+            note_desc = document.getElementById("note-data").value;
 
-            const action = selectedWords.map(word => ({
-                el: word,
-                prevColor: word.style.backgroundColor,
-                prevClasses: [...word.classList],
-            }));
-            historyStack.push(action);
+            notes.push({ "title": note_title, "book": current_book.id, "data": note_data })
+
+            sentence_index_start = Array.from(selectedWords[0].parentElement.parentElement.children).indexOf(selectedWords[0].parentElement);
+            sentence_index_end = Array.from(selectedWords[selectedWords.length - 1].parentElement.parentElement.children).indexOf(selectedWords[selectedWords.length - 1].parentElement);
+
+            word_index_start = Array.from(selectedWords[0].parentElement.children).indexOf(selectedWords[0]);
+            word_index_end = Array.from(selectedWords[selectedWords.length - 1].parentElement.children).indexOf(selectedWords[selectedWords.length - 1]);
+
+            //sends json to backend
+            save_note({
+                "title": note_title,
+                "book": current_book.id,
+                "data": note_data,
+                "note_color": temp_note_color,
+                "sentence_index_start": sentence_index_start,
+                "sentence_index_end": sentence_index_end,
+                "word_index_start": word_index_start,
+                "word_index_end": word_index_end
+            });
+
 
             selectedWords.forEach((word, i) => {
                 console.log(word);
                 word.classList.add(`note_${notes.length}`);
 
-                // if (i === 0) word.classList.add("start-marker");
-                // if (i === selectedWords.length - 1) word.classList.add("end-marker");
             });
+
+            // el_class = selectedWords[0].classList.value;
+            // temp_note = new Note(notes.length, note_title, current_book.id, note_desc, el_class)
 
             document.getElementById("note-title").value = "";
             document.getElementById("note-data").value = "";
@@ -144,23 +164,24 @@ function addItem(note_title, note_data, note_id) {
 }
 
 
-function save_notes(notes) {
-    console.log(notes);
-    let username = document.getElementById("ui-username").innerText;
+function save_note(note) {
+    console.log(note);
+    let username = document.getElementById("ui-username").innerText.trim();
     showSpinner();
 
     const payload = {
         username: username,
-        notes: notes
+        note: note
     }
 
     // Send a POST request
-    fetch('/save-notes', {
+    fetch('/api/save-note/', {
         method: 'POST',
+        body: JSON.stringify(note),
         headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrftoken,
+        }
     })
         .then(response => response.json())
         .then(result => {
@@ -241,4 +262,29 @@ function btnDelete(id) {
             hideSpinner();
             console.error('Error:', error);
         });
+}
+
+
+function loadNotes(bookId) {
+    fetch('/api/notes/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+        },
+        body: JSON.stringify({ book_id: bookId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log(data);
+        for(let d=0; d<data.length; d++){
+            console.log(data[d]);
+            addItem(data[d].title, data[d].note, data[d].id);
+        }
+        hideSpinner();
+    })
+    .catch(err => {
+        console.error(err);
+        hideSpinner();
+    });
 }

@@ -1,7 +1,9 @@
 let isMouseDown = false;
 let selectedWords = [];
 let savedHighlights = [];
-let historyStack = [];
+// let historyStack = [];
+let temp_note_color;
+let startWord;
 
 const textLayout = document.getElementById("text-layout");
 const toolbar = document.getElementById("toolbar");
@@ -11,12 +13,21 @@ let isCurrentHighlightSaved = false;
 
 textLayout.addEventListener("mousedown", (e) => {
     if (e.button === 0 && e.target.classList.contains("word")) {
-        isMouseDown = true;
-        if(myModal._isShown == false){
-            clearTemporaryHighlights();
+        
+        if (myModal._isShown == false) {
+            if (e.target.classList.contains("highlighted")) {
+                h_note = document.getElementsByClassName(e.target.classList.value)
+                console.log(h_note)
+            }
+            else {
+                isMouseDown = true;
+                clearTemporaryHighlights();
+                startWord = e.target;
+                updateSelectedWords(e.target);
+            }
+
         }
-        startWord = e.target;
-        updateSelectedWords(e.target);
+
 
         // let startIndex = document.createElement("i");
         // startIndex.setAttribute("class", "bi bi-cursor-text");
@@ -27,7 +38,11 @@ textLayout.addEventListener("mousedown", (e) => {
 
 textLayout.addEventListener("mouseover", (e) => {
     if (isMouseDown && e.target.classList.contains("word")) {
-        updateSelectedWords(e.target);
+        if (e.target.classList.contains("highlighted")) { }
+        else {
+            updateSelectedWords(e.target);
+        }
+
     }
 });
 
@@ -57,8 +72,11 @@ document.addEventListener("mouseup", (e) => {
 textLayout.addEventListener("contextmenu", (e) => {
     e.preventDefault();
     if (!isCurrentHighlightSaved) {
-        if(myModal._isShown == false){
-            clearTemporaryHighlights();
+        if (myModal._isShown == false) {
+            if (e.target.classList.contains("highlighted")) { }
+            else {
+                updateSelectedWords(e.target);
+            }
         }
         hideToolbar();
         return;
@@ -76,8 +94,11 @@ textLayout.addEventListener("contextmenu", (e) => {
 document.addEventListener("mousedown", (e) => {
     if (!toolbar.contains(e.target) && !textLayout.contains(e.target)) {
         if (!isCurrentHighlightSaved) {
-            if(myModal._isShown == false){
-                clearTemporaryHighlights();
+            if (myModal._isShown == false) {
+                if (e.target.classList.contains("highlighted")) { }
+                else {
+                    updateSelectedWords(e.target);
+                }
             }
         }
         hideToolbar();
@@ -113,6 +134,8 @@ function showToolbar(x, y) {
 document.querySelectorAll(".color-swatch").forEach(swatch => {
     swatch.addEventListener("click", () => {
         const color = swatch.dataset.color;
+        temp_note_color = color;
+        console.log(temp_note_color);
         selectedWords.forEach(word => {
             word.style.backgroundColor = color;
         });
@@ -145,32 +168,32 @@ document.getElementById("share").addEventListener("click", () => {
     alert("Share:\n" + text);
 });
 
-// UNDO
-document.getElementById("undo").addEventListener("click", () => {
-    if (!historyStack.length) return;
+// // UNDO
+// document.getElementById("undo").addEventListener("click", () => {
+//     if (!historyStack.length) return;
 
-    const lastAction = historyStack.pop();
-    lastAction.forEach(({ el, prevColor, prevClasses }) => {
-        el.style.backgroundColor = prevColor;
-        el.className = ""; // reset all
-        prevClasses.forEach(cls => el.classList.add(cls));
-    });
-});
+//     const lastAction = historyStack.pop();
+//     lastAction.forEach(({ el, prevColor, prevClasses }) => {
+//         el.style.backgroundColor = prevColor;
+//         el.className = ""; // reset all
+//         prevClasses.forEach(cls => el.classList.add(cls));
+//     });
+// });
 
-// CTRL+Z Undo shortcut
-document.addEventListener("keydown", (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === "z") {
-        document.getElementById("undo").click();
-    }
-});
+// // CTRL+Z Undo shortcut
+// document.addEventListener("keydown", (e) => {
+//     if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+//         document.getElementById("undo").click();
+//     }
+// });
 
 // This function highlights the range between startWord and currentWord
 function updateSelectedWords(currentWord) {
 
-    if(myModal._isShown == false){
+    if (myModal._isShown == false) {
         clearTemporaryHighlights();
     }
-    
+
 
     // Get all .word elements in order
     const allWords = Array.from(textLayout.querySelectorAll(".word"));

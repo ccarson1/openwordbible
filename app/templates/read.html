@@ -18,12 +18,14 @@
 <script src="{% static '/app/js/read/textCompare.js' %}" defer></script>
 <script src="{% static '/app/js/read/updateLayout.js' %}" defer></script>
 <script src="{% static '/app/js/read/highlighter.js' %}" defer></script>
+<script src="{% static '/app/js/read/tags.js' %}" defer></script>
 
 {% endblock %}
 
 {% block content %}
 {% csrf_token %}
 {% if user.is_authenticated %}
+
 
 
 <div class="corner-icon" id="openSearchPopup">
@@ -171,7 +173,7 @@
         <span style="display: flex;"><input type="number" id="current_page" class="form-control" value=1>
             <h4 style="padding: .7%;">/<span id="total-pages"></span> </h4>
         </span>
-        <button class="btn btn-primary" style="margin-left: 80%;" id="bookmark">bookmark</button>
+        <button class="btn btn-primary" style="margin-left: 80%;" id="bookmark"><i class="bi bi-bookmark"></i></button>
         <div class="d-flex justify-content-center page-nav" id="pg1">
             <nav aria-label="Page navigation example">
                 <ul class="pagination">
@@ -206,7 +208,7 @@
             <span class="color-swatch" data-color="lightgreen" style="background: lightgreen;"></span>
             <span class="color-swatch" data-color="lightblue" style="background: lightblue;"></span>
             <span class="color-swatch" data-color="pink" style="background: pink;"></span>
-            <span class="toolbar-icon" id="save"><i class="bi bi-bookmark"></i></span>
+            <span class="toolbar-icon" id="save"><i class="bi bi-file-earmark-plus"></i></span>
             <span class="toolbar-icon" id="copy"><i class="bi bi-clipboard"></i></span>
             <span class="toolbar-icon" id="share"><i class="bi bi-share"></i></span>
             <span class="toolbar-icon" id="undo"><i class="bi bi-arrow-counterclockwise"></i></span>
@@ -240,14 +242,21 @@
             </div>
             <label for="note-data">Description</label>
             <textarea class="form-control" aria-label="With textarea" id="note-data"></textarea>
+            <label for="">Tags</label>
+            <div class="input-group mb-3">
 
+                <input type="text" class="form-control" aria-label="Default"
+                    aria-describedby="inputGroup-sizing-default" id="note-tags">
+                <ul id="tag-suggestions" class="list-group position-absolute" style="z-index: 1000; margin-top: 10%;"></ul>
+
+            </div>
             <div class="modal-footer" id="m-footer">
 
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" id="save-note">Save changes</button>
 
-
             </div>
+
         </div>
     </div>
 </div>

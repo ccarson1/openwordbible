@@ -24,10 +24,11 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib import messages
-from .models import BookFormat, Profile, Note
+from .models import BookFormat, Profile, Note, Tag
 
 import PyPDF2
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.permissions import IsAuthenticated
 from .book_convert import ConvertBook
 # from .annotations import Annotation
@@ -37,6 +38,11 @@ from django.db import transaction
 
 from rest_framework import serializers
 from rest_framework.decorators import api_view
+from rest_framework.generics import ListAPIView
+from rest_framework.filters import SearchFilter
+from rest_framework import serializers
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
 
 
 class ProfileAPIView(APIView):
@@ -195,6 +201,84 @@ class LoadBookmarkAPIView(APIView):
             print(f'Error loading bookmark: {e}')
             return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+class SaveNote(APIView):
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+
+        if user.is_authenticated:
+            data = request.data
+            title = data.get('title')
+            book_id  = data.get('book')
+            note_data = data.get('data')
+            color = data.get('note_color')
+            sentence_index_start = data.get('sentence_index_start')
+            sentence_index_end = data.get('sentence_index_end')
+            word_index_start = data.get('word_index_start')
+            word_index_end = data.get('word_index_end')
+            tag_names = data.get('tags', [])
+
+            try:
+                book = Book.objects.get(id=book_id)
+            except Book.DoesNotExist:
+                return Response({'error': 'Book not found'}, status=404)
+            
+            print({
+                user.username: user.id,
+                'title': title,
+                'book': book,
+                'note_data': note_data,
+                'color': color,
+                'sentence_index_start': sentence_index_start,
+                'sentence_index_end': sentence_index_end,
+                'word_index_start': word_index_start,
+                'word_index_end': word_index_end,
+                'tag_names': tag_names
+            })
+
+            # Save or process note here
+            ##################################################################
+            note = Note.objects.create(
+                user = user,
+                title = title,
+                book = book,
+                note = note_data,
+                color = color,
+                sentence_index_start = sentence_index_start,
+                sentence_index_end = sentence_index_end,
+                word_index_start = word_index_start,
+                word_index_end = word_index_end,
+            )
+            
+            for name in tag_names:
+                tag, _ = Tag.objects.get_or_create(name=name)
+                note.tags.add(tag)
+
+            return Response({'status': 'success', 'notes': []})
+        
+        return Response({'error': 'Unauthorized'}, status=401)
+    
+
+class LoadNotes(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        book_id = request.data.get('book_id')
+
+        notes_qs = Note.objects.filter(user=user)
+        if book_id:
+            notes_qs = notes_qs.filter(book_id=book_id)
+
+        notes_list = list(notes_qs.values(
+            'id', 'book', 'title', 'note', 'color', 'tags',
+            'sentence_index_start', 'sentence_index_end',
+            'word_index_start', 'word_index_end', 'date'
+        ))
+
+        return Response(notes_list, status=status.HTTP_200_OK)
         
 class UploadBook(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -625,6 +709,18 @@ class ExportDataset(APIView):
         print(file_name)
         response['Content-Disposition'] = 'attachment; filename="'+ file_name +'.csv"'
         return response
+    
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ['id', 'name']
+    
+class TagListView(ListAPIView):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [SearchFilter]
+    search_fields = ['name']
 
 
 

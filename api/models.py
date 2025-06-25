@@ -52,10 +52,23 @@ class BookFormat(models.Model):
     font_size = models.PositiveSmallIntegerField(default=15, max_length=24)
     color = models.CharField(max_length=50, default="black")
 
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.name
+
 class Note(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    note = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.TextField(blank=True)
+    note = models.TextField(blank=True)
+    color = models.TextField(default='yellow')
+    tags = models.ManyToManyField(Tag, blank=True)
+    sentence_index_start = models.PositiveIntegerField(blank=True, default=0)
+    sentence_index_end = models.PositiveIntegerField(blank=True, default=0)
+    word_index_start = models.PositiveIntegerField(blank=True, default=0)
+    word_index_end = models.PositiveIntegerField(blank=True, default=0)
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
