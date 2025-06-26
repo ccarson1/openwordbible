@@ -1,17 +1,29 @@
 
 class Note {
-    constructor(
+    constructor({
+        id = null,
         book,
         title,
-        description,
-        el_class,
-        date
-    ) {
+        note,  
+        color,
+        tags = null,
+        sentence_index_start,
+        sentence_index_end,
+        word_index_start,
+        word_index_end,
+        date = new Date()
+    }) {
+        this.id = id;
         this.book = book;
         this.title = title;
-        this.description = description;
-        this.el_class = el_class;
-        this.date = date;
+        this.note = note;
+        this.color = color;
+        this.tags = tags;
+        this.sentence_index_start = sentence_index_start;
+        this.sentence_index_end = sentence_index_end;
+        this.word_index_start = word_index_start;
+        this.word_index_end = word_index_end;
+        this.date = new Date(date);
     }
 }
 
@@ -22,6 +34,20 @@ notes = []
 
 
 var myModal = new bootstrap.Modal(document.getElementById('exampleModal'));
+
+
+function resetModal() {
+    editingNote = null;
+    document.getElementById("note-title").value = "";
+    document.getElementById("note-data").value = "";
+    document.getElementById("NoteModalLabel").innerText = "New Note";
+
+    const delBtn = document.getElementById('delete-button');
+    if (delBtn) delBtn.remove();
+
+
+}
+document.getElementById('exampleModal').addEventListener('hidden.bs.modal', resetModal);
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -34,18 +60,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Add an event listener to the button to show the modal
     triggerButton.addEventListener('click', function () {
-        myModal.show();
+
         document.getElementById("note-title").value = "";
         document.getElementById("note-data").value = "";
         document.getElementById("NoteModalLabel").innerText = "New Note";
+        const delBtn = document.getElementById('delete-button');
+        if (delBtn) delBtn.remove();
+
+        selectedWords = [];
+        hideToolbar();
+        myModal.show();
     });
 
     document.getElementById("save-note").addEventListener("click", function () {
 
         let note_title = document.getElementById("note-title").value;
         let note_data = document.getElementById("note-data").value;
-
-
 
 
         console.log(notes);
@@ -128,8 +158,20 @@ function noteItem(id) {
 
 }
 
-function addItem(note_title, note_data, note_id) {
 
+
+
+function addItem(note) {
+
+
+    let temp_note = new Note(note)
+    notes.push(temp_note);
+
+    for (let x = temp_note.sentence_index_start; x <= temp_note.sentence_index_end; x++) {
+        for (let y = temp_note.word_index_start; y <= temp_note.word_index_end; y++) {
+            document.getElementById('text-layout').children[x].children[y].style.backgroundColor = temp_note.color;
+        }
+    }
 
 
     let note_list = document.getElementById('notes-list');
@@ -147,13 +189,16 @@ function addItem(note_title, note_data, note_id) {
     let newNote = document.createElement("div");
     newNote.innerHTML = `
         
-        <div  class='list-group-item  lh-tight notes' onclick="noteItem(`+ note_id + `)" id="` + note_id + `">
+        <div  class='list-group-item  lh-tight notes' onclick="noteItem(`+ note.id + `)" id="` + note.id + `">
             <div class="d-flex w-100 align-items-center justify-content-between" >
-                <strong class="mb-1">${note_title}</strong>
-                <small class="text-muted"> ${year}-${month}-${day}</small>
+                <strong class="mb-1">${note.title}</strong>
+                <div class="d-flex flex-column align-items-end">
+                <small class="text-muted">${year}-${month}-${day}</small>
+                <div class="circle-indicator mt-1" style="background-color:`+ note.color + `;"></div>
+            </div>
                 
             </div>
-            <div class="col-10 mb-1 small">${note_data}</div>
+            <div class="col-10 mb-1 small">${note.note}</div>
             
         </div>
         
@@ -192,19 +237,19 @@ function save_note(note) {
             console.log('Success:', result);
             console.log('notes saved')
 
-            const notes = result.notes;
+            const new_notes = result.notes;
 
-            console.log(notes)
+            console.log(new_notes)
             document.getElementById('notes-list').innerHTML = "";
-            for (let i = 0; i < notes.length; i++) {
-                console.log(notes[i].id);
-                console.log(notes[i].title);
-                console.log(notes[i].book);
-                console.log(notes[i].data);
+            for (let i = 0; i < new_notes.length; i++) {
+                console.log(new_notes[i].id);
+                console.log(new_notes[i].title);
+                console.log(new_notes[i].book);
+                console.log(new_notes[i].data);
 
                 //Adds note to the DOM
 
-                addItem(notes[i].title, notes[i].data, notes[i].id)
+                addItem(new_notes[i])
             }
             //setupStartPage();
         })
@@ -227,12 +272,13 @@ function btnDelete(id) {
     showSpinner();
 
     // Send a POST request
-    fetch('/delete-note', {
+    fetch('/api/delete-note/', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            "X-CSRFToken": csrftoken,
         },
-        body: JSON.stringify({ "note_id": id, "book_id": curr_book }) // Use 'body' to send the request payload
+        body: JSON.stringify({ "note_id": id, "book_id": current_book.id }) // Use 'body' to send the request payload
     })
         .then(response => response.json())
         .then(result => {
@@ -241,21 +287,36 @@ function btnDelete(id) {
             console.log('Success:', result);
             console.log('Note deleted');
 
-            const notes = result.notes;
-
-            console.log(notes)
-            document.getElementById('notes-list').innerHTML = "";
-            for (let i = 0; i < notes.length; i++) {
-                console.log(notes[i].id);
-                console.log(notes[i].title);
-                console.log(notes[i].book);
-                console.log(notes[i].data);
-
-                //Adds note to the DOM
-
-                addItem(notes[i].title, notes[i].data, notes[i].id)
+            const deletedElement = document.getElementById(result.deleted);
+            if (deletedElement) {
+                deletedElement.classList.add('fade-out');
+                setTimeout(() => deletedElement.remove(), 300); // wait for animation
             }
-            //setupStartPage();
+
+            const note_result = notes.find(n => n.id === result.deleted);
+            console.log(note_result);
+
+            for (let x = note_result.sentence_index_start; x <= note_result.sentence_index_end; x++) {
+                for (let y = note_result.word_index_start; y <= note_result.word_index_end; y++) {
+                    document.getElementById('text-layout').children[x].children[y].style.backgroundColor = 'white';
+                }
+            }
+            notes = notes.filter(note => note.id !== result.deleted);
+
+            // const notes = result.notes;
+
+            // console.log(notes)
+            // document.getElementById('notes-list').innerHTML = "";
+            // for (let i = 0; i < notes.length; i++) {
+            //     console.log(notes[i].id);
+            //     console.log(notes[i].title);
+            //     console.log(notes[i].book);
+            //     console.log(notes[i].data);
+
+            //     //Adds note to the DOM
+
+            //     addItem(notes[i])
+            // }
         })
         .catch(error => {
             // Hide spinner
@@ -274,17 +335,20 @@ function loadNotes(bookId) {
         },
         body: JSON.stringify({ book_id: bookId })
     })
-    .then(res => res.json())
-    .then(data => {
-        console.log(data);
-        for(let d=0; d<data.length; d++){
-            console.log(data[d]);
-            addItem(data[d].title, data[d].note, data[d].id);
-        }
-        hideSpinner();
-    })
-    .catch(err => {
-        console.error(err);
-        hideSpinner();
-    });
+        .then(res => res.json())
+        .then(data => {
+            console.log(data);
+            returned_notes = data;
+            for (let d = 0; d < data.length; d++) {
+                
+                console.log(data[d]);
+                addItem(data[d]);
+                //notes.push({'title': data[d].title, 'book': data[d].id, 'data': data[d].note})
+            }
+            hideSpinner();
+        })
+        .catch(err => {
+            console.error(err);
+            hideSpinner();
+        });
 }

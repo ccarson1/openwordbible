@@ -124,3 +124,21 @@
 .premium-btn i {
     font-size: 1.2rem;
 }
+
+.free-btn {
+    background: linear-gradient(145deg, #4f9ecf, #1c6692);
+    color: white;
+    font-weight: 600;
+    border: 1px solid #0d4d75;
+    border-radius: 8px;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3),
+                0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.free-btn:hover {
+    background: linear-gradient(145deg, #5fb3e7, #2e7fae);
+    box-shadow: 0 0 12px rgba(46, 127, 174, 0.5), 0 4px 6px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}

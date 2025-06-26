@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import ProfileAPIView, LoadBookmarkAPIView, UploadBook, PublishBook, LoadBook, search_books, UpdateLayout, UpdateAnnotation, ExportDataset, SaveNote, TagListView, LoadNotes
+from .views import ProfileAPIView, LoadBookmarkAPIView, UploadBook, PublishBook, LoadBook, search_books, UpdateLayout, UpdateAnnotation, ExportDataset, SaveNote, TagListView, LoadNotes, DeleteNote
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -18,6 +18,7 @@ urlpatterns = [
    path('export-dataset/', ExportDataset.as_view(), name='export-dataset'),
    path('save-note/', SaveNote.as_view(), name='save-note'),
    path('tags/', TagListView.as_view(), name='tag-list'),
-   path('notes/', LoadNotes.as_view(), name='notes-by-user-book'),
+   path('notes/', LoadNotes.as_view(), name='notes'),
+   path('delete-note/', DeleteNote.as_view(), name='delete-note'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

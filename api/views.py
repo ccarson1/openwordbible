@@ -260,6 +260,24 @@ class SaveNote(APIView):
         
         return Response({'error': 'Unauthorized'}, status=401)
     
+class DeleteNote(APIView):
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+
+        if user.is_authenticated:
+            data = request.data
+            print(data)
+
+            note_id = request.data.get('note_id')
+            book_id = request.data.get('book_id')
+
+            Note.objects.filter(id=note_id).delete()
+        
+        return Response({'deleted': note_id})
+    
 
 class LoadNotes(APIView):
     permission_classes = [IsAuthenticated]

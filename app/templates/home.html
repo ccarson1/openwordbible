@@ -3,41 +3,272 @@
 
 {% block extra_head %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<link rel="stylesheet" href="{% static '/app/css/home/timeline.css' %}">
+<!-- <link rel="stylesheet" href="{% static '/app/css/home/timeline.css' %}">
+<link rel="stylesheet" href="{% static '/app/css/home/membership.css' %}"> -->
 {% endblock %}
 
 {% block content %}
 {% csrf_token %}
-<div class="container">
-    <!-- <div class="d-flex justify-content-end mt-3">
-        <a href="" class="premium-btn">
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .free-btn,
+    .premium-btn {
+        font-weight: 500;
+        padding: 0.5rem 1.2rem;
+        border-radius: 30px;
+    }
+
+    .horizontal-timeline {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin-top: 60px;
+        overflow-x: auto;
+        padding: 40px 0;
+    }
+
+    .timeline-container {
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .timeline-line {
+        position: absolute;
+        top: 100px;
+        left: 0;
+        height: 4px;
+        background: #ccc;
+        width: 100%;
+        z-index: 1;
+    }
+
+    .timeline-item {
+        text-align: center;
+        position: relative;
+        flex: 1;
+        min-width: 180px;
+        margin: 0 20px;
+        z-index: 2;
+    }
+
+    .timeline-dot {
+        width: 16px;
+        height: 16px;
+        background-color: #ff5722;
+        border-radius: 50%;
+        margin: 0 auto;
+        position: absolute;
+        top: 92px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 3;
+    }
+
+    .timeline-img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin: 0 auto 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .timeline-date {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #666;
+    }
+
+    .timeline-title {
+        font-size: 1rem;
+        color: #333;
+    }
+
+    .image-content {
+        background-size: cover;
+        background-position: center;
+        height: 220px;
+        position: relative;
+    }
+
+    .overlay {
+        background: rgba(0, 0, 0, 0.55);
+        color: white;
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 1rem;
+    }
+
+    .overlay h5 {
+        margin-bottom: 0.25rem;
+        font-size: 1.1rem;
+    }
+
+    .overlay p,
+    .overlay a {
+        font-size: 0.9rem;
+    }
+
+    .timeline-content a {
+        color: #ffc107;
+        text-decoration: none;
+    }
+
+    .timeline-content a:hover {
+        text-decoration: underline;
+    }
+
+    .tier-container .card {
+        border-radius: 16px;
+    }
+
+    .card-title {
+        font-size: 2rem;
+    }
+
+    .btn-warning {
+        font-weight: 600;
+    }
+
+    .text-subtle {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+</style>
+
+<div class="container mt-4">
+
+    <!-- Top right buttons -->
+    <div class="d-flex justify-content-end align-items-center gap-2">
+        <a href="#" class="btn btn-light border shadow-sm free-btn">
+            <i class="bi bi-person"></i> Free Sign up
+        </a>
+        <a href="#" class="btn btn-warning text-white premium-btn">
             <i class="bi bi-gem"></i> Premium
         </a>
-    </div> -->
+    </div>
 
+    <!-- Header -->
+    <p id="current-date" class="text-center text-muted mt-4"></p>
+    <h1 class="text-center my-4 display-5 fw-bold">Today in History</h1>
+
+    <!-- Timeline Section -->
+    <div class="timeline-container container my-5">
+        <h2 class="text-center mb-5">Today in History</h2>
+        <div class="horizontal-timeline position-relative">
+            <!-- Timeline Line -->
+            <div class="timeline-line"></div>
+
+            <!-- Timeline Items -->
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <img src="/media/book_images/images.jpg" alt="Event" class="timeline-img">
+                <div class="timeline-date">325 AD</div>
+                <div class="timeline-title">First Council of Nicaea</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <img src="/media/book_images/quran.jpg" alt="Event" class="timeline-img">
+                <div class="timeline-date">570 AD</div>
+                <div class="timeline-title">Muhammad Born</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <img src="/media/book_images/Ibn Khordadbeh.jpg" alt="Event" class="timeline-img">
+                <div class="timeline-date">885</div>
+                <div class="timeline-title">Book of Roads and Kingdoms</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <img src="/media/book_images/first_crusade.jpg" alt="Event" class="timeline-img">
+                <div class="timeline-date">1096–1099</div>
+                <div class="timeline-title">First Crusade</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalContent">
+                <!-- Event details will go here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pricing Section -->
+<div class="container my-5 tier-container">
+    <div class="row row-cols-1 row-cols-md-2 g-4 text-center">
+
+        <!-- Free Tier -->
+        <div class="col">
+            <div class="card border-primary h-100 shadow-sm">
+                <div class="card-header bg-primary text-white fw-bold">Free</div>
+                <div class="card-body">
+                    <h2 class="card-title">$0<span class="fs-6">/mo</span></h2>
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>✔ Basic features</li>
+                        <li>✔ Limited access</li>
+                        <li>✖ Timeline Creation</li>
+                    </ul>
+                    <a href="#" class="btn btn-outline-primary">Sign Up</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Premium Tier -->
+        <div class="col">
+            <div class="card border-warning h-100 shadow-sm">
+                <div class="card-header bg-warning text-dark fw-bold">Premium</div>
+                <div class="card-body">
+                    <h2 class="card-title">$19<span class="fs-6">/mo</span></h2>
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>✔ All Free features</li>
+                        <li>✔ Unlimited Notes</li>
+                        <li>✔ Unlimited Timeline Creation</li>
+                        <li>✔ Early access to new tools</li>
+                    </ul>
+                    <a href="#" class="btn btn-warning text-dark">Upgrade</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- <div class="container">
+
+    <div class="d-flex justify-content-end align-items-center gap-2 mt-3">
+        <a href="#" class="btn btn-light border shadow-sm free-btn">
+            <i class="bi bi-person"></i> Free Sign up
+        </a>
+
+        <a href="#" class="btn btn-warning text-white premium-btn">
+            <i class="bi bi-gem"></i> Premium
+        </a>
+    </div>
     <p id="current-date" class="text-center text-muted mt-4"></p>
     <h1 class="text-center my-4 ">Today in History</h1>
     <div class="timeline mt-4">
-        <!-- <div class="timeline-item" data-event="Event 1 details">
-            <div class="timeline-content">
-                <h5>Event 1</h5>
-                <p>Details about Event 1</p>
-            </div>
-        </div>
-        <div class="timeline-item" data-event="Event 2 details">
-            <div class="timeline-content">
-                <h5>Event 2</h5>
-                <p>Details about Event 2</p>
-            </div>
-        </div>
-        <div class="timeline-item" data-event="Event 3 details">
-            <div class="timeline-content">
-                <h5>Event 3</h5>
-                <p>Details about Event 3</p>
-            </div>
-        </div> -->
 
-        <div class="timeline-item" data-event="Event 3 details">
+
+        <div class="timeline-item" data-event="Event 1 details">
             <div class="image-content" style="background-image: url('/media/book_images/images.jpg');">
                 <div class="overlay">
 
@@ -52,7 +283,7 @@
 
         </div>
 
-        <div class="timeline-item" data-event="Event 3 details">
+        <div class="timeline-item" data-event="Event 2 details">
             <div class="image-content" style="background-image: url('/media/book_images/quran.jpg');">
                 <div class="overlay">
 
@@ -60,6 +291,21 @@
                         <h5>Muhammad born</h5>
                         <p>570 AD</p>
                         <a href=""><small>Resources: <em>Some book</em></small></a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="timeline-item"
+            data-event="The earliest known description of the routes connecting the provinces of the Abbasid Empire to Baghdad was written by Ibn Khurradādhbih, the director of the Abbasid Bureau of Posts and Intelligence. He completed the final version of his Book of Roads and Kingdoms in 885, though it includes material from the early 9th century.">
+            <div class="image-content" style="background-image: url('/media/book_images/Ibn Khordadbeh.jpg');">
+                <div class="overlay">
+
+                    <div class="timeline-content">
+                        <h5>Book of Roads and Kingdoms</h5>
+                        <p>885</p>
+                        <a href=""><small>Resources: <em>THE ROUTES OF THE RĀDHĀNĪYA</em></small></a>
                     </div>
                 </div>
 
@@ -80,10 +326,11 @@
             </div>
 
         </div>
+
     </div>
 </div>
 
-<!-- Modal -->
+
 <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -92,11 +339,53 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="modalContent">
-                <!-- Event details will go here -->
+
             </div>
         </div>
     </div>
 </div>
+
+<div class="container my-5">
+    <div class="container my-5">
+        <div class="row row-cols-1 row-cols-md-2 g-4 text-center">
+
+
+            <div class="col">
+                <div class="card border-primary h-100 shadow-sm">
+                    <div class="card-header bg-primary text-white fw-bold">Free</div>
+                    <div class="card-body">
+                        <h2 class="card-title">$0<span class="fs-6">/mo</span></h2>
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li>✔ Basic features</li>
+                            <li>✔ Limited access</li>
+                            <li>✖ Timeline Creation</li>
+                        </ul>
+                        <a href="#" class="btn btn-outline-primary">Sign Up</a>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col">
+                <div class="card border-warning h-100 shadow-sm">
+                    <div class="card-header bg-warning text-dark fw-bold">Premium</div>
+                    <div class="card-body">
+                        <h2 class="card-title">$19<span class="fs-6">/mo</span></h2>
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li>✔ All Free features</li>
+                            <li>✔ Unlimited Notes</li>
+                            <li>✔ Unlimited Timeline Creation</li>
+                            <li>✔ Early access to new tools</li>
+                        </ul>
+                        <a href="#" class="btn btn-warning text-dark">Upgrade</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div> -->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>

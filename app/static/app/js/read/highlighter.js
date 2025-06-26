@@ -13,7 +13,7 @@ let isCurrentHighlightSaved = false;
 
 textLayout.addEventListener("mousedown", (e) => {
     if (e.button === 0 && e.target.classList.contains("word")) {
-        
+
         if (myModal._isShown == false) {
             if (e.target.classList.contains("highlighted")) {
                 h_note = document.getElementsByClassName(e.target.classList.value)
@@ -216,5 +216,24 @@ function updateSelectedWords(currentWord) {
     selectedWords.forEach(word => {
         word.classList.add("highlighted");
     });
+}
+
+function toggleHighlighted() {
+    console.log(notes);
+    console.log(document.getElementById('highlighterToggle').checked)
+    for (let n = 0; n < notes.length; n++) {
+        for (let x = notes[n].sentence_index_start; x <= notes[n].sentence_index_end; x++) {
+            for (let y = notes[n].word_index_start; y <= notes[n].word_index_end; y++) {
+                if(document.getElementById('highlighterToggle').checked == true){
+                    document.getElementById('text-layout').children[x].children[y].style.backgroundColor = notes[n].color;
+                }
+                else{
+                    document.getElementById('text-layout').children[x].children[y].style.backgroundColor = 'white';
+                }
+                
+            }
+        }
+    }
+
 }
 
