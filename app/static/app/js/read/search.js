@@ -102,7 +102,7 @@ if (document.getElementById("btn-top-search") != null) {
         console.log(matches.length);
         matches.forEach(m => {
             console.log(m.highlightedText);  
-            document.getElementById("num_of_results").innerText = m.highlightedText;
+            //document.getElementById("num_of_results").innerText = m.highlightedText;
             addSearchedItem("searched item", m.highlightedText, '2')
         });
 

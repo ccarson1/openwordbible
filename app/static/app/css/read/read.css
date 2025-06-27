@@ -100,9 +100,9 @@ h1 {
   overflow-y: scroll;
 }
 
-#search-container {
+/* #search-container {
   display: none;
-}
+} */
 
 .header-page {
   margin-left: 50%;

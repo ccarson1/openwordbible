@@ -56,16 +56,41 @@ Guidelines for the NER dataset
 
 **Labels**
 ```bash
-   Label Prefix Entity Type     Description                          
-
-   B-/I-art      Artifact         Titles of creative works             
-   B-/I-eve      Event            Named events (e.g. "Olympics")       
-   B-/I-geo      Geographical     Non-political location (e.g. "Nile") 
-   B-/I-gpe      Geo-Political    Countries, cities, etc.              
-   B-/I-nat      Natural Object   Natural things (e.g. "Amazon River") 
-   B-/I-org      Organization     Corporations, agencies, etc. (e.g., "Federalist Party", "Romans","Soviets", "Catholic Church")         
-   B-/I-per      Person           People names                         
-   B-/I-tim      Time Expression  Dates, times                         
-   O             Outside          Not a named entity                   
+   BIO Format Summary
+   B-XXX: Beginning of entity type XXX
+   I-XXX: Inside of the same entity
+   O: Outside any named entity
+   Entity Labels and Examples
+   PER: Person names (e.g., 'Abraham Lincoln' -> B-PER I-PER)
+   ORG: Organizations (e.g., 'United States' -> B-ORG I-ORG)
+   GPE: Countries, cities, states (e.g., 'New York' -> B-GPE I-GPE)
+   LOC: Other locations (e.g., 'Grand Canyon' -> B-LOC I-LOC)
+   GEO: Natural features (e.g., 'Nile River' -> B-GEO I-GEO)
+   TIM: Time expressions (e.g., 'August 15, 1947' -> B-TIM I-TIM O I-TIM, A.D. -> B-TIM O I-TIM O)
+   NAT: Natural entities (e.g., 'COVID-19', 'Hurricane Ian' -> B-NAT)
+   EVE: Named events (e.g., 'World War II' -> B-EVE I-EVE I-EVE)
+   ART: Artworks (e.g., 'Starry Night' -> B-ART I-ART)
+   MISC: Miscellaneous named items (e.g., 'Western culture' -> B-MISC I-MISC)
+   Common Mistakes
+   - Do not mix entity types in one phrase (e.g., B-PER I-ORG is incorrect)
+   - Always start an entity with B-XXX
+   - Label punctuation as O unless it is part of the named entity
+   - Use B-XXX for new entity mentions even if same type
+   NER Label Set for Prodigy / Doccano
+   Prodigy:
+   {
+   "labels": ["PER", "ORG", "GPE", "LOC", "GEO", "TIM", "NAT", "EVE", "ART", "MISC"]
+   }
+   Doccano YAML:
+   - [PER, Person]
+   - [ORG, Organization]
+   - [GPE, Geo-political Entity]
+   - [LOC, Other Location]
+   - [GEO, Geographical Feature]
+   - [TIM, Time Expression]
+   - [NAT, Natural Entity]
+   - [EVE, Event]
+   - [ART, Artwork]
+   - [MISC, Miscellaneous]               
 
 ```
