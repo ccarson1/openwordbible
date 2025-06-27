@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from api.models import BookFormat, Profile
 from api.models import Book
 import json
+import os
 
 def home(request):
     user = request.user
@@ -22,12 +23,18 @@ def read(request, id):
     user = request.user
     book = get_object_or_404(Book, id=id)
 
+    print("Book file path:", book.book_file.path)
+    print("File exists?", os.path.exists(book.book_file.path))
+
     book_json = None
     if book.book_file and book.book_file.name:
         try:
             with book.book_file.open('rb') as file:
-                content = file.read().decode('utf-8')
-                book_json = json.loads(content) 
+                raw = file.read()
+                if not raw:
+                    raise ValueError("Book file is empty or unreadable in Docker.")
+                content = raw.decode('utf-8')
+                book_json = json.loads(content)
         except Exception as e:
             print(f"Error reading file for book {book.name}: {e}")
 
@@ -48,8 +55,9 @@ def read(request, id):
             #print(test['content'][cha]['pages'][s])
 #######################################################################################################################
 
-    # print(type(book_json["published_book"]))
+    print(type(book_json["published_book"]))
     # print(type(str(test)))
+    print(book_json)
 
     books_data = {
         "id": book.id,

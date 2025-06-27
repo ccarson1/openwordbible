@@ -21,8 +21,10 @@ RUN python3 -m venv venv
 # Activate virtual environment and install requirements
 RUN . venv/bin/activate && pip install --upgrade pip && pip install -r requirements.txt
 
+
+
 #Download words for spacy to use
-RUN python -m spacy download en_core_web_sm
+#RUN python3 -m spacy download en_core_web_sm
 
 # Expose port 8000
 EXPOSE 8000
