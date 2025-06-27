@@ -1,5 +1,8 @@
 Docker Setup of the OpenWordBible Web Application
 
+ ⚠️ **Warning: Docker Incompatibility**
+ This project currently has broken pages when running in docker!
+
 1. **Download the repository**
    
 2. **Build the docker image***

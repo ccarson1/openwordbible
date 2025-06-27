@@ -23,13 +23,15 @@ def read(request, id):
     user = request.user
     book = get_object_or_404(Book, id=id)
 
-    print("Book file path:", book.book_file.path)
-    print("File exists?", os.path.exists(book.book_file.path))
+    normalized_path = os.path.normpath(book.book_file.path)
+
+    print("Book file path:", normalized_path)
+    print("File exists?", os.path.exists(normalized_path))
 
     book_json = None
     if book.book_file and book.book_file.name:
         try:
-            with book.book_file.open('rb') as file:
+            with open(normalized_path, 'rb') as file:
                 raw = file.read()
                 if not raw:
                     raise ValueError("Book file is empty or unreadable in Docker.")
@@ -118,6 +120,11 @@ def read(request, id):
     # print(books_data['book_index'])
     # print(type(books_data['book_index']))
     book_index = json.loads(books_data['book_index'])
+    print(f"Book index: {book_index}")
+    print(f"Type: {type(book_index)}")
+    print(books_data['book_index'])
+    print(books_data['content'])
+
     # print(books_data['book_index'])
     # print(books_data['book_index'][0])
     # book_index_json = json.dumps(book_index) 
