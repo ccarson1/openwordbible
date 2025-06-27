@@ -55,8 +55,8 @@ Running Application Locally
 Guidelines for the NER dataset
 
 **Labels**
+***BIO Format Summary***
 ```bash
-   BIO Format Summary
    B-XXX: Beginning of entity type XXX
    I-XXX: Inside of the same entity
    O: Outside any named entity
@@ -71,11 +71,37 @@ Guidelines for the NER dataset
    EVE: Named events (e.g., 'World War II' -> B-EVE I-EVE I-EVE)
    ART: Artworks (e.g., 'Starry Night' -> B-ART I-ART)
    MISC: Miscellaneous named items (e.g., 'Western culture' -> B-MISC I-MISC)
-   Common Mistakes
+```
+**Common Mistakes**
+```bash
+   
    - Do not mix entity types in one phrase (e.g., B-PER I-ORG is incorrect)
    - Always start an entity with B-XXX
    - Label punctuation as O unless it is part of the named entity
    - Use B-XXX for new entity mentions even if same type
+```
+***LOC vs GEO***
+```bash
+   Entity	Tag	Why
+   Grand Canyon	LOC	Often treated as a tourist destination or landmark
+   Mississippi River	GEO	A natural river — not man-made
+   5th Avenue	LOC	A street — man-made, not a natural feature
+   Sahara Desert	GEO	A natural desert
+   Central Park	LOC	Designed by humans — a city park
+   Himalayas	GEO	Mountain range — natural formation
+```
+***B-TIM, I-TIM***
+```bash
+   3 → B-TIM  
+   : → O  
+   15 → I-TIM
+
+   A → B-TIM  
+   . → O  
+   D → I-TIM
+   . → O  
+```
+```bash
    NER Label Set for Prodigy / Doccano
    Prodigy:
    {
@@ -94,3 +120,5 @@ Guidelines for the NER dataset
    - [MISC, Miscellaneous]               
 
 ```
+
+
