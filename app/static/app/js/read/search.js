@@ -62,7 +62,7 @@ if (document.getElementById("btn-search-notes") != null) {
 //     search_list.appendChild(newNote);
 // }
 
-function addSearchedItem(note_title, note_data, note_page) {
+function addSearchedItem(note_title, chapter, sentence, note_data, note_page) {
     let search_list = document.getElementById('search-results');
 
     if (!search_list) {
@@ -75,6 +75,7 @@ function addSearchedItem(note_title, note_data, note_page) {
         <div class='list-group-item lh-tight notes' onclick="pageJump(${note_page})">
             <div class="d-flex w-100 align-items-center justify-content-between">
                 <strong class="mb-1">${note_title}</strong>
+                <small class="text-muted"><em>Chapter:${chapter}, Sentence: ${sentence}</em></small>
                 <small class="text-muted">Page: ${note_page}</small>
             </div>
             <div class="col-10 mb-1 small">${note_data}</div>
@@ -101,12 +102,12 @@ if (document.getElementById("btn-top-search") != null) {
         const matches = searchWordWithHighlight(current_book.content,search_value);
         console.log(matches.length);
         matches.forEach(m => {
-            console.log(m.highlightedText);  
+            console.log(m);  
             //document.getElementById("num_of_results").innerText = m.highlightedText;
-            addSearchedItem("searched item", m.highlightedText, '2')
+            addSearchedItem(`[${search_value}]`, m.chapter, m.sentence, m.highlightedText, m.page)
         });
 
-        //document.getElementById("num_of_results").innerText = matches.length;
+        document.getElementById("num_of_results").innerText = matches.length;
 
         // let book_words = document.getElementsByClassName("read_cols");
         // let book_passages = document.getElementsByClassName("passage");
@@ -144,8 +145,8 @@ function searchWordWithHighlight(data, searchWord) {
 
     data.forEach((chapter, chapterIndex) => {
         chapter.pages.forEach((page, pageIndex) => {
-            page.forEach((paragraph, paragraphIndex) => {
-                const originalText = paragraph.text;
+            page.forEach((sentence, sentenceIndex) => {
+                const originalText = sentence.text;
                 if (searchRegex.test(originalText)) {
                     const highlightedText = originalText.replace(
                         searchRegex,
@@ -155,7 +156,7 @@ function searchWordWithHighlight(data, searchWord) {
                     results.push({
                         chapter: chapter.chapter,
                         page: pageIndex,
-                        paragraph: paragraphIndex,
+                        sentence: sentenceIndex,
                         highlightedText: highlightedText
                     });
                 }

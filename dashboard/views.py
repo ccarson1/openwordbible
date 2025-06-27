@@ -6,6 +6,10 @@ from django.http import JsonResponse
 import os
 import json
 import csv
+import os
+import zipfile
+from io import BytesIO
+from django.http import HttpResponse
 
 
 def dashboard(request):
@@ -19,6 +23,19 @@ def dashboard(request):
     }
 
     return render(request, "dashboard.html", context)
+
+
+def upload(request):
+
+    languages = Language.objects.all()
+    religions = Religion.objects.all()
+
+    context = {
+        "languages": languages,
+        "religions": religions
+    }
+
+    return render(request, "upload.html", context)
 
 def analytics(request):
 
@@ -143,3 +160,31 @@ def update_publish_status(request, book_id):
         except Book.DoesNotExist:
             return JsonResponse({'error': 'Book not found'}, status=404)
     return JsonResponse({'error': 'Invalid method'}, status=405)
+
+
+def download_owb_service(request):
+    folder_path = os.path.join(settings.MEDIA_ROOT, 'owb_service')
+    zip_filename = 'owb_service.zip'
+
+    if not os.path.exists(folder_path):
+        return HttpResponse("The requested folder does not exist.", status=404)
+
+    zip_buffer = BytesIO()
+
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        for root, dirs, files in os.walk(folder_path):
+            # Exclude __pycache__ folders from walking
+            dirs[:] = [d for d in dirs if d != '__pycache__']
+
+            for file in files:
+                if '__pycache__' in root:
+                    continue  # Skip any file inside __pycache__
+                file_path = os.path.join(root, file)
+                arcname = os.path.relpath(file_path, folder_path)
+                zip_file.write(file_path, arcname)
+
+    zip_buffer.seek(0)
+
+    response = HttpResponse(zip_buffer, content_type='application/zip')
+    response['Content-Disposition'] = f'attachment; filename="{zip_filename}"'
+    return response

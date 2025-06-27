@@ -209,11 +209,11 @@ function renderNextBatch() {
 }
 
 // Scroll listener to load more when near bottom
-window.addEventListener('scroll', () => {
-    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 200) {
-        renderNextBatch();
-    }
-});
+// window.addEventListener('scroll', () => {
+//     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 200) {
+//         renderNextBatch();
+//     }
+// });
 
 // Initial load
 renderNextBatch();

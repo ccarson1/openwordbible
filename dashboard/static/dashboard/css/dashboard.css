@@ -23,10 +23,6 @@ body {
 }
 
 
-.card {
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
 
 
 #spinner-container {
@@ -36,6 +32,33 @@ body {
   
     z-index: 1050;
     display: none;  
+}
+
+.btn-download {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transition: background 0.3s, transform 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-download:hover {
+    background: linear-gradient(135deg, #0056b3, #003f7f);
+    transform: translateY(-2px);
+}
+
+pre {
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 6px;
+    overflow-x: auto;
 }
 
 

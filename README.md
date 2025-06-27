@@ -101,6 +101,45 @@ Guidelines for the NER dataset
    D → I-TIM
    . → O  
 ```
+***Explicit dates***
+```bash
+   January 5th	B-TIM I-TIM
+   03/17/2022	B-TIM
+   the 14th of July	B-TIM I-TIM I-TIM
+```
+
+***Specific Times of Day***
+```bash
+   3:45 PM	B-TIM O I-TIM
+   at noon	B-TIM I-TIM
+   12 o'clock	B-TIM I-TIM
+```
+
+***Date + Time Combinations***
+```bash
+   January 1st, 2023 at 4 PM	B-TIM I-TIM O I-TIM I-TIM I-TIM I-TIM
+```
+
+***Relative Time Expressions***
+```bash
+   yesterday	B-TIM
+   last week	B-TIM I-TIM
+   two days ago	B-TIM I-TIM I-TIM
+   next year	B-TIM I-TIM
+   in 5 minutes	B-TIM I-TIM I-TIM
+```
+
+***Durations***
+```bash
+   for three hours	B-TIM I-TIM I-TIM
+   about 10 minutes	B-TIM I-TIM I-TIM
+```
+
+***Time Ranges***
+```bash
+   from 10am to 2pm	B-TIM I-TIM I-TIM I-TIM
+   between Monday and Friday	B-TIM I-TIM I-TIM I-TIM
+```
 ```bash
    NER Label Set for Prodigy / Doccano
    Prodigy:
