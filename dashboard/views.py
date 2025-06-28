@@ -106,10 +106,10 @@ def settings_view(request):
 
 def annotations(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
-
+    file_path = book.book_file.path.replace("\\", "/")
     # Attempt to read and parse the JSON file
     try:
-        with open(book.book_file.path, 'r', encoding='utf-8') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             content = json.load(f)
             content = content['published_book']
             content = content['content']

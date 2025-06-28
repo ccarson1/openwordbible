@@ -237,13 +237,14 @@ document.getElementById("save-btn").addEventListener("click", function () {
     showSpinner();
 
     console.log(book.path)
+    let bookPath = book.path.replace("\\", "/");
 
     console.log(content)
     fetch("/api/update-annotation/", {
         method: "POST",
         body: JSON.stringify({
             content: content,
-            path: book.path,
+            path: bookPath,
             id: book.id,
         }),
         headers: {
