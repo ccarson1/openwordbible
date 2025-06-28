@@ -24,6 +24,7 @@ def read(request, id):
     book = get_object_or_404(Book, id=id)
 
     normalized_path = os.path.normpath(book.book_file.path)
+    normalized_path = normalized_path.replace("\\", "/")
 
     print("Book file path:", normalized_path)
     print("File exists?", os.path.exists(normalized_path))
