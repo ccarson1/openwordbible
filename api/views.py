@@ -678,7 +678,7 @@ class ExportDataset(APIView):
             return self.export_to_CSV(file_path)
 
     def export_to_CSV(self, file_path):
-        with open("media\\" + file_path, 'r', encoding='utf-8') as file:
+        with open("media/" + file_path, 'r', encoding='utf-8') as file:
             content = json.load(file)
 
         labels = []

@@ -24,6 +24,7 @@ function export_csv(file) {
     showSpinner();
     console.log(file)
     let fileName = file.split(/[\\.]/);
+    fileName = fileName.replace("\\", "/")
     fileName = fileName[1]
     console.log(fileName)
     const formData = new FormData();
