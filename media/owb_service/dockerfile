@@ -1,0 +1,23 @@
+
+FROM nvcr.io/nvidia/tensorflow:22.12-tf2-py3
+
+WORKDIR /app
+
+# Copy your project into the container
+COPY . /app
+COPY models/dbmdz-bert-large /app/models/dbmdz-bert-large
+
+# Install Flask and Transformers (if needed)
+RUN pip install --no-cache-dir flask transformers[tf,tokenizers]
+RUN pip install --upgrade pip
+
+RUN pip install -r requirements.txt
+RUN pip install spacy --prefer-binary
+RUN python -m spacy download en_core_web_sm
+
+# Expose port
+EXPOSE 5000
+
+# Run the Flask app
+CMD ["python3", "owb_service.py"]
+

@@ -3,6 +3,8 @@ from flask_cors import CORS
 from app.annotations import Annotation
 from app.pos import POS
 import json
+import tensorflow as tf
+
 
 app = Flask(__name__)
 CORS(app) 
@@ -32,10 +34,24 @@ def process():
         "published_book": new_pos_labeled,
         "book_index": book_index
     })
+    
+@app.route("/gpu-connection")
+def gpu_connection():
+    
+    physical_devices = tf.config.list_physical_devices('GPU')
+    gpu_available = tf.test.is_gpu_available()
+    device_name = tf.test.gpu_device_name()
+    tensorflow_version = tf.__version__
+    
+    return jsonify({"physical_devices": physical_devices,
+                    "gpu_available": gpu_available,
+                    "device_name": device_name,
+                    "tensorflow_version": tensorflow_version
+                    })
 
 @app.route('/')
 def index():
     return "Local Flask service is running"
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5001)
+    app.run(host="0.0.0.0", port=5000)

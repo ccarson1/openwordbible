@@ -429,7 +429,7 @@ document.getElementById("btn-annotate-page").addEventListener("click", function(
 
     console.log(book_data);
 
-    fetch("http://127.0.0.1:5001/process", {
+    fetch("http://127.0.0.1:5000/process", {
         method: "POST",
         body: book_data,
         headers: {

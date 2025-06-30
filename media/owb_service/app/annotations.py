@@ -23,8 +23,14 @@ class Annotation:
         - Selects a GPU if available.
         - Prepares label mappings from the model config.
         """
-        self.model_name = "dbmdz/bert-large-cased-finetuned-conll03-english"
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        snapshot_path = os.path.join(
+            "models", "dbmdz-bert-large",
+            "models--dbmdz--bert-large-cased-finetuned-conll03-english",
+            "snapshots", "4c534963167c08d4b8ff1f88733cf2930f86add0"
+        )
+
+        self.model_name = snapshot_path  # Replace remote model name with local path
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name, local_files_only=True)
 
         # Auto-select GPU if available
         physical_devices = tf.config.list_physical_devices('GPU')
@@ -33,7 +39,7 @@ class Annotation:
         else:
             print("🟡 GPU not available, using CPU")
 
-        self.model = TFAutoModelForTokenClassification.from_pretrained(self.model_name)
+        self.model = TFAutoModelForTokenClassification.from_pretrained(self.model_name, local_files_only=True)
         self.label_list = self.model.config.id2label
 
     def annotate_sentences_batch(self, sentences):

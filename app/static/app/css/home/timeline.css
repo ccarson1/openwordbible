@@ -1,4 +1,4 @@
-.timeline {
+/* .timeline {
     position: relative;
     padding: 20px;
 }
@@ -20,6 +20,10 @@
     
     box-sizing: border-box;
     
+}
+
+.timeline-item:hover{
+    transform: scale(1.5);
 }
 
 .timeline-item:nth-child(odd) {
@@ -63,7 +67,7 @@
 
 .image-content {
     width: 100%;
-    height: 200px; /* or whatever height you need */
+    height: 200px;
 
     border-radius: 8px;
     background-size: cover;
@@ -141,4 +145,141 @@
     background: linear-gradient(145deg, #5fb3e7, #2e7fae);
     box-shadow: 0 0 12px rgba(46, 127, 174, 0.5), 0 4px 6px rgba(0, 0, 0, 0.15);
     transform: translateY(-1px);
-}
+} */
+
+body {
+        background-color: #f8f9fa;
+    }
+
+    .free-btn,
+    .premium-btn {
+        font-weight: 500;
+        padding: 0.5rem 1.2rem;
+        border-radius: 30px;
+    }
+
+    .horizontal-timeline {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin-top: 60px;
+        overflow-x: auto;
+        padding: 40px 0;
+    }
+
+    .timeline-container {
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .timeline-line {
+        position: absolute;
+        top: 100px;
+        left: 0;
+        height: 4px;
+        background: #ccc;
+        width: 100%;
+        z-index: 1;
+    }
+
+    .timeline-item {
+        text-align: center;
+        position: relative;
+        flex: 1;
+        min-width: 180px;
+        margin: 0 20px;
+        z-index: 2;
+        transition: .3s;
+    }
+    .timeline-item:hover{
+        transform: scale(1.1);
+        transition: .3s;
+    }
+
+    .timeline-dot {
+        width: 16px;
+        height: 16px;
+        background-color: #ff5722;
+        border-radius: 50%;
+        margin: 0 auto;
+        position: absolute;
+        top: 92px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 3;
+    }
+
+    .timeline-img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin: 0 auto 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .timeline-date {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #666;
+    }
+
+    .timeline-title {
+        font-size: 1rem;
+        color: #333;
+    }
+
+    .image-content {
+        background-size: cover;
+        background-position: center;
+        height: 220px;
+        position: relative;
+    }
+
+    .overlay {
+        background: rgba(0, 0, 0, 0.55);
+        color: white;
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 1rem;
+    }
+
+    .overlay h5 {
+        margin-bottom: 0.25rem;
+        font-size: 1.1rem;
+    }
+
+    .overlay p,
+    .overlay a {
+        font-size: 0.9rem;
+    }
+
+    .timeline-content a {
+        color: #ffc107;
+        text-decoration: none;
+    }
+
+    .timeline-content a:hover {
+        text-decoration: underline;
+        
+    }
+
+    .tier-container .card {
+        border-radius: 16px;
+    }
+
+    .card-title {
+        font-size: 2rem;
+    }
+
+    .btn-warning {
+        font-weight: 600;
+    }
+
+    .text-subtle {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
