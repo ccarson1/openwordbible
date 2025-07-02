@@ -45,23 +45,7 @@
         {% endif %}
     </div>
     {% endif %}
-<!-- 
-    <div class="books-container" style="background-image: url('/media/{{ book.image }}');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;">
-        <div class="book-item">
-            <p>Date: {{ book.date }}</p>
-            <p>Religion: {{ book.religion }}</p>
-            {% if book.id %}
-            <a href="{% url 'read' book.id %}">Read</a>
-            {% else %}
-            <span>Unavailable</span>
-            {% endif %}
 
-
-        </div>
-    </div> -->
     {% endfor %}
     {% else %}
 </div>

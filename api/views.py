@@ -201,6 +201,11 @@ class LoadBookmarkAPIView(APIView):
             print(f'Error loading bookmark: {e}')
             return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+class NoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Note
+        fields = '__all__'
+        
 class SaveNote(APIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     permission_classes = [IsAuthenticated]
@@ -214,6 +219,8 @@ class SaveNote(APIView):
             book_id  = data.get('book')
             note_data = data.get('data')
             color = data.get('note_color')
+            chapter = data.get('chapter')
+            page = data.get('page')
             sentence_index_start = data.get('sentence_index_start')
             sentence_index_end = data.get('sentence_index_end')
             word_index_start = data.get('word_index_start')
@@ -231,6 +238,8 @@ class SaveNote(APIView):
                 'book': book,
                 'note_data': note_data,
                 'color': color,
+                'chapter': chapter,
+                'page': page,
                 'sentence_index_start': sentence_index_start,
                 'sentence_index_end': sentence_index_end,
                 'word_index_start': word_index_start,
@@ -246,6 +255,8 @@ class SaveNote(APIView):
                 book = book,
                 note = note_data,
                 color = color,
+                chapter = chapter,
+                page = page,
                 sentence_index_start = sentence_index_start,
                 sentence_index_end = sentence_index_end,
                 word_index_start = word_index_start,
@@ -256,7 +267,9 @@ class SaveNote(APIView):
                 tag, _ = Tag.objects.get_or_create(name=name)
                 note.tags.add(tag)
 
-            return Response({'status': 'success', 'notes': []})
+            all_notes = Note.objects.filter(user=user, book=book).order_by('-date')
+            serialized = NoteSerializer(all_notes, many=True)
+            return Response({'status': 'success', 'notes': serialized.data})
         
         return Response({'error': 'Unauthorized'}, status=401)
     
@@ -291,7 +304,7 @@ class LoadNotes(APIView):
             notes_qs = notes_qs.filter(book_id=book_id)
 
         notes_list = list(notes_qs.values(
-            'id', 'book', 'title', 'note', 'color', 'tags',
+            'id', 'book', 'title', 'note', 'color', 'tags', 'chapter', 'page', 
             'sentence_index_start', 'sentence_index_end',
             'word_index_start', 'word_index_end', 'date'
         ))

@@ -1,7 +1,6 @@
 let isMouseDown = false;
 let selectedWords = [];
 let savedHighlights = [];
-// let historyStack = [];
 let temp_note_color;
 let startWord;
 
@@ -29,10 +28,6 @@ textLayout.addEventListener("mousedown", (e) => {
         }
 
 
-        // let startIndex = document.createElement("i");
-        // startIndex.setAttribute("class", "bi bi-cursor-text");
-
-        // startWord.parentNode.insertBefore(startIndex, startWord);
     }
 });
 
@@ -57,15 +52,7 @@ document.addEventListener("mouseup", (e) => {
         const endIndex = selectedWords.length - 1;
         const lastWord = selectedWords[endIndex];
 
-        // let endIndexIcon = document.createElement("i");
-        // endIndexIcon.setAttribute("class", "bi bi-cursor-text");
 
-        // // Insert after the lastWord element
-        // if (lastWord.nextSibling) {
-        //   lastWord.parentNode.insertBefore(endIndexIcon, lastWord.nextSibling);
-        // } else {
-        //   lastWord.parentNode.appendChild(endIndexIcon);
-        // }
     }
 });
 // Right-click cancels current unsaved highlights
@@ -145,7 +132,13 @@ document.querySelectorAll(".color-swatch").forEach(swatch => {
 // SAVE BUTTON: finalize highlight and store to history
 document.getElementById("save").addEventListener("click", () => {
     if (!selectedWords.length) return;
+    sentence_index_start = Array.from(selectedWords[0].parentElement.parentElement.children).indexOf(selectedWords[0].parentElement);
+    sentence_index_end = Array.from(selectedWords[selectedWords.length - 1].parentElement.parentElement.children).indexOf(selectedWords[selectedWords.length - 1].parentElement);
 
+    word_index_start = Array.from(selectedWords[0].parentElement.children).indexOf(selectedWords[0]);
+    word_index_end = Array.from(selectedWords[selectedWords.length - 1].parentElement.children).indexOf(selectedWords[selectedWords.length - 1]);
+    console.log(`Note${current_book.id}_${sentence_index_start}`);
+    document.getElementById("note-title").value = `Note${current_book.id}${currentPageIndex}${sentence_index_start}${sentence_index_end}${word_index_start}${word_index_end}`;
     myModal.show();
 
 
@@ -168,24 +161,6 @@ document.getElementById("share").addEventListener("click", () => {
     alert("Share:\n" + text);
 });
 
-// // UNDO
-// document.getElementById("undo").addEventListener("click", () => {
-//     if (!historyStack.length) return;
-
-//     const lastAction = historyStack.pop();
-//     lastAction.forEach(({ el, prevColor, prevClasses }) => {
-//         el.style.backgroundColor = prevColor;
-//         el.className = ""; // reset all
-//         prevClasses.forEach(cls => el.classList.add(cls));
-//     });
-// });
-
-// // CTRL+Z Undo shortcut
-// document.addEventListener("keydown", (e) => {
-//     if ((e.ctrlKey || e.metaKey) && e.key === "z") {
-//         document.getElementById("undo").click();
-//     }
-// });
 
 // This function highlights the range between startWord and currentWord
 function updateSelectedWords(currentWord) {
@@ -219,21 +194,68 @@ function updateSelectedWords(currentWord) {
 }
 
 function toggleHighlighted() {
-    console.log(notes);
-    console.log(document.getElementById('highlighterToggle').checked)
-    for (let n = 0; n < notes.length; n++) {
-        for (let x = notes[n].sentence_index_start; x <= notes[n].sentence_index_end; x++) {
-            for (let y = notes[n].word_index_start; y <= notes[n].word_index_end; y++) {
-                if(document.getElementById('highlighterToggle').checked == true){
-                    document.getElementById('text-layout').children[x].children[y].style.backgroundColor = notes[n].color;
-                }
-                else{
-                    document.getElementById('text-layout').children[x].children[y].style.backgroundColor = 'white';
-                }
-                
+    const textLayout = document.getElementById('text-layout');
+    const sentenceCount = textLayout.children.length;
+    const isHighlightingEnabled = document.getElementById('highlighterToggle').checked;
+
+    const currentChapter = current_book.current_chapter;
+    const currentPage = currentPageIndex;
+
+    for (let note of notes) {
+        // Only apply notes for the current chapter and page
+        if (note.chapter !== currentChapter || note.page !== currentPage) continue;
+
+        const {
+            sentence_index_start,
+            sentence_index_end,
+            word_index_start,
+            word_index_end,
+            color
+        } = note;
+
+        for (let x = sentence_index_start; x <= sentence_index_end; x++) {
+            const sentenceEl = textLayout.children[x];
+            if (!sentenceEl) continue;
+
+            let startWord = 0;
+            let endWord = sentenceEl.children.length - 1;
+
+            if (x === sentence_index_start) {
+                startWord = word_index_start;
+            }
+            if (x === sentence_index_end) {
+                endWord = word_index_end;
+            }
+
+            if (x === sentence_index_start && x === sentence_index_end && word_index_start > word_index_end) {
+                [startWord, endWord] = [endWord, startWord];
+            }
+
+            for (let y = startWord; y <= endWord; y++) {
+                const wordEl = sentenceEl.children[y];
+                if (!wordEl) continue;
+                wordEl.style.backgroundColor = isHighlightingEnabled ? color : 'white';
             }
         }
     }
-
 }
+
+// function toggleHighlighted() {
+//     console.log(notes);
+//     console.log(document.getElementById('highlighterToggle').checked)
+//     for (let n = 0; n < notes.length; n++) {
+//         for (let x = notes[n].sentence_index_start; x <= notes[n].sentence_index_end; x++) {
+//             for (let y = notes[n].word_index_start; y <= notes[n].word_index_end; y++) {
+//                 if (document.getElementById('highlighterToggle').checked == true) {
+//                     document.getElementById('text-layout').children[x].children[y].style.backgroundColor = notes[n].color;
+//                 }
+//                 else {
+//                     document.getElementById('text-layout').children[x].children[y].style.backgroundColor = 'white';
+//                 }
+
+//             }
+//         }
+//     }
+
+// }
 

@@ -3,3 +3,5 @@ dashboard/__pycache__/
 api/__pycache__/book_convert.cpython-313.pyc
 dashboard/__pycache__/views.cpython-313.pyc
 __pycache__/
+media/owb_service/models/
+media/books/Holy_Bible_King_James_Version.json

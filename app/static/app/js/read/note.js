@@ -7,6 +7,8 @@ class Note {
         note,  
         color,
         tags = null,
+        chapter,
+        page,
         sentence_index_start,
         sentence_index_end,
         word_index_start,
@@ -19,6 +21,8 @@ class Note {
         this.note = note;
         this.color = color;
         this.tags = tags;
+        this.chapter = chapter;
+        this.page = page;
         this.sentence_index_start = sentence_index_start;
         this.sentence_index_end = sentence_index_end;
         this.word_index_start = word_index_start;
@@ -52,7 +56,16 @@ document.getElementById('exampleModal').addEventListener('hidden.bs.modal', rese
 document.addEventListener('DOMContentLoaded', function () {
 
 
-    loadNotes(current_book.id);
+    const checkTextLayoutReady = () => {
+        const layout = document.getElementById('text-layout');
+        if (layout && layout.children.length > 0) {
+            loadNotes(current_book.id);
+        } else {
+            setTimeout(checkTextLayoutReady, 100); // check again after 100ms
+        }
+    };
+
+    checkTextLayoutReady();
 
     // Get references to the modal and the trigger button
 
@@ -84,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (validate_inputs() == true) {
             note_desc = document.getElementById("note-data").value;
 
-            notes.push({ "title": note_title, "book": current_book.id, "data": note_data })
+            //notes.push({ "title": note_title, "book": current_book.id, "data": note_data })
 
             sentence_index_start = Array.from(selectedWords[0].parentElement.parentElement.children).indexOf(selectedWords[0].parentElement);
             sentence_index_end = Array.from(selectedWords[selectedWords.length - 1].parentElement.parentElement.children).indexOf(selectedWords[selectedWords.length - 1].parentElement);
@@ -92,12 +105,16 @@ document.addEventListener('DOMContentLoaded', function () {
             word_index_start = Array.from(selectedWords[0].parentElement.children).indexOf(selectedWords[0]);
             word_index_end = Array.from(selectedWords[selectedWords.length - 1].parentElement.children).indexOf(selectedWords[selectedWords.length - 1]);
 
+            console.log(`Chapter : ${current_book.current_chapter}`);
+            console.log(`Page : ${currentPageIndex}`)
             //sends json to backend
             save_note({
                 "title": note_title,
                 "book": current_book.id,
                 "data": note_data,
                 "note_color": temp_note_color,
+                "chapter": current_book.current_chapter,
+                "page": currentPageIndex,
                 "sentence_index_start": sentence_index_start,
                 "sentence_index_end": sentence_index_end,
                 "word_index_start": word_index_start,
@@ -166,12 +183,22 @@ function addItem(note) {
 
     let temp_note = new Note(note)
     notes.push(temp_note);
+    toggleHighlighted();
 
-    for (let x = temp_note.sentence_index_start; x <= temp_note.sentence_index_end; x++) {
-        for (let y = temp_note.word_index_start; y <= temp_note.word_index_end; y++) {
-            document.getElementById('text-layout').children[x].children[y].style.backgroundColor = temp_note.color;
-        }
-    }
+    // const layout = document.getElementById('text-layout');
+    // for (let x = temp_note.sentence_index_start; x <= temp_note.sentence_index_end; x++) {
+    //     const sentence = layout?.children[x];
+    //     if (!sentence) continue;
+
+    //     for (let y = temp_note.word_index_start; y <= temp_note.word_index_end; y++) {
+    //         const word = sentence?.children[y];
+    //         if (!word) continue;
+
+    //         word.style.backgroundColor = temp_note.color;
+    //     }
+    // }
+
+    
 
 
     let note_list = document.getElementById('notes-list');
@@ -240,6 +267,7 @@ function save_note(note) {
             const new_notes = result.notes;
 
             console.log(new_notes)
+            notes = []
             document.getElementById('notes-list').innerHTML = "";
             for (let i = 0; i < new_notes.length; i++) {
                 console.log(new_notes[i].id);
@@ -252,6 +280,8 @@ function save_note(note) {
                 addItem(new_notes[i])
             }
             //setupStartPage();
+
+            //loadNotes(new_notes[0].book)
         })
         .catch(error => {
             // Hide spinner
@@ -298,25 +328,11 @@ function btnDelete(id) {
 
             for (let x = note_result.sentence_index_start; x <= note_result.sentence_index_end; x++) {
                 for (let y = note_result.word_index_start; y <= note_result.word_index_end; y++) {
-                    document.getElementById('text-layout').children[x].children[y].style.backgroundColor = 'white';
+                    document.getElementById('text-layout').children[x].children[y].style.backgroundColor = 'rgba(255,255,255,255)';
                 }
             }
             notes = notes.filter(note => note.id !== result.deleted);
 
-            // const notes = result.notes;
-
-            // console.log(notes)
-            // document.getElementById('notes-list').innerHTML = "";
-            // for (let i = 0; i < notes.length; i++) {
-            //     console.log(notes[i].id);
-            //     console.log(notes[i].title);
-            //     console.log(notes[i].book);
-            //     console.log(notes[i].data);
-
-            //     //Adds note to the DOM
-
-            //     addItem(notes[i])
-            // }
         })
         .catch(error => {
             // Hide spinner
@@ -343,7 +359,6 @@ function loadNotes(bookId) {
                 
                 console.log(data[d]);
                 addItem(data[d]);
-                //notes.push({'title': data[d].title, 'book': data[d].id, 'data': data[d].note})
             }
             hideSpinner();
         })

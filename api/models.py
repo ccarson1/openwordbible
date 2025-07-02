@@ -65,6 +65,8 @@ class Note(models.Model):
     note = models.TextField(blank=True)
     color = models.TextField(default='yellow')
     tags = models.ManyToManyField(Tag, blank=True)
+    chapter = models.PositiveIntegerField(blank=True, default=0)
+    page = models.PositiveIntegerField(blank=True, default=0)
     sentence_index_start = models.PositiveIntegerField(blank=True, default=0)
     sentence_index_end = models.PositiveIntegerField(blank=True, default=0)
     word_index_start = models.PositiveIntegerField(blank=True, default=0)

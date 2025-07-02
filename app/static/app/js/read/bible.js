@@ -255,6 +255,7 @@ function renderPage(pageIndex) {
     currentPageIndex = parseInt(pageIndex);
     document.getElementById("current_page").value = (currentPageIndex + 1) + current_book.content[current_book.current_chapter]['start']
     updatePaginationUI();
+    toggleHighlighted();
 }
 
 function updatePaginationUI() {
@@ -305,6 +306,7 @@ function setupPaginationControls() {
             if (currentPageIndex > 0) {
                 renderPage(--currentPageIndex);
                 setupPaginationControls();
+                
             }
             else {
                 if (current_book.current_chapter > 0) {
@@ -326,6 +328,7 @@ function setupPaginationControls() {
             if (currentPageIndex < current_book.content[current_book.current_chapter]['length'] - 1) {
                 renderPage(++currentPageIndex);
                 setupPaginationControls();
+                toggleHighlighted();
             }
             else {
                 if (current_book.current_chapter < current_book.content.length -1) {
