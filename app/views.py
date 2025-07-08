@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 
-from api.models import BookFormat, Profile
+from api.models import BookFormat, Profile, Sentence, Chapter
 from api.models import Book
 import json
 import os
@@ -26,8 +26,43 @@ def read(request, id):
     normalized_path = os.path.normpath(book.book_file.path)
     normalized_path = normalized_path.replace("\\", "/")
 
-    print("Book file path:", normalized_path)
-    print("File exists?", os.path.exists(normalized_path))
+    # print("Book file path:", normalized_path)
+    # print("File exists?", os.path.exists(normalized_path))
+
+    sentences = Sentence.objects.filter(book_id=id).select_related('chapter').order_by('sentence_index')
+    chapters = Chapter.objects.filter(book_id=id).order_by('index')
+
+    chapters_array = []
+    sentences_array = []
+
+    for c in chapters:
+        # Group sentences by page number for this chapter
+        chapter_sentences = [s for s in sentences if s.chapter_id == c.id]
+
+        # Build a dict where key = page number, value = list of sentences
+        pages_dict = {}
+        for s in chapter_sentences:
+            pages_dict.setdefault(s.page, []).append({
+                "text": s.text
+            })
+
+        print(pages_dict)
+
+        # Sort pages by page number and convert to list of lists
+        sorted_pages = [pages_dict[page_num] for page_num in sorted(pages_dict)]
+
+        chapters_array.append({
+            "chapter": c.name,
+            "index": c.index,
+            "start": c.start,
+            "end": c.end,
+            "length": c.length,
+            "pages": sorted_pages  # list of page-lists
+        })
+
+    
+    json_string = json.dumps(chapters_array, ensure_ascii=False, indent=2)
+    #print(json_string)
 
     book_json = None
     if book.book_file and book.book_file.name:
@@ -41,26 +76,10 @@ def read(request, id):
         except Exception as e:
             print(f"Error reading file for book {book.name}: {e}")
 
-    ######################Needs moved to PublishBook in api views.py###################################################
-    # test = json.loads(book_json['published_book'])
-    # #print(test['content'][0]['pages'][1])
-    # for cha in range(len(test['content'])):
-    #     for s in range(len(test['content'][cha]['pages'])):
-    #         sentences = []
-    #         for c in test['content'][cha]['pages'][s]:
-    #             #print(c.split(" "))
-    #             sentence = {
-    #                 "labels": [],
-    #                 "text": c
-    #             }
-    #             sentences.append(sentence)
-    #         test['content'][cha]['pages'][s] = sentences
-            #print(test['content'][cha]['pages'][s])
-#######################################################################################################################
 
-    print(type(book_json["published_book"]))
-    # print(type(str(test)))
-    print(book_json)
+    # print(type(book_json["published_book"]))
+    # # print(type(str(test)))
+    # print(book_json)
 
     books_data = {
         "id": book.id,
@@ -76,6 +95,7 @@ def read(request, id):
         "rights": book.rights,
         "publisher": book.publisher,
         "image_url": book.image.url if book.image else None,
+        #"content": chapters_array,
         "content": book_json['published_book']['content'] if book_json else None,
         "book_index": book_json["book_index"] if book_json else None,
         
@@ -118,17 +138,8 @@ def read(request, id):
                 "color": book_format_obj.color,
             }
 
-    # print(books_data['book_index'])
-    # print(type(books_data['book_index']))
     book_index = json.loads(books_data['book_index'])
-    print(f"Book index: {book_index}")
-    print(f"Type: {type(book_index)}")
-    print(books_data['book_index'])
-    print(books_data['content'])
 
-    # print(books_data['book_index'])
-    # print(books_data['book_index'][0])
-    # book_index_json = json.dumps(book_index) 
 
     return render(request, 'read.html', {
         'profile': profile,

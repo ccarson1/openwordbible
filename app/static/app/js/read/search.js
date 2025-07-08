@@ -96,8 +96,9 @@ if (document.getElementById("btn-top-search") != null) {
         console.log("Searching...");
         console.log(search_value);
 
-
-
+        const searchTabTrigger = new bootstrap.Tab(document.querySelector('#search-tab'));
+        searchTabTrigger.show();
+        
         // Usage
         const matches = searchWordWithHighlight(current_book.content,search_value);
         console.log(matches.length);

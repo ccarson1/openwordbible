@@ -23,8 +23,11 @@ function getCSRFToken() {
 function export_csv(file) {
     showSpinner();
     console.log(file)
+    file = file.replace("\\", "/")
     let fileName = file.split(/[\\.]/);
-    fileName = fileName.replace("\\", "/")
+    console.log(fileName);
+    
+    
     fileName = fileName[1]
     console.log(fileName)
     const formData = new FormData();

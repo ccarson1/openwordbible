@@ -1,13 +1,13 @@
-body {
+/* body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
     margin: 0;
     padding: 0;
     color: #333;
-}
+} */
 
 
-form {
+#form-container {
     width: 50%;
     height: 100vh;
     margin: 30px auto;
@@ -15,6 +15,8 @@ form {
     background: #ffffff;
     border-radius: 8px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+
+    margin-bottom: 5%;
 }
 
 
@@ -31,7 +33,7 @@ h3 {
 }
 
 
-label {
+#form-container > label {
     display: block;
     font-weight: bold;
     margin-top: 10px;
@@ -39,7 +41,7 @@ label {
 }
 
 
-input, select {
+#form-container > input, select {
     width: 100%;
     padding: 10px;
     margin-top: 5px;
@@ -49,27 +51,28 @@ input, select {
 }
 
 
-input:focus, select:focus {
+#form-container > input:focus, select:focus {
     border-color: #007BFF;
     outline: none;
     box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
 }
 
 
-input[type="password"] {
+#form-container > input[type="password"] {
     font-size: 18px;
 }
 
 
-input[type="checkbox"] {
+#form-container > input[type="checkbox"] {
     width: 20px;
     height: 20px;
     vertical-align: middle;
     margin-left: 5px;
+    
 }
 
 
-button {
+#form-container > button {
     display: block;
     width: 100%;
     padding: 12px;
@@ -84,23 +87,14 @@ button {
 }
 
 
-button:hover {
+#form-container > button:hover {
     background: #0056b3;
 }
 
 
-@media (max-width: 768px) {
-    form {
-        width: 90%;
-        padding: 15px;
-    }
 
-    button {
-        font-size: 16px;
-    }
-}
 
-body.dark-mode {
+/* body.dark-mode {
     background-color: #222;
     color: #ddd;
 }
@@ -135,4 +129,4 @@ body.dark-mode button {
 
 body.dark-mode button:hover {
     background: #0088cc;
-}
+} */

@@ -24,7 +24,7 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib import messages
-from .models import BookFormat, Profile, Note, Tag
+from .models import BookFormat, Bookmark, Profile, Note, Tag
 
 import PyPDF2
 from rest_framework import status
@@ -32,7 +32,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.permissions import IsAuthenticated
 from .book_convert import ConvertBook
 # from .annotations import Annotation
-from .models import Book, Religion, Language, Word, Label, Annotation, Profile, Sentence, POSLabel
+from .models import Book, Religion, Language, Word, Label, Annotation, Profile, Sentence, POSLabel, Chapter
 from django.core.files import File
 from django.db import transaction
 
@@ -96,110 +96,61 @@ class ProfileAPIView(APIView):
             return Response({"error": "User not found"}, status=404)
 
 
-class LoadBookmarkAPIView(APIView):
+class BookmarkAPIView(APIView):
+    permission_classes = [IsAuthenticated]
 
-    def create_html_text(self, passages):
-        # Initialize the HTML with the heading
-        head = passages[0].pop(0)  # Assuming the first element in passages contains the header
-        page_text = "<h4 class='text-center'>" + head + " <small id='header-page' style='margin-left: 50%;'></small></h4><hr>"
-        counter = 0
-        for page_count, g in enumerate(passages):
-            spans = ''
-
-            for count, i in enumerate(g):
-                # Split the text by spaces and process each word
-                words = i.split()
-
-                for j in words:
-                    if j.strip():  # Check if the word is not just whitespace
-                        if re.search(r"{\d+:\d+}", j):
-                            counter = counter +1
-                            spans += '<span class="passage p' + str(counter) + '">' + j + '</span>'
-                        else:
-                            spans += '<span class="word w' + str(counter) + ' p'+ str(page_count) +'">' + j + '</span>'
-
-            # Append the constructed spans to the page_text
-            page_text += '<div class="read_cols">' + spans + '</div>'
-
-        return page_text
-    
-    def get_book_text(self, book_name):
-
-        #pdf_file = 'D:\Library/bible\KJVBible\kjvbible\pdfs/'+ book_name +'.pdf'
-        pdf_file = 'pdfs/'+ book_name +'.pdf'
-        #print(pdf_file)
-
-        file = open(pdf_file, 'rb')
-        pdfreader = PyPDF2.PdfReader(file)
-
-        numbered_books = r"Page\s\d+\s\d+\s[a-sA-Z]+\s"
-        #passages = r"\s{\d:\d}\s"
-
-        x = pdfreader.pages
-
-        passages=[]
-        for p in range(len(x)):
-            passage = x[p].extract_text().replace('www.holybooks.com', '').replace("\n", " ")
-            passage = re.sub(r'\s+', ' ', passage).strip()
-
-            sub_pass = re.split(r"(\s{\d+:\d+}\s)", passage)
-            passages.append(sub_pass)
-
-
-
-        return passages
-
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
+        """
+        Save or update a bookmark
+        """
+        data = request.data
         try:
-            # Get JSON data from the request body
-            data = request.data
-            username = data.get('username')
-            print("received request")
-            # Fetch user from the database
-            # user = get_object_or_404(User, username=username)
-            user = request.user
+            book = Book.objects.get(id=data.get("book_id"))
+            defaults={
+                    "current_chapter": data.get("chapter", 0),
+                    "current_page": data.get("page", 0),
+                    "current_word": data.get("word", 0),
+                    "scroll_position": data.get("scroll", 0)
+                }
+            print(defaults)
 
+            bookmark, _ = Bookmark.objects.update_or_create(
+                user=request.user,
+                book=book,
+                defaults={
+                    "current_chapter": data.get("chapter", 0),
+                    "current_page": data.get("page", 0),
+                    "current_word": data.get("word", 0),
+                    "scroll_position": data.get("scroll", 0)
+                }
+            )
+            return Response({"status": "saved"}, status=status.HTTP_200_OK)
 
-            profile = Profile.objects.filter(user__username=username).first()
-            if profile.bookmark:
-                # If user exists, process bookmark data
-                bookmark = json.loads(profile.bookmark)
-                print("Going")
-                print(bookmark)
-                print(type(bookmark))
-                print(bookmark['book'])
+        except Book.DoesNotExist:
+            return Response({"error": "Book not found"}, status=status.HTTP_404_NOT_FOUND)
 
-                book = bookmark['book']
-                book_id = bookmark['book_id']
-                page = bookmark['page']
+    def get(self, request, book_id):
+        """
+        Load a bookmark for the given book ID
+        """
+        try:
+            book = Book.objects.get(id=book_id)
+            bookmark = Bookmark.objects.get(user=request.user, book=book)
 
-                # Create passages (assuming create_html_text is a utility function)
-                passages = self.create_html_text(self.get_book_text(book))
+            data = {
+                "chapter": bookmark.current_chapter,
+                "page": bookmark.current_page,
+                "word": bookmark.current_word,
+                "scroll": bookmark.scroll_position,
+                "updated_at": bookmark.updated_at.isoformat() if hasattr(bookmark, "updated_at") else None
+            }
 
-                # Fetch notes for the specific book_id
-                all_notes = Note.objects.filter(book_id=book_id)
-                notes_list = []
-                for note in all_notes:
-                    if str(note.owner).rstrip() == str(user).rstrip():  # Assuming `note.owner` and `user` are strings
-                        notes_list.append({"id": note.id, "title": note.title, "book": note.book_id, "data": note.data})
-            else:
-                book = 'Genesis'
-                book_id = 1
-                page = 1
-                passages = []
-                notes_list = []
-            # Return the response with the required data
-            return Response({
-                'book': book,
-                'book_id': book_id,
-                'page': page,
-                'passage': passages,
-                'notes': notes_list
-            }, status=status.HTTP_200_OK)
+            return Response({"bookmark": data})
+        except Book.DoesNotExist:
+            return Response({"error": "Book not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Bookmark.DoesNotExist:
+            return Response({"bookmark": None})
 
-        except Exception as e:
-            print(f'Error loading bookmark: {e}')
-            return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -402,22 +353,18 @@ class PublishBook(APIView):
             print("book_language_id:", book_language_id)
             print("book_image:", book_image)
             print("book_index", book_index)
+            print("Content Type: ", type(published_book))
             print("This is the Published book")
-            print(published_book)
+            #print(published_book)
+            loaded_content = json.loads(published_book)
+            for index, ch in enumerate(loaded_content["content"]):
+                print(loaded_content["content"][index])
+                print("Chapter Name: ", loaded_content["content"][index]["chapter"])
+                print("Start: ", loaded_content["content"][index]["start"])
+                print("End: ", loaded_content["content"][index]["end"])
+                print("Length: ", loaded_content["content"][index]["length"])
+                print("Index: ", index)
 
-            #################################This is where you will pass the book data to the machine learning process#########################################
-            # annotation = Annotation()
-            # test = annotation.initiate_annotations(published_book)
-            ###################################################################################################################################################
-
-            # if book_religion_id and book_religion_id.lower() != "none":
-            #     try:
-            #         book_religion = Religion.objects.get(name=book_religion_id)
-            #         religion_name = book_religion.name
-            #     except Religion.DoesNotExist:
-            #         return Response({"error": "Religion not found"}, status=status.HTTP_400_BAD_REQUEST)
-            # else:
-            #     print("No religion provided or explicitly set to 'none'.")
 
             language_name = book_language.name
             print("Language Name:", language_name)
@@ -457,6 +404,24 @@ class PublishBook(APIView):
                         image=book_image,
                         book_file=os.path.join("books", filename)
                     )
+
+                    # Save chapters to the database
+                    for index, ch in enumerate(loaded_content["content"]):
+                        chapter_name = ch["chapter"]
+                        start = ch["start"]
+                        end = ch["end"]
+                        length = ch["length"]
+
+                        Chapter.objects.create(
+                            book=new_book,
+                            index=index,
+                            name=chapter_name,
+                            start=start,
+                            end=end,
+                            length=length
+                        )
+
+                        print(f"Chapter '{chapter_name}' saved.")
 
                 print(f"Book {book_name} saved successfully with ID {new_book.id}")
                 return Response({"message": "Book saved successfully!", "book_id": new_book.id}, status=status.HTTP_201_CREATED)
@@ -590,9 +555,12 @@ class UpdateAnnotation(APIView):
             book = Book.objects.get(pk=book_id)
         except Book.DoesNotExist:
             return Response({"error": "Book not found"}, status=404)
+        
+        
 
         with transaction.atomic():
             for chapter_index, chapter in enumerate(content):
+                chapter_obj = Chapter.objects.get(book=book, index=chapter_index) 
                 for page_index, page in enumerate(chapter['pages']):
                     for sentence_index, sentence in enumerate(page):
                         words = sentence['text'].split(" ")
@@ -606,7 +574,7 @@ class UpdateAnnotation(APIView):
                         sentence_obj = Sentence.objects.create(
                             text=sentence['text'],
                             book=book,
-                            chapter=chapter_index,
+                            chapter=chapter_obj, 
                             page=page_index,
                             sentence_index=sentence_index
                         )

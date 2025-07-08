@@ -45,7 +45,7 @@ def analytics(request):
     for ann in annotations:
         data.append({
             "book_id": ann.sentence.book.id,
-            "chapter": ann.sentence.chapter,
+            "chapter": ann.sentence.chapter.id,
             "page": ann.sentence.page,
             "sentence": ann.sentence.text,
             "word_index": ann.word_index,

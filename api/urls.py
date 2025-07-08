@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import ProfileAPIView, LoadBookmarkAPIView, UploadBook, PublishBook, LoadBook, search_books, UpdateLayout, UpdateAnnotation, ExportDataset, SaveNote, TagListView, LoadNotes, DeleteNote
+from .views import ProfileAPIView, BookmarkAPIView, UploadBook, PublishBook, LoadBook, search_books, UpdateLayout, UpdateAnnotation, ExportDataset, SaveNote, TagListView, LoadNotes, DeleteNote
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -8,7 +8,8 @@ api_name = "api"
 
 urlpatterns = [
    path('profile/', ProfileAPIView.as_view(), name='api_profile'),
-   path('load-bookmark/', LoadBookmarkAPIView.as_view(), name='load-bookmark'),
+   path("bookmark/<int:book_id>/", BookmarkAPIView.as_view(), name="load_bookmark"),
+   path("bookmark/", BookmarkAPIView.as_view(), name="update_bookmark"), 
    path('upload-book/', UploadBook.as_view(), name='upload-book'),
    path('publish-book/', PublishBook.as_view(), name='publish-book'),
    path('load-book/', LoadBook.as_view(), name='load-book'),

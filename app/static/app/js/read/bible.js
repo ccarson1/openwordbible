@@ -1,215 +1,63 @@
-// const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-// let current_page = 0;
-// let  pag, pag2, prevs, nexts;
 
-// function setupStartPage(current_page = 0) {
-//     cols = document.getElementsByClassName("read_cols");
-//     pag = document.getElementsByClassName("pag");
-//     pag2 = document.getElementsByClassName("pag2");
 
-//     for (let x = 0; x < pages.length; x++) {
-//         pages[x].style.display = "none";
-//     }
+function pageJump(note_page) {
+    if (note_page >= 0 && note_page < pages.length) {
+        // pages[current_book.current_page].style.display = "none";
+        // current_page = note_page;
+        // pages[current_page].style.display = "block";
+        // window.scrollTo({ top: 0 });
+        // document.getElementById("header-page").innerText = "Page: " + (current_page + 1);
+        //setPagButtons(current_page);
 
-//     if (pages[current_page]) {
-//         pages[current_page].style.display = "block";
-//         document.getElementById("header-page").innerText = "Page: " + (current_page + 1);
-//     } else {
-//         console.log("page not loaded");
-//     }
+        renderPage(note_page);
+    }
+}
 
-//     if (pag.length > 0 && pag2.length > 0) {
-//         pag[0].style.backgroundColor = "gray";
-//         pag2[0].style.backgroundColor = "gray";
-//     }
-// }
 
-// function setPagButtons(nav_pag) {
-//     for (let g = 0; g < pag.length; g++) {
-//         pag[g].style.backgroundColor = "white";
-//         pag2[g].style.backgroundColor = "white";
+function getScrollPosition() {
+    return window.scrollY || document.documentElement.scrollTop;
+}
 
-//         if (nav_pag % 3 > 1 && nav_pag > 2) {
-//             pag[g].innerText = parseInt(pag[g].innerText) - 3;
-//             pag2[g].innerText = parseInt(pag2[g].innerText) - 3;
-//         } else if (nav_pag >= 3) {
-//             pag[g].innerText = parseInt(pag[g].innerText) + 3;
-//             pag2[g].innerText = parseInt(pag2[g].innerText) + 3;
-//         } else if (nav_pag == 0 && parseInt(pag[g].innerText) > 3) {
-//             pag[g].innerText = parseInt(pag[g].innerText) - 3;
-//             pag2[g].innerText = parseInt(pag2[g].innerText) - 3;
-//         }
+let bookmarkBtns = document.getElementsByClassName("bookmark");
 
-//         // Hide if exceeds page count
-//         if (parseInt(pag[g].innerText) > pages.length) {
-//             pag[g].style.display = "none";
-//             pag2[g].style.display = "none";
-//         } else {
-//             pag[g].style.display = "inline-block";
-//             pag2[g].style.display = "inline-block";
-//         }
-//     }
+for (let b = 0; b < bookmarkBtns.length; b++) {
+    bookmarkBtns[b].addEventListener("click", () => {
+ 
+            const bookmarkData = {
+                book_id: current_book.id,
+                chapter: current_book.current_chapter,
+                page: currentPageIndex,
+                word: 0,
+                scroll: getScrollPosition()
+            }
 
-//     pag[nav_pag % 3].style.backgroundColor = "gray";
-//     pag2[nav_pag % 3].style.backgroundColor = "gray";
-// }
+            Bookmark.save(bookmarkData);
+            const tempBookmark = new Bookmark(bookmarkData);
 
-// function addPaginationListeners() {
-//     prevs = document.getElementsByClassName("prev");
-//     nexts = document.getElementsByClassName("next");
+    });
+}
 
-//     for (let p = 0; p < prevs.length; p++) {
-//         prevs[p].addEventListener("click", () => {
-//             if (current_page > 0) {
-//                 //pages[current_page].style.display = "none";
-//                 current_page--;
-//                 //pages[current_page].style.display = "block";
-//                 window.scrollTo({ top: 0 });
-//                 //document.getElementById("header-page").innerText = "Page: " + (current_page + 1);
-//                 setPagButtons(current_page);
+
+
+
+// window.onload = () => {
+
+//     (async () => {
+//         try {
+
+//             const bookmark = await Bookmark.load(current_book.id);
+//             if (bookmark) {
+//                 //goToPosition(bookmark.chapter, bookmark.page, bookmark.word, bookmark.scroll);
+//                 console.log(bookmark.chapter, bookmark.page, bookmark.word, bookmark.scroll);
+//                 current_book.current_chapter = bookmark.chapter;
 //             }
-//         });
-//     }
 
-//     for (let n = 0; n < nexts.length; n++) {
-//         nexts[n].addEventListener("click", () => {
-//             if (current_page < pages.length - 1) {
-//                 //pages[current_page].style.display = "none";
-//                 current_page++;
-//                 //pages[current_page].style.display = "block";
-//                 window.scrollTo({ top: 0 });
-//                 //document.getElementById("header-page").innerText = "Page: " + (current_page + 1);
-//                 setPagButtons(current_page);
-//             }
-//         });
-//     }
-
-//     for (let g = 0; g < pag.length; g++) {
-//         pag[g].addEventListener("click", function () {
-//             pageJump(parseInt(this.innerText) - 1);
-//         });
-
-//         pag2[g].addEventListener("click", function () {
-//             pageJump(parseInt(this.innerText) - 1);
-//         });
-//     }
-// }
-
-// function pageJump(note_page) {
-//     if (note_page >= 0 && note_page < pages.length) {
-//         pages[current_page].style.display = "none";
-//         current_page = note_page;
-//         pages[current_page].style.display = "block";
-//         window.scrollTo({ top: 0 });
-//         document.getElementById("header-page").innerText = "Page: " + (current_page + 1);
-//         setPagButtons(current_page);
-//     }
-// }
-
-// function paginateTextFromDOM() {
-//     pages = document.getElementsByClassName("read_cols");
-
-//     pag = document.getElementsByClassName("pag");
-//     pag2 = document.getElementsByClassName("pag2");
-
-//     // Show only first 3 page buttons if total pages > 3
-//     for (let g = 0; g < pag.length; g++) {
-//         let pageIndex = parseInt(pag[g].innerText) - 1;
-//         if (pageIndex >= pages.length) {
-//             pag[g].style.display = "none";
-//             pag2[g].style.display = "none";
-//         } else {
-//             pag[g].style.display = "inline-block";
-//             pag2[g].style.display = "inline-block";
+//         } catch (error) {
+//             console.error("Failed to load bookmark:", error);
 //         }
-//     }
+//     })();
+
 // }
-
-// document.addEventListener("DOMContentLoaded", () => {
-//     paginateTextFromDOM();
-//     setupStartPage(current_page);
-//     addPaginationListeners();
-// });
-
-
-
-// // function loadBookmark() {
-// //     showSpinner();
-// //     console.log("Bookmark Loading...")
-
-// //     username = document.getElementById("ui-username").innerText.trim();
-// //     console.log(username)
-
-// //     fetch('/api/load-bookmark/', {
-// //         method: 'POST',
-// //         headers: {
-// //             'Content-Type': 'application/json',
-// //             'X-CSRFToken': csrftoken
-// //         },
-// //         body: JSON.stringify({ "username": username })
-// //     })
-// //         .then(response => response.json())
-// //         .then(result => {
-// //             console.log('Success:', result);
-// //             document.getElementById("page-text").innerHTML = result['passage'];
-// //             document.getElementById("book-header").innerText = result['book'];
-// //             document.getElementById("notes-header").innerText = result['book'];
-
-
-// //             const notes = result.notes;
-// //             let page = result.page;
-// //             document.cookie = `bookmarkpage=${page};bookmarkbook=${result['book']}`;
-// //             console.log(page);
-// //             curr_book = result['book_id'];
-// //             current_page = page;
-
-
-
-// //             console.log(notes)
-// //             document.getElementById('notes-list').innerHTML = "";
-// //             for (let i = 0; i < notes.length; i++) {
-// //                 console.log(notes[i].id);
-// //                 console.log(notes[i].title);
-// //                 console.log(notes[i].book);
-// //                 console.log(notes[i].data);
-
-// //                 //Adds note to the DOM
-// //                 addItem(notes[i].title, notes[i].data, notes[i].id)
-// //             }
-
-
-// //             document.getElementById("btn-new-note").disabled = false;
-// //             document.getElementsByClassName("page-nav")[0].style.visibility = "visible";
-// //             document.getElementsByClassName("page-nav")[1].style.visibility = "visible";
-// //             setupStartPage(page);
-// //             verses = load_page_array();
-
-// //             create_clickable_passages(verses);
-// //             setPagButtons(page);
-
-
-// //             // Hide spinner
-// //             hideSpinner();
-// //         })
-// //         .catch(error => {
-// //             // Hide spinner
-// //             hideSpinner();
-// //             console.error('Error:', error);
-// //         });
-
-
-// // }
-
-
-// // window.onload = (event) => {
-
-// //     let t = document.getElementById("page-text").innerHTML;
-
-
-
-// //     // loadBookmark();
-
-// // }
 
 let currentPageIndex = 0;
 
@@ -220,24 +68,24 @@ function renderPage(pageIndex) {
     textLayout.innerHTML = ""; // Clear existing
     document.getElementById("chapter-header").innerText = current_book.content[current_book.current_chapter]['chapter']
     //current_book.content[0] = JSON.parse(current_book.content)
-    current_book.current_page = currentPageIndex
+    //current_book.current_page = currentPageIndex
     console.log(`Current Chapter ${current_book.current_chapter}`);
     console.log(`Current Page: ${current_book.current_page}/${currentPageIndex}`)
     // console.log(current_book.content['content'][current_book.current_chapter]['pages'][current_book.current_page])
-    if (current_book.content[current_book.current_chapter]['pages'][current_book.current_page].length > 0) {
-        let sentences = current_book.content[current_book.current_chapter]['pages'][current_book.current_page];
-        for(let n=0; n<sentences.length; n++){
+    if (current_book.content[current_book.current_chapter]['pages'][currentPageIndex].length > 0) {
+        let sentences = current_book.content[current_book.current_chapter]['pages'][currentPageIndex];
+        for (let n = 0; n < sentences.length; n++) {
             let newSent = document.createElement("span");
             newSent.setAttribute("class", "sentPartition");
-            let tempSent = current_book.content[current_book.current_chapter]['pages'][current_book.current_page][n]['text'].split(/\s+/);
-            for(let w=0; w<tempSent.length; w++){
+            let tempSent = current_book.content[current_book.current_chapter]['pages'][currentPageIndex][n]['text'].split(/\s+/);
+            for (let w = 0; w < tempSent.length; w++) {
                 let newWord = document.createElement("div");
                 newWord.className = "word";
                 newWord.innerText = tempSent[w];
                 newSent.appendChild(newWord);
             }
 
-            temppage = temppage.concat(current_book.content[current_book.current_chapter]['pages'][current_book.current_page][n]['text'].split(/\s+/));
+            temppage = temppage.concat(current_book.content[current_book.current_chapter]['pages'][currentPageIndex][n]['text'].split(/\s+/));
             textLayout.appendChild(newSent);
         }
     }
@@ -306,7 +154,8 @@ function setupPaginationControls() {
             if (currentPageIndex > 0) {
                 renderPage(--currentPageIndex);
                 setupPaginationControls();
-                
+                current_book.current_page--
+
             }
             else {
                 if (current_book.current_chapter > 0) {
@@ -327,11 +176,12 @@ function setupPaginationControls() {
         btn.onclick = () => {
             if (currentPageIndex < current_book.content[current_book.current_chapter]['length'] - 1) {
                 renderPage(++currentPageIndex);
+                current_book.current_page++
                 setupPaginationControls();
                 toggleHighlighted();
             }
             else {
-                if (current_book.current_chapter < current_book.content.length -1) {
+                if (current_book.current_chapter < current_book.content.length - 1) {
                     ++current_book.current_chapter;
                     currentPageIndex = 0
                     renderPage(currentPageIndex);
@@ -385,7 +235,7 @@ function page_search(index) {
     console.log(`Current Page: ${current_book.content[current_book.current_chapter]['start']}/${index}`)
     currentPageIndex = (parseInt(index) - current_book.content[current_book.current_chapter]['start']);
     console.log(`This page is ${currentPageIndex}`);
-    current_book.current_page = currentPageIndex;
+    //current_book.current_page = currentPageIndex;
     renderPage(parseInt(currentPageIndex));
     setupPaginationControls();
 }

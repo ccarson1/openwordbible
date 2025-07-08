@@ -36,9 +36,18 @@ class Book(models.Model):
 class Bookmark(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="bookmarks")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bookmarks")
-    current_page = models.IntegerField(default=1)
+    current_chapter = models.IntegerField(default=0)
+    current_page = models.IntegerField(default=0)
+    current_word = models.IntegerField(default=0)
     scroll_position = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["user", "book"], name="unique_user_book_bookmark")
+        ]
 
     def __str__(self):
         return f"Bookmark for {self.book.name} by {self.user.username}"
@@ -49,7 +58,7 @@ class BookFormat(models.Model):
     words = models.IntegerField(default=500)
     columns = models.PositiveSmallIntegerField(choices=[(i, str(i)) for i in range(1, 5)], default=1)
     font = models.CharField(max_length=25, blank=True, null=True)
-    font_size = models.PositiveSmallIntegerField(default=15, max_length=24)
+    font_size = models.PositiveSmallIntegerField(default=15)
     color = models.CharField(max_length=50, default="black")
 
 class Tag(models.Model):
@@ -96,11 +105,19 @@ class Label(models.Model):
     def __str__(self):
         return self.text
     
+class Chapter(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="chapters")
+    index = models.IntegerField(default=0)
+    name = models.CharField(max_length=150)
+    start = models.IntegerField(default=0)
+    end = models.IntegerField(default=0)
+    length = models.IntegerField(default=0)
+    
 
 class Sentence(models.Model):
     text = models.CharField(max_length=500)
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="sentences")
-    chapter = models.IntegerField(default=0)
+    chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, default=None, null=True, related_name="sentences")
     page = models.IntegerField(default=0)
     sentence_index = models.IntegerField(default=0)
 
