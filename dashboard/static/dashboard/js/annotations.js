@@ -17,6 +17,11 @@ let all_instances = document.getElementById("all-instances");
 //     }
 // }
 
+for(let x=0; x<book.chapter_count; x++){
+    loadChapterPages(book.id, x)
+}
+
+
 all_instances.addEventListener("change", function(){
     console.log(modifiedWords);
     modifiedWords = [];
@@ -49,6 +54,7 @@ function editAnnotation([chapter, page, sentence, word], label) {
 // Function to render a batch
 function renderNextBatch() {
     //let end = Math.min(currentIndex + batchSize, sentencesList.length);
+    console.log(book.id)
     
 
     let sents = document.getElementsByClassName("sent");
@@ -83,6 +89,8 @@ function renderNextBatch() {
                         let sentIndex = Array.from(pageDiv.children).indexOf(sentDiv);
                         let pageIndex = parseInt(pageDiv.id);
                         let chapterIndex = parseInt(chapterDiv.id);
+
+                        console.log(wordIndex)
 
                         const label = content[chapterIndex].pages[pageIndex][sentIndex].labels[wordIndex].trim();
                         document.getElementById('word-label').value = label;
@@ -208,15 +216,26 @@ function renderNextBatch() {
     //currentIndex = end;
 }
 
-// Scroll listener to load more when near bottom
-// window.addEventListener('scroll', () => {
-//     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 200) {
-//         renderNextBatch();
-//     }
-// });
 
-// Initial load
-renderNextBatch();
+
+
+async function loadChapterPages(bookId, chapterIndex) {
+    try {
+        const response = await fetch(`/api/book/${bookId}/chapter/${chapterIndex}/`);
+        if (!response.ok) {
+            throw new Error(`Failed to load chapter ${chapterIndex}`);
+        }
+
+        const data = await response.json();
+        console.log(data)
+        content.push(data); // Fill in the blank
+        console.log(`Loaded chapter ${chapterIndex}`);
+        renderNextBatch();
+        //renderChapter(chapterIndex);
+    } catch (error) {
+        console.error("Error loading chapter:", error);
+    }
+}
 
 document.getElementById("add-btn").addEventListener('click', function () {
     let word = document.getElementById('target-word').value;

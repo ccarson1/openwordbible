@@ -20,6 +20,7 @@
 <script src="{% static '/app/js/read/highlighter.js' %}" defer></script>
 <script src="{% static '/app/js/read/tags.js' %}" defer></script>
 <script src="{% static '/app/js/read/search.js' %}" defer></script>
+<script src="{% static '/app/js/read/aiChatbot.js' %}" defer></script>
 
 {% endblock %}
 
@@ -80,22 +81,22 @@
                 <button class="btn btn-outline-success" id="btn-search-notes">Find</button>
             </form>
             <div class="form-check form-switch mt-4">
-                <input class="form-check-input" type="checkbox" id="highlighterToggle"
-                    onchange="toggleHighlighted()" checked>
+                <input class="form-check-input" type="checkbox" id="highlighterToggle" onchange="toggleHighlighted()"
+                    checked>
                 <label class="form-check-label small" for="highlighterToggle">Show Highlighted</label>
-                
+
             </div>
             <div class="dropdown mt-4">
-                    <button class="btn btn-primary dropdown-toggle" type="button" id="filterDropdown"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-filter"></i>
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="filterDropdown">
-                        <li><a class="dropdown-item" href="#">Filter by Date</a></li>
-                        <li><a class="dropdown-item" href="#">Filter by Name</a></li>
-                        <li><a class="dropdown-item" href="#">Filter by Color</a></li>
-                    </ul>
-                </div>
+                <button class="btn btn-primary dropdown-toggle" type="button" id="filterDropdown"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-filter"></i>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                    <li><a class="dropdown-item" href="#">Filter by Date</a></li>
+                    <li><a class="dropdown-item" href="#">Filter by Name</a></li>
+                    <li><a class="dropdown-item" href="#">Filter by Color</a></li>
+                </ul>
+            </div>
             <span class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
                 <svg class="bi me-2" width="30" height="24">
                     <use xlink:href="#bootstrap"></use>
@@ -109,7 +110,7 @@
         </div>
         <div class="tab-pane fade" id="search-container" role="tabpanel">
             <h4 class="text-center">Results <span id="num_of_results"></span></h4>
-            
+
             <div id="search-results">
 
             </div>
@@ -205,102 +206,143 @@
             </nav>
         </div>
         <div id="toolbar">
-        <div>
-            <span class="color-swatch" data-color="yellow" style="background: yellow;"></span>
-            <span class="color-swatch" data-color="lightgreen" style="background: lightgreen;"></span>
-            <span class="color-swatch" data-color="lightblue" style="background: lightblue;"></span>
-            <span class="color-swatch" data-color="pink" style="background: pink;"></span>
-            <span class="toolbar-icon" id="save"><i class="bi bi-file-earmark-plus"></i></span>
-            <span class="toolbar-icon bookmark" id=""><i class="bi bi-bookmark"></i></span>
-            <span class="toolbar-icon" id="copy"><i class="bi bi-clipboard"></i></span>
-            <span class="toolbar-icon" id="share"><i class="bi bi-share"></i></span>
-            <span class="toolbar-icon" id="undo"><i class="bi bi-arrow-counterclockwise"></i></span>
+            <div>
+                <span class="color-swatch" data-color="yellow" style="background: yellow;"></span>
+                <span class="color-swatch" data-color="lightgreen" style="background: lightgreen;"></span>
+                <span class="color-swatch" data-color="lightblue" style="background: lightblue;"></span>
+                <span class="color-swatch" data-color="pink" style="background: pink;"></span>
+                <span class="toolbar-icon" id="save"><i class="bi bi-file-earmark-plus"></i></span>
+                <span class="toolbar-icon bookmark" id=""><i class="bi bi-bookmark"></i></span>
+                <span class="toolbar-icon" id="copy"><i class="bi bi-clipboard"></i></span>
+                <span class="toolbar-icon" id="share"><i class="bi bi-share"></i></span>
+
+            </div>
+        </div>
+        <!-- Sticky AI Icon -->
+        <div id="ai-icon">
+            <i class="fas fa-robot"></i>
+        </div>
+
+        <!-- AI Prompt Box -->
+        <div id="ai-prompt-box">
+            <label for="ai-input" class="form-label">Ask me anything:</label>
+            <input type="text" class="form-control mb-2" id="ai-input" placeholder="Type your prompt...">
+
+            <!-- Select Model Button -->
+            <button class="btn btn-outline-secondary w-100 mb-2" type="button" data-bs-toggle="collapse"
+                data-bs-target="#modelOptions" aria-expanded="false" aria-controls="modelOptions">
+                Select Model
+            </button>
+
+            <!-- Collapsible Content -->
+            <div class="collapse" id="modelOptions">
+                <div class="mb-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="ai-model" value="GPT-4" id="model-gpt4" checked>
+                        <label class="form-check-label" for="model-gpt4" >GPT-4</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="ai-model" value="Claude" id="model-claude">
+                        <label class="form-check-label" for="model-claude">Claude</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="ai-model" value="Mistral" id="model-mistral">
+                        <label class="form-check-label" for="model-mistral">Mistral</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="ai-model" value="Gemini" id="model-gemini">
+                        <label class="form-check-label" for="model-gemini">Gemini</label>
+                    </div>
+                </div>
+            </div>
+            <button id="ai-send-button" class="btn btn-sm btn-primary w-100 mt-2">Send</button>
+        </div>
+
+    </div>
+    <div id="spinner-overlay" class="overlay">
+        <div id="spinner-container" class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
         </div>
     </div>
+    <!-- Modal Save New Note-->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div id="alert-container"></div>
 
-    </div>
+        <div class="modal-dialog">
+            <div class="modal-content" style="padding: 1%;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="NoteModalLabel">New Note</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <label for="note-title">Title</label>
+                <div class="input-group mb-3">
 
-</div>
-<div id="spinner-overlay" class="overlay">
-    <div id="spinner-container" class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-</div>
-<!-- Modal Save New Note-->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div id="alert-container"></div>
+                    <input type="text" class="form-control" aria-label="Default"
+                        aria-describedby="inputGroup-sizing-default" id="note-title">
 
-    <div class="modal-dialog">
-        <div class="modal-content" style="padding: 1%;">
-            <div class="modal-header">
-                <h5 class="modal-title" id="NoteModalLabel">New Note</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <label for="note-title">Title</label>
-            <div class="input-group mb-3">
+                </div>
+                <label for="note-data">Description</label>
+                <textarea class="form-control" aria-label="With textarea" id="note-data"></textarea>
+                <label for="">Tags</label>
+                <div class="input-group mb-3">
 
-                <input type="text" class="form-control" aria-label="Default"
-                    aria-describedby="inputGroup-sizing-default" id="note-title">
+                    <input type="text" class="form-control" aria-label="Default"
+                        aria-describedby="inputGroup-sizing-default" id="note-tags">
+                    <ul id="tag-suggestions" class="list-group position-absolute"
+                        style="z-index: 1000; margin-top: 10%;">
+                    </ul>
 
-            </div>
-            <label for="note-data">Description</label>
-            <textarea class="form-control" aria-label="With textarea" id="note-data"></textarea>
-            <label for="">Tags</label>
-            <div class="input-group mb-3">
+                </div>
+                <div class="modal-footer" id="m-footer">
 
-                <input type="text" class="form-control" aria-label="Default"
-                    aria-describedby="inputGroup-sizing-default" id="note-tags">
-                <ul id="tag-suggestions" class="list-group position-absolute" style="z-index: 1000; margin-top: 10%;"></ul>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="save-note">Save changes</button>
 
-            </div>
-            <div class="modal-footer" id="m-footer">
-
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="save-note">Save changes</button>
+                </div>
 
             </div>
-
         </div>
     </div>
-</div>
-{% else %}
-<div>
-    <h2>You aren't supposed to be here!</h2>
-</div>
-{% endif %}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-{{ book_content|json_script:"bookContent" }}
-{{ book|json_script:"books_data" }}
+    
+    {% else %}
+    <div>
+        <h2>You aren't supposed to be here!</h2>
+    </div>
+    {% endif %}
+    
+    {{ book_content|json_script:"bookContent" }}
+    {{ book|json_script:"books_data" }}
 
-<script>
+    <script>
 
-    let this_book = "This is a book test"
-    const parsedContent = JSON.parse(document.getElementById("bookContent").textContent);
-    const booksData = JSON.parse(document.getElementById("books_data").textContent);
-    let current_book = new Book({
-        id: "{{ book.id }}",
-        name: "{{ book.name}}",
-        language: "{{ book.language|default:''|escapejs }}",
-        date: "{{ book.date|default:''|escapejs }}",
-        religion: "{{ book.religion|default:''|escapejs }}",
-        content: parsedContent,
-        authors: "{{ book.authors|default:''|escapejs }}",
-        book_index: "{{ book_index|safe|escapejs }}"
-    });
-    console.log(current_book)
-    let book_format = new BookFormatter(
-        '{{book_format.book}}',
-        '{{book_format.user}}',
-        '{{book_format.words}}',
-        '{{book_format.columns}}',
-        '{{book_format.font}}',
-        '{{book_format.font_size}}',
-        '{{book_format.color}}'
-    );
+        let this_book = "This is a book test"
+        const parsedContent = JSON.parse(document.getElementById("bookContent").textContent);
+        const booksData = JSON.parse(document.getElementById("books_data").textContent);
+        let current_book = new Book({
+            id: "{{ book.id }}",
+            name: "{{ book.name}}",
+            language: "{{ book.language|default:''|escapejs }}",
+            date: "{{ book.date|default:''|escapejs }}",
+            religion: "{{ book.religion|default:''|escapejs }}",
+            content: parsedContent,
+            authors: "{{ book.authors|default:''|escapejs }}",
+            book_index: "{{ book_index|safe|escapejs }}"
+        });
+        console.log(current_book)
+        let book_format = new BookFormatter(
+            '{{book_format.book}}',
+            '{{book_format.user}}',
+            '{{book_format.words}}',
+            '{{book_format.columns}}',
+            '{{book_format.font}}',
+            '{{book_format.font_size}}',
+            '{{book_format.color}}'
+        );
 
-    //document.getElementById("page-text").innerText = '{{ book.content }}'
+        //document.getElementById("page-text").innerText = '{{ book.content }}'
 
-</script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </script>
 
-{% endblock %}
+
+    
+    {% endblock %}

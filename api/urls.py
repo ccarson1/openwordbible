@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import ProfileAPIView, BookmarkAPIView, UploadBook, PublishBook, LoadBook, search_books, UpdateLayout, UpdateAnnotation, ExportDataset, SaveNote, TagListView, LoadNotes, DeleteNote
+from .views import ProfileAPIView, BookmarkAPIView, UploadBook, PublishBook, LoadBook, search_books, UpdateLayout, UpdateAnnotation, ExportDataset, SaveNote, TagListView, LoadNotes, DeleteNote, ChapterDetailAPIView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -13,6 +13,7 @@ urlpatterns = [
    path('upload-book/', UploadBook.as_view(), name='upload-book'),
    path('publish-book/', PublishBook.as_view(), name='publish-book'),
    path('load-book/', LoadBook.as_view(), name='load-book'),
+   path("book/<int:book_id>/chapter/<int:chapter_index>/", ChapterDetailAPIView.as_view(), name="chapter-detail"),
    path('update-layout/', UpdateLayout.as_view(), name='update-layout'),
    path('update-annotation/', UpdateAnnotation.as_view(), name='update-annotation'),
    path('search-books/', search_books, name='search_books'),

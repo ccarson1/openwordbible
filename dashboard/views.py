@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.conf import settings
-from api.models import Book, Language, Religion, Profile, Annotation, Word, Label, POSLabel
+from api.models import Book, Chapter, Language, Religion, Profile, Annotation, Sentence, Word, Label, POSLabel
 from django.http import JsonResponse
 
 import os
@@ -104,38 +104,76 @@ def settings_view(request):
 #     return render(request, "books.html", {"books": books_data})
 
 
+# def annotations(request, book_id):
+#     book = get_object_or_404(Book, pk=book_id)
+#     file_path = book.book_file.path.replace("\\", "/")
+#     # Attempt to read and parse the JSON file
+#     try:
+#         with open(file_path, 'r', encoding='utf-8') as f:
+#             content = json.load(f)
+#             content = content['published_book']
+#             content = content['content']
+            
+#             print(content)
+#     except FileNotFoundError:
+#         content = {'error': 'File not found'}
+#     except json.JSONDecodeError:
+#         content = {'error': 'Invalid JSON format'}
+
+#     if request.method == 'POST':
+#         return JsonResponse({
+#             'success': True,
+#             'book_id': book.id,
+#             'book_name': book.name,
+#             'content': content
+#         })
+
+#     return render(request, "annotations.html", {
+#         "book": {
+#             "id": book.id,
+#             "path": book.book_file.path
+#         },
+#         "content": content
+#     })
+
+
 def annotations(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
-    file_path = book.book_file.path.replace("\\", "/")
-    # Attempt to read and parse the JSON file
-    try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            content = json.load(f)
-            content = content['published_book']
-            content = content['content']
-            
-            print(content)
-    except FileNotFoundError:
-        content = {'error': 'File not found'}
-    except json.JSONDecodeError:
-        content = {'error': 'Invalid JSON format'}
 
     if request.method == 'POST':
+        chapters = Chapter.objects.filter(book_id=book.id).order_by("index")
+        sentences = Sentence.objects.filter(book_id=book.id).order_by("sentence_index")
+
+        chapter_data = []
+        for chapter in chapters:
+            chapter_dict = {
+                "chapter": chapter.name,
+                "index": chapter.index,
+                "start": chapter.start,
+                "end": chapter.end,
+                "length": chapter.length,
+                "pages": []  # Will be filled progressively on the frontend
+            }
+            chapter_data.append(chapter_dict)
+        print(chapter_data)
         return JsonResponse({
             'success': True,
             'book_id': book.id,
             'book_name': book.name,
-            'content': content
+            'content': chapter_data  # All chapters with empty pages
         })
-
-    return render(request, "annotations.html", {
-        "book": {
-            "id": book.id,
-            "path": book.book_file.path
-        },
-        "content": content
-    })
-
+    else:
+        chapters = Chapter.objects.filter(book_id=book.id).order_by("index")
+        chapter_count = chapters.count()
+        print(chapter_count)
+        return render(request, "annotations.html", {
+            "book": {
+                "id": book.id,
+                "path": book.book_file.path,
+                "chapter_count": chapter_count
+            },
+            "content": []  # Let frontend call POST to populate this
+        })
 
 
 

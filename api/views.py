@@ -503,6 +503,88 @@ class LoadBook(APIView):
             "book_format": format_data,
         })
     
+# class ChapterDetailAPIView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request, book_id, chapter_index):
+#         user = request.user
+#         book = get_object_or_404(Book, id=book_id)
+#         chapter = get_object_or_404(Chapter, book=book, index=chapter_index)
+
+#         # Fetch sentences for this chapter, grouped by page
+#         sentences = Sentence.objects.filter(chapter=chapter).order_by('sentence_index')
+
+#         pages = {}
+#         for s in sentences:
+#             pages.setdefault(s.page, []).append({"text": s.text})
+
+#         sorted_pages = [pages[p] for p in sorted(pages)]
+
+#         return Response({
+#             "chapter": chapter.name,
+#             "index": chapter.index,
+#             "start": chapter.start,
+#             "end": chapter.end,
+#             "length": chapter.length,
+#             "pages": sorted_pages
+#         })
+
+
+class ChapterDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, book_id, chapter_index):
+        user = request.user
+        book = get_object_or_404(Book, id=book_id)
+        chapter = get_object_or_404(Chapter, book=book, index=chapter_index)
+
+        # Fetch all relevant sentences
+        sentences = Sentence.objects.filter(chapter=chapter).order_by('sentence_index')
+
+        # Prefetch annotations and pos labels for efficiency
+        annotations = Annotation.objects.filter(sentence__in=sentences).select_related('label', 'text')
+        pos_labels = POSLabel.objects.filter(sentence__in=sentences).select_related('label', 'text')
+
+        # Build index: sentence_id → list of (word_index, label/text)
+        ann_map = {}
+        for a in annotations:
+            ann_map.setdefault(a.sentence_id, []).append((a.word_index, a.label.text, a.text.text))
+
+        pos_map = {}
+        for p in pos_labels:
+            pos_map.setdefault(p.sentence_id, []).append((p.word_index, p.label.text, p.text.text))
+
+        # Group sentences by page
+        pages = {}
+        for s in sentences:
+            # Get the word-level info
+            sentence_annotations = sorted(ann_map.get(s.id, []), key=lambda x: x[0])
+            sentence_pos = sorted(pos_map.get(s.id, []), key=lambda x: x[0])
+
+            labels = [label for _, label, _ in sentence_annotations]
+            pos_tags = [pos for _, pos, _ in sentence_pos]
+            words = [text for _, _, text in sentence_annotations] or s.text.split()  # fallback
+
+            sentence_dict = {
+                "text": " ".join(words),
+                "labels": labels,
+                "POS": pos_tags
+            }
+
+            pages.setdefault(s.page, []).append(sentence_dict)
+
+        # Sort pages
+        sorted_pages = [pages[p] for p in sorted(pages)]
+
+        return Response({
+            "chapter": chapter.name,
+            "index": chapter.index,
+            "start": chapter.start,
+            "end": chapter.end,
+            "length": chapter.length,
+            "pages": sorted_pages
+        })
+    
 class UpdateLayout(APIView):
 
     def post(self, request, *args, **kwargs):
