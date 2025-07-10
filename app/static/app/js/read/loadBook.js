@@ -15,11 +15,6 @@ function create_pages(array, chunkSize) {
 window.onload = (event) => {
 
 
-    // (async () => {
-
-    // })();
-
-
     console.log(booksData['bookmark'])
     let bookmark = booksData['bookmark'];
     console.log(bookmark["chapter"])
@@ -35,7 +30,7 @@ window.onload = (event) => {
 
 
     current_book.content = book_content
-    current_book.callTotalPages();
+    //current_book.callTotalPages();
     console.log(current_book.content[current_book.current_chapter]['pages'][current_book.current_page]);
     document.getElementById('total-pages').innerText = current_book.total_pages + 1;
     console.log(current_book.current_chapter)
@@ -77,7 +72,7 @@ window.onload = (event) => {
             }
             const data = await response.json();
             current_book.content[index].pages = data.pages;  // Fill in the missing pages
-            console.log(`Loaded chapter ${index}`);
+            // console.log(`Loaded chapter ${index}`);
         } catch (err) {
             console.error(`Error loading chapter ${index}:`, err);
         }

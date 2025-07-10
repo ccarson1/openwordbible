@@ -317,7 +317,9 @@
 
         let this_book = "This is a book test"
         const parsedContent = JSON.parse(document.getElementById("bookContent").textContent);
+        console.log(parsedContent)
         const booksData = JSON.parse(document.getElementById("books_data").textContent);
+        //let currentPageIndex = bookmark["current_page"];
         let current_book = new Book({
             id: "{{ book.id }}",
             name: "{{ book.name}}",
@@ -326,7 +328,8 @@
             religion: "{{ book.religion|default:''|escapejs }}",
             content: parsedContent,
             authors: "{{ book.authors|default:''|escapejs }}",
-            book_index: "{{ book_index|safe|escapejs }}"
+            book_index: "{{ book_index|safe|escapejs }}",
+            total_pages: "{{ book.total_pages|safe|escapejs }}",
         });
         console.log(current_book)
         let book_format = new BookFormatter(

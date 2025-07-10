@@ -8,14 +8,7 @@ let modifiedWords = [];
 let lastClicked;
 let all_instances = document.getElementById("all-instances");
 
-// // Flatten all sentences first
-// for (let a = 0; a < content.length; a++) {
-//     for (let b = 0; b < content[a].length; b++) {
-//         for (let c = 0; c < content[a].pages[b].length; c++) {
-//             sentencesList.push(content[a].pages[b][c]);
-//         }
-//     }
-// }
+
 
 for(let x=0; x<book.chapter_count; x++){
     loadChapterPages(book.id, x)
@@ -59,7 +52,7 @@ function renderNextBatch() {
 
     let sents = document.getElementsByClassName("sent");
     for (let a = 0; a < content.length; a++) {
-        console.log(content[a])
+
         let chapterDiv = document.createElement("div");
         chapterDiv.setAttribute("class", "cha");
         chapterDiv.setAttribute("id", a)
@@ -146,62 +139,6 @@ function renderNextBatch() {
                     });
 
 
-                    // word.addEventListener('click', function (event) {
-                    //     let div_words = document.getElementsByClassName("word");
-                    //     let clickedElement = event.target;
-                    //     document.getElementById("target-word").value = this.innerText;
-
-                    //     let children = Array.from(div_words);
-                    //     let index = children.indexOf(clickedElement);
-                    //     console.log(this);
-                    //     console.log(`a: ${a}, b: ${b}, c: ${c}, index: ${index}`);
-                    //     console.log(content[a].pages[b][c].labels[index]);
-                    //     document.getElementById('word-label').value = content[a].pages[b][c].labels[index].trim();
-
-                    //     console.log(document.getElementById('word-label').value);
-
-
-                    //     let word_count = 0;
-
-
-
-                    //     for (let w of div_words) {
-
-                    //         if (w.innerText === this.innerText) {
-                    //             sent_index = Array.from(w.parentNode.parentNode.children).indexOf(w.parentNode)
-                    //             word_index = Array.from(w.parentNode.children).indexOf(w)
-                    //             sent = w.parentNode.parentNode.children[sent_index]
-                    //             page_index = sent.parentNode.id;
-                    //             chapter_index = sent.parentNode.parentNode.id;
-                    //             document.getElementById('word-label').value = content[chapter_index].pages[page_index][sent_index].labels[word_index]
-                    //             if (all_instances.checked) {
-
-                    //                 w.style.backgroundColor = "yellow";
-                    //                 word_count++;
-
-                    //                 modifiedWords.push([chapter_index, page_index, sent_index, word_index])
-
-
-                    //             }
-                    //         } else {
-                    //             w.style.backgroundColor = "white";
-                    //         }
-
-
-                    //     }
-
-                    //     document.getElementById('word-count').innerText = word_count;
-                    //     this.style.backgroundColor = 'yellow';
-                    //     // console.log(`Sentence Index: ${Array.from(this.parentNode.parentNode.children).indexOf(this.parentNode)}`);
-                    //     // console.log(`Word Index: ${Array.from(this.parentNode.children).indexOf(this)}`);
-                    //     sent_index = Array.from(this.parentNode.parentNode.children).indexOf(this.parentNode)
-                    //     word_index = Array.from(this.parentNode.children).indexOf(this)
-                    //     sent = this.parentNode.parentNode.children[sent_index]
-                    //     page_index = sent.parentNode.id;
-                    //     chapter_index = sent.parentNode.parentNode.id;
-
-                    //     modifiedWords.push([chapter_index, page_index, sent_index, word_index])
-                    // });
 
                     sentenceDiv.appendChild(word);
                 }
@@ -230,7 +167,7 @@ async function loadChapterPages(bookId, chapterIndex) {
         console.log(data)
         content.push(data); // Fill in the blank
         console.log(`Loaded chapter ${chapterIndex}`);
-        renderNextBatch();
+        //renderNextBatch();
         //renderChapter(chapterIndex);
     } catch (error) {
         console.error("Error loading chapter:", error);

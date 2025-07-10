@@ -39,7 +39,7 @@ class Book {
         this.is_published = is_published;
         this.book_index = book_index;
         this.current_page = current_page;
-        this.total_pages = total_pages;
+        this.total_pages = parseInt(total_pages);
         this.current_chapter = current_chapter;
     }
 
@@ -52,7 +52,7 @@ class Book {
         let total_pages = 0
         console.log(this.content)
         for(let x=0; x<this.content.length; x++){
-            //console.log(this.content['content'][x]["pages"]);
+            console.log(this.content[x]["pages"]);
 
             for(let y=0; y<this.content[x]["pages"].length; y++){
                 // console.log(this.content['content'][x]["pages"][y])

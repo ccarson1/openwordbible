@@ -67,11 +67,11 @@ def read(request, id):
 
     chapters_array = []
     book_index = []
-
+    page_index = 0
     for c in chapters:
-        print(f"Chapter: {c.name} : {c.index}")
+        #print(f"Chapter: {c.name} : {page_index}")
 
-        book_index.append({"header":c.name,"page": c.index})
+        #print(bookmark_index)
         if c.index == bookmark_index:
             # Load full content for bookmarked chapter
             chapter_sentences = [s for s in sentences if s.chapter_id == c.id]
@@ -86,6 +86,11 @@ def read(request, id):
         else:
             # Leave content empty, will be fetched later
             pages_data = []
+        
+        #print(pages_data)
+        page_index+=c.length
+        #print(page_index)
+        book_index.append({"header":c.name,"page": page_index})
 
         chapters_array.append({
             "chapter": c.name,
@@ -93,10 +98,11 @@ def read(request, id):
             "start": c.start,
             "end": c.end,
             "length": c.length,
-            "pages": pages_data
+            "pages": pages_data,
+            "page_index": page_index
         })
 
-    print(book_index)
+    #print(book_index)
     #json_string = json.dumps(chapters_array, ensure_ascii=False, indent=2)
     #print(json_string)
 
@@ -112,6 +118,7 @@ def read(request, id):
     #     except Exception as e:
     #         print(f"Error reading file for book {book.name}: {e}")
 
+    print(f"Total pages: {page_index}")
     books_data = {
         "id": book.id,
         "name": book.name,
@@ -130,7 +137,8 @@ def read(request, id):
         "bookmark": serialized_bookmark,
         #"content": book_json['published_book']['content'] if book_json else None,
         #"book_index": book_json["book_index"] if book_json else None,
-        "book_index": str(book_index)
+        "book_index": str(book_index),
+        "total_pages": page_index
         
     }
 

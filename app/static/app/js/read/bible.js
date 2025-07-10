@@ -40,24 +40,7 @@ for (let b = 0; b < bookmarkBtns.length; b++) {
 
 
 
-// window.onload = () => {
 
-//     (async () => {
-//         try {
-
-//             const bookmark = await Bookmark.load(current_book.id);
-//             if (bookmark) {
-//                 //goToPosition(bookmark.chapter, bookmark.page, bookmark.word, bookmark.scroll);
-//                 console.log(bookmark.chapter, bookmark.page, bookmark.word, bookmark.scroll);
-//                 current_book.current_chapter = bookmark.chapter;
-//             }
-
-//         } catch (error) {
-//             console.error("Failed to load bookmark:", error);
-//         }
-//     })();
-
-// }
 
 let currentPageIndex = 0;
 
@@ -92,13 +75,7 @@ function renderPage(pageIndex) {
     else {
         temppage = [];
     }
-    // console.log(temppage);
-    // temppage.forEach(word => {
-    //     let newWord = document.createElement("div");
-    //     newWord.className = "word";
-    //     newWord.innerText = word;
-    //     textLayout.appendChild(newWord);
-    // });
+
 
     currentPageIndex = parseInt(pageIndex);
     document.getElementById("current_page").value = (currentPageIndex + 1) + current_book.content[current_book.current_chapter]['start']
@@ -216,11 +193,7 @@ function page_search(index) {
     console.log(`Start: ${current_book.content[current_book.current_chapter]['start']}`)
     console.log(`End: ${current_book.content[current_book.current_chapter]['end']}`)
     for (let p = 0; p < current_book.content.length; p++) {
-        console.log(`${current_book.content[current_book.current_chapter]['start']} <= ${index} : ${current_book.content[current_book.current_chapter]['start'] <= currentPageIndex}`)
-        console.log(`${current_book.content[current_book.current_chapter]['end']} > ${index} : ${current_book.content[current_book.current_chapter]['end'] > currentPageIndex}`)
-        // if(current_book.content['content'][current_book.current_chapter]['start'] <= index && current_book.content['content'][current_book.current_chapter]['end'] > currentPageIndex){
-        //     break;
-        // }
+
         if (current_book.content[current_book.current_chapter]['start'] > index) {
             --current_book.current_chapter;
         }
@@ -231,10 +204,7 @@ function page_search(index) {
 
     }
 
-    console.log(`Current Chapter ${current_book.current_chapter}`);
-    console.log(`Current Page: ${current_book.content[current_book.current_chapter]['start']}/${index}`)
-    currentPageIndex = (parseInt(index) - current_book.content[current_book.current_chapter]['start']);
-    console.log(`This page is ${currentPageIndex}`);
+
     //current_book.current_page = currentPageIndex;
     renderPage(parseInt(currentPageIndex));
     setupPaginationControls();
