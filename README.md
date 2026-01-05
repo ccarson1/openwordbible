@@ -42,14 +42,27 @@ Running Application Locally
       pip install -r requirements.txt
       python -m spacy download en_core_web_sm
    ```
+5. **Update Django Settings**
+   Warning ❗
+   Open openwordbible/settings
+   1. Add the IP of the host "[]": ALLOWED_HOSTS = []
+   2. Change the IP address to the IP of the host: SESSION_COOKIE_DOMAIN = '.localhost'
 
-5. **Run Django Application**
+6. **Run Django Application**
+   Running Locally
    ```Bash
       python manage.py runserver
    ```
 
-6. **Test Application**
-   Go to [http://localhost:8000/](http://localhost:8000/) location in the browser
+   Running over the network
+   ```Bash
+      python manage.py runserver 0.0.0.0:8000
+   ```
+
+7. **Test Application**
+   Go to [http://localhost:8000/](http://localhost:8000/) location in the browser when running the application locally.
+   Go to [http://[server address]:8000/](http://[server address]:8000/) location in the browser when running the application locally.
+  ❗[server address] is the IP address of the host server
  
    
 
