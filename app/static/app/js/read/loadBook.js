@@ -32,7 +32,7 @@ window.onload = (event) => {
     current_book.content = book_content
     //current_book.callTotalPages();
     console.log(current_book.content[current_book.current_chapter]['pages'][current_book.current_page]);
-    document.getElementById('total-pages').innerText = current_book.total_pages + 1;
+    document.getElementById('total-pages').innerText = current_book.total_pages;
     console.log(current_book.current_chapter)
     let textArray = current_book.content[current_book.current_chapter]['pages'][current_book.current_page];
     let pageText = []

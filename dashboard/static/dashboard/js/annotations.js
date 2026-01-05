@@ -10,9 +10,9 @@ let all_instances = document.getElementById("all-instances");
 
 
 
-for(let x=0; x<book.chapter_count; x++){
-    loadChapterPages(book.id, x)
-}
+// for(let x=0; x<book.chapter_count; x++){
+//     loadChapterPages(book.id, x)
+// }
 
 
 all_instances.addEventListener("change", function(){
@@ -153,7 +153,7 @@ function renderNextBatch() {
     //currentIndex = end;
 }
 
-
+renderNextBatch();
 
 
 async function loadChapterPages(bookId, chapterIndex) {
@@ -167,7 +167,7 @@ async function loadChapterPages(bookId, chapterIndex) {
         console.log(data)
         content.push(data); // Fill in the blank
         console.log(`Loaded chapter ${chapterIndex}`);
-        //renderNextBatch();
+        renderNextBatch();
         //renderChapter(chapterIndex);
     } catch (error) {
         console.error("Error loading chapter:", error);

@@ -6,6 +6,7 @@ let inputBookDenom = document.getElementById("input-book-denom");
 let textPreview = document.getElementById("text-preview");
 let activeTabText = 'TXT';
 let page_pile;
+const CHUNK_SIZE = 1024 * 1024;
 
 let formated_book = {
     "content": [
@@ -148,6 +149,7 @@ document.getElementById("convert-book").addEventListener("click", function () {
                 preview_content.innerText = page_pile.get_content();
             }
 
+
             current_page = page_pile.get_current_page();
             page_pile.set_end_page();
             page_pile.set_content_pages();
@@ -214,12 +216,12 @@ document.getElementById("btn-add-all-page").addEventListener("click", function (
     content_pages = page_pile.get_content_pages();
     console.log(content_pages);
 
-    function split_page(pages){
-        for(let p=0; p<pages.length; p++){
+    function split_page(pages) {
+        for (let p = 0; p < pages.length; p++) {
             pages[p] = pages[p].replace(/\n/g, ' ')
             pages[p] = pages[p].split(page_pile.sentRegex);
 
-            
+
             // for(let s=0; s<pages[p].length; s++){
             //     pages[p][s] = pages[p][s].split(/\s+/)
             // }
@@ -231,13 +233,13 @@ document.getElementById("btn-add-all-page").addEventListener("click", function (
     if (page_pile.outline.length > 0) {
         for (let x = 0; x < page_pile.outline.length; x++) {
             start = parseInt(page_pile.outline[x]['page']) - 1
-            if ((x + 1) > page_pile.outline.length -1 ) {
+            if ((x + 1) > page_pile.outline.length - 1) {
                 end = page_pile.content_pages.length;
             }
             else {
                 end = parseInt(page_pile.outline[x + 1]['page']) - 1
 
-            } 
+            }
             chapter_pages = page_pile.content_pages.slice(start, end)
             ////////////////////////slice here///////////////////////////
             chapter_pages = split_page(chapter_pages);
@@ -301,8 +303,8 @@ document.getElementById("add-partition").addEventListener("click", function () {
     let delimiter = document.getElementById("search-input").value;
 
     const partition = page_pile.partitionText(content, label, delimiter);
-    
-    if(partition.errorMessage){
+
+    if (partition.errorMessage) {
         alert(partition.errorMessage);
     }
 
@@ -391,16 +393,19 @@ document.getElementById("add-outline-element").addEventListener("click", functio
     document.getElementById("new-element-value").value = "";
 });
 
-document.getElementById("label-input").addEventListener("change", function(){
+document.getElementById("label-input").addEventListener("change", function () {
     let label = document.getElementById("label-input").value;
 
-    if(label == 'sentence'){
+    if (label == 'sentence') {
         document.getElementById("search-input").value = '(?<=[.!?])\\s+(?=[A-Z\\[])';
     }
 });
 
 
-document.getElementById("btn-annotate-page").addEventListener("click", function(){
+document.getElementById("btn-annotate-page").addEventListener("click", function () {
+    let start = 0;
+    let chunkIndex = 0;
+
     showSpinner();
     book_image = document.getElementById("input-book-cover");
     book_index = collect_index();
@@ -451,3 +456,57 @@ document.getElementById("btn-annotate-page").addEventListener("click", function(
             alert(data['message'])
         })
 });
+
+
+// document.getElementById("btn-annotate-page").addEventListener("click", async function () {
+//     showSpinner();
+
+//     const book_image = document.getElementById("input-book-cover").files[0];
+//     const book_name = document.getElementById("input-book-title").value;
+//     const book_author = document.getElementById("input-book-author").value;
+//     const book_index = document.getElementById("input-book-index").value;
+
+//     if (!formated_book) {
+//         hideSpinner();
+//         alert("Book data is missing.");
+//         return;
+//     }
+
+//     const formated_book_string = JSON.stringify(formated_book);
+//     const CHUNK_SIZE = 100000; // ~100KB
+//     const totalChunks = Math.ceil(formated_book_string.length / CHUNK_SIZE);
+
+//     const results = [];
+
+//     for (let i = 0; i < totalChunks; i++) {
+//         const chunk = formated_book_string.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+
+//         const formData = new FormData();
+//         formData.append("book_name", book_name);
+//         formData.append("book_author", book_author);
+//         formData.append("book_index", book_index);
+//         formData.append("book_image", book_image);
+//         formData.append("published_book", chunk);
+//         formData.append("chunk_index", i);
+//         formData.append("total_chunks", totalChunks);
+
+//         try {
+//             const response = await fetch("/process", {
+//                 method: "POST",
+//                 body: formData,
+//             });
+
+//             const result = await response.json();
+//             results.push(result);
+//         } catch (error) {
+//             console.error("Chunk upload failed at", i, error);
+//             hideSpinner();
+//             alert("Failed to upload chunk " + (i + 1));
+//             return;
+//         }
+//     }
+
+//     hideSpinner();
+//     alert("Book uploaded and processed successfully!");
+//     console.log("All results:", results);
+// });
