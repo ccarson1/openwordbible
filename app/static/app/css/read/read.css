@@ -74,6 +74,25 @@ h1 {
   display: none;
 }
 
+#ai-spinner {
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+.ai-message {
+    padding: 5px 10px;
+    border-radius: 10px;
+}
+
+.user-message {
+    background-color: #d1e7dd;
+}
+
+.ai-message:not(.user-message) {
+    background-color: #f8d7da;
+}
+
+
 .overlay {
   position: fixed;
   top: 0;

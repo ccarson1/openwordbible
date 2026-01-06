@@ -61,14 +61,29 @@ Running Application Locally
 
 7. **Test Application**
    Go to [http://localhost:8000/](http://localhost:8000/) location in the browser when running the application locally.
-   Go to [http://[server address]:8000/](http://[server address]:8000/) location in the browser when running the application locally.
+   Go to [http://serveraddress:8000/](http://serveraddress:8000/) location in the browser when running the application locally.
   ❗[server address] is the IP address of the host server
  
    
 
+Running Chatbot server
+**Server edits**
+   Edit the app.py file ip address to the server host ip address
 
+   origins = [
+      "http://localhost:8000",
+      "http://127.0.0.1:8000",
+      "http://192.168.56.101:8000",
+   ]
 
-Guidelines for the NER dataset
+**Front end edits**
+   Edit the aiChatbot.js file ip address to the host ip address
+   const response = await fetch("http://192.168.56.101:9000/query",
+
+**Start the RAG server**
+   uvicorn app:app --host 0.0.0.0 --port 9000
+
+   Guidelines for the NER dataset
 
 **Labels**
 ***BIO Format Summary***

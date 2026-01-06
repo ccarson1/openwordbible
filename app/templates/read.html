@@ -226,6 +226,9 @@
         <!-- AI Prompt Box -->
         <div id="ai-prompt-box">
             <label for="ai-input" class="form-label">Ask me anything:</label>
+            <div id="ai-chat-container" class="mt-2" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+                <!-- AI messages will appear here -->
+            </div>
             <input type="text" class="form-control mb-2" id="ai-input" placeholder="Type your prompt...">
 
             <!-- Select Model Button -->
@@ -238,24 +241,29 @@
             <div class="collapse" id="modelOptions">
                 <div class="mb-2">
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="ai-model" value="GPT-4" id="model-gpt4" checked>
-                        <label class="form-check-label" for="model-gpt4" >GPT-4</label>
+                        <input class="form-check-input" type="radio" name="ai-model" value="llama3-2-1b" id="model-llama3-2-1b">
+                        <label class="form-check-label" for="model-llama3-2-1b">llama3.2:1b </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="ai-model" value="Claude" id="model-claude">
-                        <label class="form-check-label" for="model-claude">Claude</label>
+                        <input class="form-check-input" type="radio" name="ai-model" value="llama3-2-11b" id="model-llama3-2-11b">
+                        <label class="form-check-label" for="model-llama3-2-11b">llama3.2-vision:11b</label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="ai-model" value="Mistral" id="model-mistral">
-                        <label class="form-check-label" for="model-mistral">Mistral</label>
+                        <input class="form-check-input" type="radio" name="ai-model" value="gemma-2b" id="model-gemma-2b">
+                        <label class="form-check-label" for="model-gemma-2b">gemma:2b </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="ai-model" value="Gemini" id="model-gemini">
-                        <label class="form-check-label" for="model-gemini">Gemini</label>
+                        <input class="form-check-input" type="radio" name="ai-model" value="phi3-mini" id="model-phi3-mini" checked>
+                        <label class="form-check-label" for="model-phi3-mini">phi3:mini</label>
                     </div>
                 </div>
             </div>
             <button id="ai-send-button" class="btn btn-sm btn-primary w-100 mt-2">Send</button>
+
+            <!-- Inline spinner, hidden by default -->
+            <div id="ai-spinner" class="spinner-border spinner-border-sm text-primary mt-2" role="status" style="display: none;">
+            <span class="visually-hidden">Loading...</span>
+            </div>
         </div>
 
     </div>
