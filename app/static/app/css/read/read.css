@@ -89,7 +89,7 @@ h1 {
 }
 
 .ai-message:not(.user-message) {
-    background-color: #f8d7da;
+    background-color: lightblue;
 }
 
 

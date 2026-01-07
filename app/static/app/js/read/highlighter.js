@@ -149,9 +149,28 @@ document.getElementById("copy").addEventListener("click", () => {
     const text = [...document.querySelectorAll(".highlighted")]
         .map(w => w.textContent)
         .join(" ");
-    navigator.clipboard.writeText(text);
-    alert(text);
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+            .then(() => console.log("Copied to clipboard"))
+            .catch(err => {
+                console.error("Clipboard API failed:", err);
+                fallbackCopy(text);
+            });
+    } else {
+        fallbackCopy(text);
+    }
 });
+
+function fallbackCopy(text) {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+    console.log("Copied using fallback");
+}
 
 // SHARE
 document.getElementById("share").addEventListener("click", () => {

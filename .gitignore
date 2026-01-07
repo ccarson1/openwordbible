@@ -1,7 +1,24 @@
-api/__pycache__/
-dashboard/__pycache__/
-api/__pycache__/book_convert.cpython-313.pyc
-dashboard/__pycache__/views.cpython-313.pyc
-__pycache__/
+# --- Media ---
 media/owb_service/models/
 media/books/Holy_Bible_King_James_Version.json
+
+# --- Secrets ---
+*.pem
+*.key
+.env
+
+# --- Databases ---
+db.sqlite3
+
+# --- Python ---
+__pycache__/
+app/__pycache__
+api/__pycache__
+accounts/__pycache__
+dashboard/__pycache__
+
+*.pyc
+
+# --- RAG / Vector DB ---
+rag/vectordb/
+rag/__pycache__/
