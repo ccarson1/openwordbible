@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-%i31v@0w3v!kwkd51@o^v8$_kfc-@h(jp9y26e@ssu2l+4o-6g
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.56.101"]
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -100,7 +100,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_HTTPONLY = False
 SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_SECURE = False  
-SESSION_COOKIE_DOMAIN = '192.168.56.101' 
+SESSION_COOKIE_DOMAIN = '.localhost' 
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

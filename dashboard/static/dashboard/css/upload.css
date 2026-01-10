@@ -91,13 +91,12 @@ button,
 
 #spinner-overlay.overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     background-color: rgba(255, 255, 255, 0.8);
     z-index: 1000;
+
     display: none;
+    flex-direction: column;   /* ✅ */
     align-items: center;
     justify-content: center;
 }
@@ -133,6 +132,37 @@ button,
 #total-preview-pages {
     margin-top: 20px;
     font-weight: bold;
+}
+
+/* .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+} */
+
+#progress-container {
+    width: 60%;
+    margin-top: 15%;
+    background: lightgray;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+#progress-bar {
+    width: 0%;
+    height: 20px;
+    background-color: #4caf50;
+    transition: width 0.4s ease;
+}
+
+#progress-text {
+    margin-top: 8px;
+    color: #333;
+    font-weight: 500;
 }
 
 @media (min-width: 768px) {

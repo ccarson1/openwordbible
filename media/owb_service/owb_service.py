@@ -4,7 +4,7 @@ from app.annotations import Annotation
 from app.pos import POS
 import json
 import tensorflow as tf
-
+from app.progress import progress_state
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 10000 * 10240 * 10240 
@@ -14,16 +14,46 @@ chunk_store = {}
 
 @app.route('/process', methods=['POST'])
 def process():
-    # Handle text fields
     book_name = request.form.get("book_name")
     book_author = request.form.get("book_author")
-    published_book = request.form.get("published_book")
     book_index = request.form.get("book_index")
 
-    print(published_book)
-    print(f"Max content length: {app.config.get('MAX_CONTENT_LENGTH')}")
-    
-    
+    chunk = request.form.get("published_book_chunk")
+    chunk_index = int(request.form.get("chunk_index"))
+    total_chunks = int(request.form.get("total_chunks"))
+
+    # RESET STATE ONLY ON FIRST CHUNK
+    if chunk_index == 0:
+        progress_state.clear()
+        progress_state.update({
+            "status": "uploading",
+            "phase": "receiving",
+            "total": 0,
+            "current": 0,
+            "percent": 0,
+            "message": "Receiving book data",
+            "done": False
+        })
+
+    # Use book_name as session key (OK for now)
+    if book_name not in chunk_store:
+        chunk_store[book_name] = [None] * total_chunks
+
+    chunk_store[book_name][chunk_index] = chunk
+
+    # Not done yet
+    if None in chunk_store[book_name]:
+        return jsonify({
+            "message": f"Chunk {chunk_index + 1}/{total_chunks} received"
+        })
+
+    # All chunks received → rebuild book
+    full_book_json = "".join(chunk_store[book_name])
+    del chunk_store[book_name]
+
+    published_book = json.loads(full_book_json)
+
+    # === Your NLP pipeline ===
     annotation = Annotation()
     ner_labeled = annotation.initiate_annotations(published_book)
 
@@ -31,72 +61,16 @@ def process():
     new_pos_labeled = pos.pos_label_process(ner_labeled)
 
     return jsonify({
-        "message": "Processed multipart form data",
+        "message": "Book fully processed",
         "book_name": book_name,
         "book_author": book_author,
         "published_book": new_pos_labeled,
         "book_index": book_index
     })
 
-# import os
-# from flask import Flask, request, jsonify
-# from flask_cors import CORS
-
-# app = Flask(__name__)
-# CORS(app)
-
-# UPLOAD_DIR = "temp_chunks"
-# os.makedirs(UPLOAD_DIR, exist_ok=True)
-
-# @app.route('/process', methods=['POST'])
-# def process():
-#     book_name = request.form.get("book_name")
-#     book_author = request.form.get("book_author")
-#     book_index = request.form.get("book_index")
-
-#     chunk_index = int(request.form.get("chunkIndex"))
-#     total_chunks = int(request.form.get("totalChunks"))
-#     chunk_data = request.form.get("chunkData")
-
-#     session_id = request.form.get("sessionId")  # must be a unique ID per upload
-#     session_folder = os.path.join(UPLOAD_DIR, session_id)
-#     os.makedirs(session_folder, exist_ok=True)
-
-#     # Save each chunk as a separate file
-#     chunk_filename = os.path.join(session_folder, f"{chunk_index}.txt")
-#     with open(chunk_filename, "w", encoding="utf-8") as f:
-#         f.write(chunk_data)
-
-#     # Once all chunks are uploaded, merge and process
-#     if len(os.listdir(session_folder)) == total_chunks:
-#         all_chunks = []
-#         for i in range(total_chunks):
-#             chunk_path = os.path.join(session_folder, f"{i}.txt")
-#             with open(chunk_path, "r", encoding="utf-8") as f:
-#                 all_chunks.append(f.read())
-#         published_book = "".join(all_chunks)
-
-#         # Clean up
-#         for file in os.listdir(session_folder):
-#             os.remove(os.path.join(session_folder, file))
-#         os.rmdir(session_folder)
-
-#         # === Process full text ===
-#         annotation = Annotation()
-#         ner_labeled = annotation.initiate_annotations(published_book)
-
-#         pos = POS()
-#         new_pos_labeled = pos.pos_label_process(ner_labeled)
-
-#         return jsonify({
-#             "message": "Processing complete",
-#             "book_name": book_name,
-#             "book_author": book_author,
-#             "published_book": new_pos_labeled,
-#             "book_index": book_index
-#         })
-
-#     return jsonify({"message": f"Chunk {chunk_index + 1}/{total_chunks} received."})
+@app.route("/progress", methods=["GET"])
+def get_progress():
+    return jsonify(progress_state)
 
     
 @app.route("/gpu-connection")

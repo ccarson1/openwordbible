@@ -20,10 +20,31 @@
 
 <!-- Main Content -->
 <div class="content">
+    <!-- <div id="spinner-overlay" class="overlay">
+        <div id="spinner-container" class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div id="progress-container" style="width: 60%; margin-top: 10%;">
+            <div id="progress-bar" style="
+                width: 0%;
+                height: 20px;
+                background-color: #4caf50;
+                transition: width 0.4s ease;">
+            </div>
+        </div>
+        
+        <div id="progress-text"></div>
+    </div> -->
     <div id="spinner-overlay" class="overlay">
         <div id="spinner-container" class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
+
+        <div id="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+
+        <div id="progress-text"></div>
     </div>
     <h1>Open Word Bible Dashboard</h1>
     <h2>Book Parameters</h2>
@@ -313,7 +334,7 @@
                 <button class="btn btn-primary" id="btn-add-all-page" disabled>Add All</button>
                 <button class="btn btn-primary" id="btn-add-page" disabled>+ Add</button>
                 <button class="btn btn-primary" id="btn-reset-page-numbers" disabled>Reset Page Numbers</button>
-                <button class="btn btn-success" id="btn-annotate-page" >Annotate</button>
+                <button class="btn btn-success" id="btn-annotate-page">Annotate</button>
                 <button class="btn btn-success" id="btn-upload-page" disabled>Upload</button>
 
             </div>

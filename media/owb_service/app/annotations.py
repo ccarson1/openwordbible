@@ -1,5 +1,6 @@
 import tensorflow as tf
 from transformers import TFAutoModelForTokenClassification, AutoTokenizer
+from app.progress import progress_state
 import numpy as np
 import json
 import re
@@ -55,6 +56,8 @@ class Annotation:
                 - "text": Reconstructed sentence without subword tokens.
                 If no valid annotations are found for a sentence, `None` is returned in that slot.
         """
+        
+
         batch = self.tokenizer(
             sentences, return_tensors="tf", padding=True, truncation=True, is_split_into_words=False
         )
@@ -100,39 +103,87 @@ class Annotation:
 
     def initiate_annotations(self, published_book):
         """
-        Annotates an entire book-like JSON string by splitting and processing its content page by page.
-
-        Args:
-            published_book (str): A JSON string with the structure:
-                {
-                    "content": [
-                        {
-                            "pages": [
-                                ["Sentence 1.", "Sentence 2.", ...],
-                                ...
-                            ]
-                        },
-                        ...
-                    ]
-                }
-
-        Returns:
-            dict: The modified structure with entity label annotations added to each page.
-                  Each page becomes a list of dictionaries with "text" and "labels" fields.
+        Annotates an entire book structure and reports accurate progress.
         """
-        test = json.loads(published_book)
 
-        for cha in range(len(test['content'])):
-            for s in range(len(test['content'][cha]['pages'])):
-                page = test['content'][cha]['pages'][s]
+        test = published_book
+
+        # --------------------------------------------------
+        # 1. Pre-calculate TOTAL SENTENCES (true workload)
+        # --------------------------------------------------
+        total_sentences = 0
+        for chapter in test["content"]:
+            for page in chapter["pages"]:
+                for paragraph in page:
+                    total_sentences += len(
+                        re.split(r'(?<=[.!?]) +', paragraph)
+                    )
+
+        progress_state.clear()
+        progress_state.update({
+            "status": "running",
+            "phase": "annotating",
+            "total": total_sentences,
+            "current": 0,
+            "percent": 30,
+            "message": "Starting annotation",
+            "done": False
+        })
+
+        # --------------------------------------------------
+        # 2. Process chapters → pages → sentences
+        # --------------------------------------------------
+        for cha_index, chapter in enumerate(test["content"]):
+            for page_index, page in enumerate(chapter["pages"]):
+
+                # Split page into sentences
                 all_sentences = []
-                for c in page:
-                    all_sentences.extend(re.split(r'(?<=[.!?]) +', c))
+                for paragraph in page:
+                    all_sentences.extend(
+                        re.split(r'(?<=[.!?]) +', paragraph)
+                    )
 
-                print(f"⏳ Processing chapter {cha}, section {s} with {len(all_sentences)} sentences...")
+                if not all_sentences:
+                    continue
 
+                # Run model inference
                 batch_results = self.annotate_sentences_batch(all_sentences)
                 filtered = [r for r in batch_results if r is not None]
-                test['content'][cha]['pages'][s] = filtered
-                print(f"✅ Done chapter {cha}, section {s}")
+
+                # Replace page content with annotated data
+                chapter["pages"][page_index] = filtered
+
+                # --------------------------------------------------
+                # 3. Update progress AFTER real work is done
+                # --------------------------------------------------
+                progress_state["current"] += len(all_sentences)
+                progress_state["percent"] = 30 + int(
+                    (progress_state["current"] / progress_state["total"]) * 70
+                )
+
+                progress_state["message"] = (
+                    f"Chapter {cha_index + 1}, "
+                    f"Page {page_index + 1} "
+                    f"({progress_state['percent']}%)"
+                )
+
+                print(
+                    f"⏳ Chapter {cha_index + 1}, "
+                    f"Page {page_index + 1} — "
+                    f"{len(all_sentences)} sentences"
+                )
+
+        # --------------------------------------------------
+        # 4. FINAL STATE (ONLY HERE)
+        # --------------------------------------------------
+        progress_state.update({
+            "status": "complete",
+            "percent": 100,
+            "message": "Annotation complete",
+            "done": True
+        })
+
+        print("✅ Annotation complete")
+
         return test
+

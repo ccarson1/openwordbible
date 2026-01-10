@@ -6,7 +6,8 @@ let inputBookDenom = document.getElementById("input-book-denom");
 let textPreview = document.getElementById("text-preview");
 let activeTabText = 'TXT';
 let page_pile;
-const CHUNK_SIZE = 1024 * 1024;
+let progressInterval = null;
+const CHUNK_SIZE = 250 * 1024;
 
 let formated_book = {
     "content": [
@@ -47,6 +48,36 @@ function collect_index() {
     }
 
     return newIndex
+}
+
+function updateProgressBar(percent, message) {
+    const bar = document.getElementById("progress-bar");
+    const text = document.getElementById("progress-text");
+
+    if (bar) bar.style.width = `${percent}%`;
+    if (text) text.innerText = message;
+}
+
+function pollProgress() {
+    if (progressInterval) return;
+
+    progressInterval = setInterval(async () => {
+        try {
+            const res = await fetch("http://127.0.0.1:5000/progress");
+            const data = await res.json();
+
+            // 🔥 USE BACKEND VALUE DIRECTLY
+            updateProgressBar(data.percent || 0, data.message || "Processing...");
+
+            if (data.done === true) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+                updateProgressBar(100, "Completed!");
+            }
+        } catch (err) {
+            console.warn("Progress poll failed", err);
+        }
+    }, 500);
 }
 
 
@@ -402,61 +433,66 @@ document.getElementById("label-input").addEventListener("change", function () {
 });
 
 
-document.getElementById("btn-annotate-page").addEventListener("click", function () {
-    let start = 0;
-    let chunkIndex = 0;
-
+document.getElementById("btn-annotate-page").addEventListener("click", async function () {
     showSpinner();
-    book_image = document.getElementById("input-book-cover");
-    book_index = collect_index();
-    book_data = new FormData();
-    if (book_image.files.length > 0) {
-        book_data.append("book_image", book_image.files[0]);
-    } else {
-        console.error("No file selected");
+    pollProgress();
+
+    const book_image = document.getElementById("input-book-cover").files[0];
+    const book_name = document.getElementById("book-name").value;
+    const book_author = document.getElementById("input-book-author").value;
+    const book_index = collect_index();
+
+    if (!formated_book) {
+        hideSpinner();
+        alert("Book data is missing.");
+        return;
     }
-    let published_book = JSON.stringify(formated_book);
-    console.log(formated_book)
 
-    book_data.append("published_book", JSON.stringify(formated_book));
-    book_data.append("book_name", document.getElementById('book-name').value);
-    book_data.append("book_date", document.getElementById('input-book-date').value);
-    book_data.append("book_language", document.getElementById('input-book-lang').value);
-    book_data.append("book_religion", document.getElementById('book-religion').value);
-    book_data.append("book_denom", document.getElementById("input-book-denom").value);
-    book_data.append("book_author", document.getElementById("input-book-author").value);
-    book_data.append("book_translator", document.getElementById("input-book-translator").value);
-    book_data.append("book_isbn", document.getElementById("input-book-isbn").value);
-    book_data.append("book_description", document.getElementById("input-book-des").value);
-    book_data.append("book_rights", document.getElementById("book-right").value);
-    book_data.append("book_publisher", document.getElementById("book-pub").value);
-    book_data.append("book_index", JSON.stringify(book_index));
+    const formated_book_string = JSON.stringify(formated_book);
+    //const CHUNK_SIZE = 500000; // ~500 KB per chunk
+    const totalChunks = Math.ceil(formated_book_string.length / CHUNK_SIZE);
 
-    console.log(book_data);
+    try {
+        for (let i = 0; i < totalChunks; i++) {
+            const chunk = formated_book_string.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
 
-    fetch("http://127.0.0.1:5000/process", {
-        method: "POST",
-        body: book_data,
-        headers: {
-            "X-CSRFToken": csrftoken,
-        }
-    })
-        .then(response => {
+            const formData = new FormData();
+            formData.append("book_name", book_name);
+            formData.append("book_author", book_author);
+            formData.append("book_index", JSON.stringify(book_index));
+            if (book_image) formData.append("book_image", book_image);
+            formData.append("published_book_chunk", chunk);
+            formData.append("chunk_index", i);
+            formData.append("total_chunks", totalChunks);
+
+            const response = await fetch("http://127.0.0.1:5000/process", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRFToken": csrftoken,
+                },
+            });
+
             if (!response.ok) {
-                hideSpinner();
-                throw new Error(`HTTP error! status: ${response.status}`);
-
+                throw new Error(`Chunk ${i + 1} upload failed: ${response.status}`);
             }
-            return response.json();
-        })
-        .then(data => {
-            hideSpinner();
-            console.log(data)
-            formated_book = data['published_book'];
-            alert(data['message'])
-        })
-});
 
+            // Update progress after each chunk
+            const percentUploaded = Math.round(((i + 1) / totalChunks) * 30); // e.g., upload = 0-30%
+            updateProgressBar(percentUploaded, `Uploaded chunk ${i + 1}/${totalChunks}`);
+
+            const data = await response.json();
+            console.log(`Chunk ${i + 1} uploaded`, data);
+        }
+
+        hideSpinner();
+        alert("Book uploaded and processed successfully!");
+    } catch (err) {
+        hideSpinner();
+        console.error(err);
+        alert("Upload failed: " + err.message);
+    }
+});
 
 // document.getElementById("btn-annotate-page").addEventListener("click", async function () {
 //     showSpinner();
