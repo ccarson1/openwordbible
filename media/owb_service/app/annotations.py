@@ -100,6 +100,21 @@ class Annotation:
             else:
                 results.append(None)
         return results
+    
+    def split_into_sentences(self, text):
+        # Normalize spacing
+        text = text.replace("\n", " ")
+
+        # Split on:
+        # 1. punctuation (. ! ? ;)
+        # 2. OR BEFORE verse markers { 2 : 31 }
+        sentences = re.split(
+            r'(?<=[.!?;])\s+|(?=\{\s*\d+\s*:\s*\d+\s*\})',
+            text
+        )
+
+        # Clean up
+        return [s.strip() for s in sentences if s.strip()]
 
     def initiate_annotations(self, published_book):
         """
@@ -115,9 +130,7 @@ class Annotation:
         for chapter in test["content"]:
             for page in chapter["pages"]:
                 for paragraph in page:
-                    total_sentences += len(
-                        re.split(r'(?<=[.!?]) +', paragraph)
-                    )
+                    total_sentences += len(self.split_into_sentences(paragraph))
 
         progress_state.clear()
         progress_state.update({
@@ -139,9 +152,7 @@ class Annotation:
                 # Split page into sentences
                 all_sentences = []
                 for paragraph in page:
-                    all_sentences.extend(
-                        re.split(r'(?<=[.!?]) +', paragraph)
-                    )
+                    all_sentences.extend(self.split_into_sentences(paragraph))
 
                 if not all_sentences:
                     continue

@@ -58,31 +58,72 @@ class ConvertBook():
             # Strip null characters and whitespace
             return raw_title.replace('\x00', '').strip()
 
+
+        # def get_outline(reader, offset_page):
+        #     try:
+        #         outlines = reader.outline
+        #     except AttributeError:
+        #         outlines = reader.get_outlines()
+
+        #     book_outline = []
+        #     for item in outlines:
+        #         if isinstance(outlines, list):
+        #             if isinstance(item, list):
+        #                 for title in item:
+        #                     cleaned_title = clean_title(title.title)
+        #                     print(type(cleaned_title))
+        #                     print(f"- {cleaned_title} (Page: {reader.get_destination_page_number(title) + 1})")
+        #                     book_outline.append({"title": cleaned_title, "page": (reader.get_destination_page_number(title) + 1)})
+        #             else:
+        #                 cleaned_item = clean_title(item.title)
+        #                 print(type(cleaned_item))
+        #                 print(f"- {cleaned_item} (Page: {reader.get_destination_page_number(item) + 1})")
+        #                 book_outline.append({"title": f"{cleaned_item}", "page": f"{(reader.get_destination_page_number(item) + 1)}"})
+        #     print(reader)
+        #     return book_outline
+
         def get_outline(reader, offset_page):
-
-
-
-            
-
             try:
                 outlines = reader.outline
             except AttributeError:
                 outlines = reader.get_outlines()
 
             book_outline = []
-            for item in outlines:
-                if isinstance(outlines, list):
+
+            def extract_title(item):
+                if hasattr(item, "title"):
+                    return item.title
+                elif isinstance(item, dict) and "/Title" in item:
+                    return item["/Title"]
+                return str(item)
+
+            def get_page(item):
+                try:
+                    return reader.get_destination_page_number(item) + 1
+                except:
+                    return None
+
+            def process(items):
+                for item in items:
                     if isinstance(item, list):
-                        for title in item:
-                            cleaned_title = clean_title(title.title)
-                            print(type(cleaned_title))
-                            print(f"- {cleaned_title} (Page: {reader.get_destination_page_number(title) + 1})")
-                            book_outline.append({"title": cleaned_title, "page": (reader.get_destination_page_number(title) + 1)})
+                        process(item)  # recursion preserved
                     else:
-                        cleaned_item = clean_title(item.title)
-                        print(type(cleaned_item))
-                        print(f"- {cleaned_item} (Page: {reader.get_destination_page_number(item) + 1})")
-                        book_outline.append({"title": f"{cleaned_item}", "page": f"{(reader.get_destination_page_number(item) + 1)}"})
+                        raw_title = extract_title(item)
+                        cleaned_title = clean_title(raw_title)
+
+                        page = get_page(item)
+
+                        # DEBUG (keeps your old behavior)
+                        print(type(cleaned_title))
+                        print(f"- {cleaned_title} (Page: {page})")
+
+                        book_outline.append({
+                            "title": cleaned_title,
+                            "page": page
+                        })
+
+            process(outlines)
+
             print(reader)
             return book_outline
         

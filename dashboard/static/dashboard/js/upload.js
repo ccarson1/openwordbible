@@ -247,17 +247,14 @@ document.getElementById("btn-add-all-page").addEventListener("click", function (
     content_pages = page_pile.get_content_pages();
     console.log(content_pages);
 
-    function split_page(pages) {
-        for (let p = 0; p < pages.length; p++) {
-            pages[p] = pages[p].replace(/\n/g, ' ')
-            pages[p] = pages[p].split(page_pile.sentRegex);
-
-
-            // for(let s=0; s<pages[p].length; s++){
-            //     pages[p][s] = pages[p][s].split(/\s+/)
-            // }
-        }
-        return pages;
+    function split_page(pages, regex) {
+        return pages.map(page =>
+            page
+                .replace(/\n/g, ' ')
+                .split(regex)
+                .map(s => s.trim())
+                .filter(Boolean)
+        );
     }
 
     let chapters = 2
@@ -271,28 +268,17 @@ document.getElementById("btn-add-all-page").addEventListener("click", function (
                 end = parseInt(page_pile.outline[x + 1]['page']) - 1
 
             }
-            chapter_pages = page_pile.content_pages.slice(start, end)
-            ////////////////////////slice here///////////////////////////
-            chapter_pages = split_page(chapter_pages);
-            // page_labels = {}
-            // for(let x=0; x<chapter_pages.length; x++){
-            //     page_labels.push(
-            //         {
-            //             "labels": [],
-            //             "content": chapter_pages
-            //         }
-            //     )
-            // }
-            console.log(`Chapter Pages: ${chapter_pages}`)
-            formated_book.content.push(
-                {
-                    "chapter": page_pile.outline[x]['title'],
-                    "pages": chapter_pages,
-                    "start": start,
-                    "end": end,
-                    "length": chapter_pages.length
-                }
-            )
+            let chapter_pages = page_pile.content_pages.slice(start, end);
+
+            chapter_pages = split_page(chapter_pages, page_pile.sentRegex);
+
+            formated_book.content.push({
+                chapter: page_pile.outline[x]['title'],
+                pages: chapter_pages,
+                start: start,
+                end: end,
+                length: chapter_pages.length
+            });
         }
     }
     else {
@@ -482,6 +468,7 @@ document.getElementById("btn-annotate-page").addEventListener("click", async fun
             updateProgressBar(percentUploaded, `Uploaded chunk ${i + 1}/${totalChunks}`);
 
             const data = await response.json();
+            formated_book = data.published_book;
             console.log(`Chunk ${i + 1} uploaded`, data);
         }
 

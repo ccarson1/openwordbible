@@ -325,7 +325,7 @@ class PublishBook(APIView):
             book_publisher = request.data.get("book_publisher")
             book_language_id = request.data.get("book_language")
             book_image = request.FILES.get("book_image")
-            book_index = request.data.get("book_index")
+            book_index = json.loads(request.data.get("book_index"))
 
             # Get Language and Religion objects by ID
             try:

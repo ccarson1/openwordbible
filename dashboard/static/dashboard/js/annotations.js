@@ -56,7 +56,7 @@ function renderNextBatch() {
         let chapterDiv = document.createElement("div");
         chapterDiv.setAttribute("class", "cha");
         chapterDiv.setAttribute("id", a)
-        for (let b = 0; b < content[a].length; b++) {
+        for (let b = 0; b < content[a].pages.length; b++) {
             let pageDiv = document.createElement("div");
             pageDiv.setAttribute("class", "page");
             pageDiv.setAttribute("id", b);
