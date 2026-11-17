@@ -1,8 +1,5 @@
 Docker Setup of the OpenWordBible Web Application
 
- ⚠️ **Warning: Docker Incompatibility**
- This project currently has broken pages when running in docker!
-
 1. **Download the repository**
    
 2. **Build the docker image***
@@ -13,6 +10,7 @@ Docker Setup of the OpenWordBible Web Application
    ```Bash
       docker run -p 8000:8000 openwordbible_1.0.0
    ```
+   The image is built from your local copy of the project, so rebuild it after making changes.
 4. Note: Rebuilding the docker container will write over the image
    but the container will have to be removed. You can delete the container
    within dockerhub or run:
@@ -34,7 +32,8 @@ Running Application Locally
 
 3. **Start Python Environment**
    ```Bash
-      env\Scripts\activate
+      env\Scripts\activate        (Windows)
+      source env/bin/activate     (Linux)
    ```
 
 4. **Install dependencies**
@@ -42,11 +41,27 @@ Running Application Locally
       pip install -r requirements.txt
       python -m spacy download en_core_web_sm
    ```
-5. **Update Django Settings**
-   Warning ❗
-   Open openwordbible/settings
-   1. Add the IP of the host "[]": ALLOWED_HOSTS = []
-   2. Change the IP address to the IP of the host: SESSION_COOKIE_DOMAIN = '.localhost'
+5. **Settings (environment variables)**
+   Nothing needs to be edited in openwordbible/settings.py. The defaults work on localhost.
+   Set these when running over the network or in production:
+   ```Bash
+      DJANGO_ALLOWED_HOSTS=192.168.56.101,localhost   (hosts the site is reached by)
+      DJANGO_SECRET_KEY=<a long random string>        (required when DJANGO_DEBUG is False)
+      DJANGO_DEBUG=False
+      DJANGO_SECURE_COOKIES=True                      (only when served over https)
+      OWB_SERVICE_URL=http://127.0.0.1:5000           (annotation service)
+      RAG_SERVER_URL=http://192.168.56.101:9000       (chatbot server)
+   ```
+
+   Apply the database migrations:
+   ```Bash
+      python manage.py migrate
+   ```
+   Books that were annotated before the per-sentence annotation fix can be rebuilt from their saved JSON files:
+   ```Bash
+      python manage.py rebuild_sentences            (all books)
+      python manage.py rebuild_sentences 5 6        (only books 5 and 6)
+   ```
 
 6. **Run Django Application**
    Running Locally
@@ -67,18 +82,17 @@ Running Application Locally
    
 
 Running Chatbot server
-**Server edits**
-   Edit the app.py file ip address to the server host ip address
+**Server settings**
+   Set the sites that are allowed to call the chatbot (comma separated):
 
-   origins = [
-      "http://localhost:8000",
-      "http://127.0.0.1:8000",
-      "http://192.168.56.101:8000",
-   ]
+   RAG_ALLOWED_ORIGINS=http://localhost:8000,http://192.168.56.101:8000
 
-**Front end edits**
-   Edit the aiChatbot.js file ip address to the host ip address
-   const response = await fetch("http://192.168.56.101:9000/query",
+**Front end settings**
+   Set RAG_SERVER_URL for the Django app to the address of the chatbot server, e.g.
+   RAG_SERVER_URL=http://192.168.56.101:9000
+
+**Load a book into the vector database**
+   python ingest_sentences.py <book_id>
 
 **Start the RAG server**
    uvicorn app:app --host 0.0.0.0 --port 9000

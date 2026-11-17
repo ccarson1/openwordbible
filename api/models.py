@@ -25,7 +25,7 @@ class Book(models.Model):
     description = models.CharField(max_length=255, blank=True, null=True, default=None)
     rights = models.CharField(max_length=255, blank=True, null=True, default=None)
     publisher = models.CharField(max_length=255, blank=True, null=True, default=None)
-    image = models.ImageField(upload_to="book_images/", default="book_images/default.jpg")
+    image = models.ImageField(upload_to="book_images/", default="book_images/book_default.png")
     book_file = models.FileField(upload_to="books/", blank=True, null=True)
     
     is_published = models.BooleanField(default=False)
@@ -115,7 +115,7 @@ class Chapter(models.Model):
     
 
 class Sentence(models.Model):
-    text = models.CharField(max_length=500)
+    text = models.TextField()
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="sentences")
     chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, default=None, null=True, related_name="sentences")
     page = models.IntegerField(default=0)
@@ -132,7 +132,7 @@ class Annotation(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['text', 'label'], name='unique_annotation_text_label')
+            models.UniqueConstraint(fields=['sentence', 'word_index'], name='unique_annotation_sentence_word')
         ]
 
     def __str__(self):
@@ -146,7 +146,7 @@ class POSLabel(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['text', 'label'], name='unique_pos_text_label')
+            models.UniqueConstraint(fields=['sentence', 'word_index'], name='unique_pos_sentence_word')
         ]
 
     def __str__(self):

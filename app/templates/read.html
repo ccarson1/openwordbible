@@ -121,28 +121,28 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="cols" class="form-label">Columns</label>
-                        <input type="number" class="form-control" id="cols" name="columns"
+                        <input type="number" class="form-control" id="cols" name="columns" min="1" max="4"
                             value="{{ book_format.columns }}" required>
                     </div>
                     <div class="col-md-6">
                         <label for="wordsPerPage" class="form-label">Words Per Page</label>
-                        <input type="number" class="form-control" id="wordsPerPage" name="wordsPerPage"
-                            value={{book_format.words}} required>
+                        <input type="number" class="form-control" id="wordsPerPage" name="wordsPerPage" min="1"
+                            value="{{ book_format.words }}" required>
                     </div>
                     <div class="col-md-6">
                         <label for="font" class="form-label">Font</label>
-                        <input type="text" class="form-control" id="font" name="font" value={{book_format.font}}
+                        <input type="text" class="form-control" id="font" name="font" value="{{ book_format.font|default:'' }}"
                             required>
                     </div>
                     <div class="col-md-6">
                         <label for="color" class="form-label">Color</label>
-                        <input type="text" class="form-control" id="color" name="color" value={{book_format.color}}
+                        <input type="text" class="form-control" id="color" name="color" value="{{ book_format.color }}"
                             required>
                     </div>
                     <div class="col-md-6">
                         <label for="fontSize" class="form-label">Font Size</label>
-                        <input type="number" class="form-control" id="fontSize" name="fontSize"
-                            value={{book_format.font_size}} required>
+                        <input type="number" class="form-control" id="fontSize" name="fontSize" min="1"
+                            value="{{ book_format.font_size }}" required>
                     </div>
                     <div class="col-12 text-center mt-3">
                         <button type="submit" class="btn btn-primary" id="btn-apply-layout">Apply Layout</button>
@@ -173,7 +173,8 @@
 
         <h1 class="text-center" id="book-header">{{ book.name }}</h1>
         <p id="book_id" hidden>{{ book.id }}</p>
-        <span style="display: flex;"><input type="number" id="current_page" class="form-control" value=1>
+        <p id="rag-server-url" hidden>{{ RAG_SERVER_URL }}</p>
+        <span style="display: flex;"><input type="number" id="current_page" class="form-control" value=1 min="1">
             <h4 style="padding: .7%;">/<span id="total-pages"></span> </h4>
         </span>
         <button class="btn btn-primary bookmark" style="margin-left: 80%;" id=""><i class="bi bi-bookmark"></i></button>
@@ -193,7 +194,22 @@
 
 
         </div>
-        <div id="text-layout"></div>
+        <div id="compare-wrapper">
+            <div id="text-layout"></div>
+            <div id="compare-panel" hidden>
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 id="compare-title"></h5>
+                    <button class="btn btn-sm btn-outline-secondary" id="close-compare">Close</button>
+                </div>
+                <h6 id="compare-chapter"></h6>
+                <div id="compare-text"></div>
+                <div class="d-flex justify-content-between mt-2">
+                    <button class="btn btn-sm btn-outline-primary" id="compare-prev">Previous</button>
+                    <small id="compare-page"></small>
+                    <button class="btn btn-sm btn-outline-primary" id="compare-next">Next</button>
+                </div>
+            </div>
+        </div>
         <div class="d-flex justify-content-center page-nav">
             <nav aria-label="Page navigation example">
                 <ul class="pagination">
@@ -323,34 +339,28 @@
 
     <script>
 
-        let this_book = "This is a book test"
         const parsedContent = JSON.parse(document.getElementById("bookContent").textContent);
-        console.log(parsedContent)
         const booksData = JSON.parse(document.getElementById("books_data").textContent);
-        //let currentPageIndex = bookmark["current_page"];
         let current_book = new Book({
             id: "{{ book.id }}",
-            name: "{{ book.name}}",
+            name: "{{ book.name|escapejs }}",
             language: "{{ book.language|default:''|escapejs }}",
             date: "{{ book.date|default:''|escapejs }}",
             religion: "{{ book.religion|default:''|escapejs }}",
             content: parsedContent,
             authors: "{{ book.authors|default:''|escapejs }}",
-            book_index: "{{ book_index|safe|escapejs }}",
-            total_pages: "{{ book.total_pages|safe|escapejs }}",
+            book_index: booksData['book_index'],
+            total_pages: booksData['total_pages'],
         });
-        console.log(current_book)
         let book_format = new BookFormatter(
-            '{{book_format.book}}',
-            '{{book_format.user}}',
-            '{{book_format.words}}',
-            '{{book_format.columns}}',
-            '{{book_format.font}}',
-            '{{book_format.font_size}}',
-            '{{book_format.color}}'
+            '{{ book_format.book }}',
+            '{{ book_format.user }}',
+            '{{ book_format.words }}',
+            '{{ book_format.columns }}',
+            '{{ book_format.font|default:""|escapejs }}',
+            '{{ book_format.font_size }}',
+            '{{ book_format.color|escapejs }}'
         );
-
-        //document.getElementById("page-text").innerText = '{{ book.content }}'
 
     </script>
 

@@ -4,34 +4,27 @@ function updatePublishStatus(bookId) {
     fetch(`/dashboard/books/${bookId}/publish/`, {
         method: 'POST',
         headers: {
-            'X-CSRFToken': getCSRFToken() // if using Django
+            'X-CSRFToken': csrftoken
         }
     })
-        .then(response => response.json())
-        .then(data => console.log("Toggled:", data))
-        .catch(err => alert("Error toggling book status"));
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById(`publish-${bookId}`).checked = data.is_published;
+        })
+        .catch(err => {
+            const toggle = document.getElementById(`publish-${bookId}`);
+            toggle.checked = !toggle.checked;
+            alert("Error toggling book status");
+        });
 }
 
-// CSRF helper (Django only)
-function getCSRFToken() {
-    return document.cookie
-        .split('; ')
-        .find(row => row.startsWith('csrftoken='))
-        ?.split('=')[1];
-}
-
-function export_csv(file) {
+function export_csv(bookId, bookName) {
     showSpinner();
-    console.log(file)
-    file = file.replace("\\", "/")
-    let fileName = file.split(/[\\.]/);
-    console.log(fileName);
-    
-    
-    fileName = fileName[1]
-    console.log(fileName)
     const formData = new FormData();
-    formData.append("file_path", file);
+    formData.append("book_id", bookId);
 
     fetch("/api/export-dataset/", {
         method: "POST",
@@ -42,18 +35,19 @@ function export_csv(file) {
     })
     .then(response => {
         if (!response.ok) {
-            hideSpinner();
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return response.blob();
+        const disposition = response.headers.get("Content-Disposition") || "";
+        const match = disposition.match(/filename="(.+)"/);
+        return response.blob().then(blob => ({ blob: blob, fileName: match ? match[1] : `${bookName}.csv` }));
     })
-    .then(blob => {
+    .then(({ blob, fileName }) => {
         hideSpinner();
 
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${fileName}.csv`;
+        a.download = fileName;
         document.body.appendChild(a);
         a.click();
         a.remove();

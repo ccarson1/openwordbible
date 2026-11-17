@@ -37,13 +37,13 @@
                     <div><strong>Religion:</strong> {{ book.religion }}</div>
                 </div>
                 <div>
-                    <button class="btn btn-sm btn-outline-primary" onclick="export_csv('{{ book.book_file|escapejs }}')">Export
+                    <button class="btn btn-sm btn-outline-primary" onclick="export_csv('{{ book.id }}', '{{ book.name|escapejs }}')">Export
                         CSV</button>
                 </div>
                 <div class="mt-2 d-flex justify-content-between align-items-center">
                     <div>
-                        <a href="#" class="small me-2">Read</a>
-                        <a href="#" class="small me-2">Edit</a>
+                        <a href="{% url 'read' book.id %}" class="small me-2">Read</a>
+                        <a href="{% url 'dashboard:edit_book' book.id %}" class="small me-2">Edit</a>
 
                     </div>
 

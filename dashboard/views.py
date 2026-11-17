@@ -1,17 +1,32 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.conf import settings
-from api.models import Book, Chapter, Language, Religion, Profile, Annotation, Sentence, Word, Label, POSLabel
+from django.contrib.auth.views import redirect_to_login
+from django.core.exceptions import PermissionDenied
+from functools import wraps
+from django.views.decorators.http import require_POST
+from django import forms
+from api.models import Book, Language, Religion, Annotation, POSLabel
+from api.book_content import normalize_content, read_book_json
 from django.http import JsonResponse
 
-import os
-import json
-import csv
 import os
 import zipfile
 from io import BytesIO
 from django.http import HttpResponse
 
 
+def staff_member_required(view):
+    @wraps(view)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect_to_login(request.get_full_path())
+        if not request.user.is_staff:
+            raise PermissionDenied
+        return view(request, *args, **kwargs)
+    return wrapper
+
+
+@staff_member_required
 def dashboard(request):
 
     languages = Language.objects.all()
@@ -25,6 +40,7 @@ def dashboard(request):
     return render(request, "dashboard.html", context)
 
 
+@staff_member_required
 def upload(request):
 
     languages = Language.objects.all()
@@ -37,15 +53,17 @@ def upload(request):
 
     return render(request, "upload.html", context)
 
+
+@staff_member_required
 def analytics(request):
 
-    annotations = Annotation.objects.select_related("sentence__book", "text", "label")
+    annotations = Annotation.objects.select_related("sentence", "text", "label")
     data = []
 
     for ann in annotations:
         data.append({
-            "book_id": ann.sentence.book.id,
-            "chapter": ann.sentence.chapter.id,
+            "book_id": ann.sentence.book_id,
+            "chapter": ann.sentence.chapter_id,
             "page": ann.sentence.page,
             "sentence": ann.sentence.text,
             "word_index": ann.word_index,
@@ -53,71 +71,26 @@ def analytics(request):
             "label": ann.label.text,
         })
 
-    pos_data = []
-    pos = POSLabel.objects.select_related("sentence__book", "text", "label")
-
-    for p in pos:
-
-        pos_data.append({
-            "label": p.label.text
-        })
-    print(pos_data)
-
-
+    pos_data = [{"label": label} for label in POSLabel.objects.values_list("label__text", flat=True)]
 
     return render(request, "analytics.html", {"annotations": data, "pos": pos_data})
 
 
-
-
+@staff_member_required
 def settings_view(request):
-    user = request.user
-    profile, created = Profile.objects.get_or_create(user=user)
-
-    if request.method == 'POST':
-        profile_image = request.FILES.get('profile_image')
-        if profile_image:
-            profile.profile_image = profile_image
-            profile.save()
-
-        
-
-        return redirect('dashboard:settings_view')
-
-    context = {
-        'user_settings': profile,
-    }
-    return render(request, "settings.html", context)
+    return redirect('profile')
 
 
-# def books(request):
-#     json_file_path = os.path.join(settings.MEDIA_ROOT, "books/test_book.json")
-#     print(os.path.exists(json_file_path))
-#     # Read JSON file
-#     try:
-#         with open(json_file_path, "r", encoding="utf-8") as file:
-#             books_data = json.load(file)  # Load JSON data
-#             print(books_data['book_name'])
-#     except FileNotFoundError:
-#         books_data = {"error": "File not found"}
-    
-#     return render(request, "books.html", {"books": books_data})
-
-
+@staff_member_required
 def annotations(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
-    file_path = book.book_file.path.replace("\\", "/")
-    # Attempt to read and parse the JSON file
+
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            content = json.load(f)
-            content = content['published_book']
-            content = content['content']
-            
-            print(content)
+        content = read_book_json(book)
+        content = normalize_content(content['published_book']['content']) if content else []
     except FileNotFoundError:
         content = {'error': 'File not found'}
-    except json.JSONDecodeError:
+    except (ValueError, KeyError):
         content = {'error': 'Invalid JSON format'}
 
     if request.method == 'POST':
@@ -131,77 +104,67 @@ def annotations(request, book_id):
     return render(request, "annotations.html", {
         "book": {
             "id": book.id,
-            "path": book.book_file.path
+            "name": book.name,
+            "date": book.date,
+            "religion": book.religion.name if book.religion else ""
         },
         "content": content
     })
 
 
-# def annotations(request, book_id):
-#     book = get_object_or_404(Book, pk=book_id)
-
-#     if request.method == 'POST':
-#         chapters = Chapter.objects.filter(book_id=book.id).order_by("index")
-#         sentences = Sentence.objects.filter(book_id=book.id).order_by("sentence_index")
-
-#         chapter_data = []
-#         for chapter in chapters:
-#             chapter_dict = {
-#                 "chapter": chapter.name,
-#                 "index": chapter.index,
-#                 "start": chapter.start,
-#                 "end": chapter.end,
-#                 "length": chapter.length,
-#                 "pages": []  # Will be filled progressively on the frontend
-#             }
-#             chapter_data.append(chapter_dict)
-#         print(chapter_data)
-#         return JsonResponse({
-#             'success': True,
-#             'book_id': book.id,
-#             'book_name': book.name,
-#             'content': chapter_data  # All chapters with empty pages
-#         })
-#     else:
-#         chapters = Chapter.objects.filter(book_id=book.id).order_by("index")
-#         chapter_count = chapters.count()
-#         print(chapter_count)
-#         return render(request, "annotations.html", {
-#             "book": {
-#                 "id": book.id,
-#                 "path": book.book_file.path,
-#                 "chapter_count": chapter_count
-#             },
-#             "content": []  # Let frontend call POST to populate this
-#         })
-
-
-
-
+@staff_member_required
 def books(request):
-    # Query all books
-    book_objects = Book.objects.all()
-
-    # Optionally convert to a list of dictionaries for the template
-    books_data = []
-
+    book_objects = Book.objects.all().select_related('religion')
 
     return render(request, "books.html", {"books": book_objects})
 
-def update_publish_status(request, book_id):
+
+class BookForm(forms.ModelForm):
+    class Meta:
+        model = Book
+        fields = ['name', 'date', 'language', 'religion', 'authors', 'denomination', 'translator',
+                  'book_id', 'description', 'rights', 'publisher', 'image', 'is_published']
+        labels = {'book_id': 'ISBN', 'is_published': 'Published'}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['image'].required = False
+        for name, field in self.fields.items():
+            if name == 'is_published':
+                field.widget.attrs['class'] = 'form-check-input'
+            elif name in ('language', 'religion'):
+                field.widget.attrs['class'] = 'form-select'
+            else:
+                field.widget.attrs['class'] = 'form-control'
+
+
+@staff_member_required
+def edit_book(request, book_id):
+    book = get_object_or_404(Book, pk=book_id)
+
     if request.method == 'POST':
-        try:
-            book = Book.objects.get(pk=book_id)
-            book.is_published = not book.is_published
-            book.save()
-            return JsonResponse({'success': True, 'is_published': book.is_published})
-        except Book.DoesNotExist:
-            return JsonResponse({'error': 'Book not found'}, status=404)
-    return JsonResponse({'error': 'Invalid method'}, status=405)
+        form = BookForm(request.POST, request.FILES, instance=book)
+        if form.is_valid():
+            form.save()
+            return redirect('dashboard:books')
+    else:
+        form = BookForm(instance=book)
+
+    return render(request, "edit_book.html", {"book": book, "form": form})
 
 
+@staff_member_required
+@require_POST
+def update_publish_status(request, book_id):
+    book = get_object_or_404(Book, pk=book_id)
+    book.is_published = not book.is_published
+    book.save(update_fields=['is_published'])
+    return JsonResponse({'success': True, 'is_published': book.is_published})
+
+
+@staff_member_required
 def download_owb_service(request):
-    folder_path = os.path.join(settings.MEDIA_ROOT, 'owb_service')
+    folder_path = os.path.join(settings.BASE_DIR, 'owb_service')
     zip_filename = 'owb_service.zip'
 
     if not os.path.exists(folder_path):
@@ -215,8 +178,6 @@ def download_owb_service(request):
             dirs[:] = [d for d in dirs if d != '__pycache__']
 
             for file in files:
-                if '__pycache__' in root:
-                    continue  # Skip any file inside __pycache__
                 file_path = os.path.join(root, file)
                 arcname = os.path.relpath(file_path, folder_path)
                 zip_file.write(file_path, arcname)

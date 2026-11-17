@@ -1,4 +1,4 @@
-class Epub extends Book{
+class Epub extends Txtpub{
     constructor(file){
        super(file);
         

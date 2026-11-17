@@ -42,7 +42,7 @@
                     </li>
                     <!-- Add more controls as needed -->
 
-                    <input type="text" id="target-word">
+                    <input type="search" id="target-word" placeholder="Find word (Enter)">
                     <select name="" id="label-type">
                         <option value="NER">NER</option>
                         <option value="POS">POS</option>
@@ -67,8 +67,8 @@
                         <option value="I-TIM">I-TIM</option>
                         <option value="B-MISC">B-MISC</option>
                         <option value="I-MISC">I-MISC</option>
+                        <option value="B-LOC">B-LOC</option>
                         <option value="I-LOC">I-LOC</option>
-                        <option value="I-ORG">I-ORG</option>
                     </select>
 
 
@@ -96,9 +96,6 @@
         const content = JSON.parse(document.getElementById("content-data").textContent);
         const book = JSON.parse(document.getElementById("book-data").textContent);
 
-        // const bookId = book.id;
-        // const bookmarkedChapter = book.bookmark?.current_chapter || 0;
-        
 
     </script>
 </div>

@@ -1,68 +1,36 @@
 let side_note_list;
 if (document.getElementById("btn-search-notes") != null) {
     document.getElementById("btn-search-notes").addEventListener("click", function () {
-        console.log("Searching")
         side_note_list = document.getElementsByClassName("notes");
-        let side_note_search = document.getElementById("note-search");
+        let search_text = document.getElementById("note-search").value.trim().toLowerCase();
 
         for (let s = 0; s < side_note_list.length; s++) {
-            let text = side_note_list[s].innerText;
-            let search_text = side_note_search.value;
+            let text = side_note_list[s].innerText.toLowerCase();
 
-            console.log(search_text == '');
-            if (search_text == '') {
-                console.log("Display all");
+            if (search_text == '' || text.includes(search_text)) {
                 side_note_list[s].style.display = "block";
-            }
-            if (text.search(search_text) == -1) {
-
-                side_note_list[s].style.display = "none";
-
             }
             else {
-                side_note_list[s].style.display = "block";
+                side_note_list[s].style.display = "none";
             }
-
-
         }
     });
 
 }
 
 
+function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.innerText = text;
+    return div.innerHTML;
+}
 
-// function addSearchedItem(note_title, note_data, note_page) {
-
-
-
-//     let search_list = document.getElementById('search-results');
-
-//     if (!search_list) {
-//         console.error('Element with id "note-list" not found.');
-//         return;
-//     }
+function escapeRegex(text) {
+    return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 
-//     let newNote = document.createElement("div");
-//     newNote.innerHTML = `
-        
-//         <div  class='list-group-item  lh-tight notes' onclick="pageJump(`+ note_page + `)">
-//             <div class="d-flex w-100 align-items-center justify-content-between" >
-//                 <strong class="mb-1">${note_title}</strong>
-//                 <small class="text-muted">Page: ${note_page}</small>
-                
-//             </div>
-//             <div class="col-10 mb-1 small">${note_data}</div>
-            
-//         </div>
-//         <hr>
-        
-
-//         `;
-//     search_list.appendChild(newNote);
-// }
-
-function addSearchedItem(note_title, chapter, sentence, note_data, note_page) {
+function addSearchedItem(note_title, chapter, chapterIndex, sentence, note_data, note_page) {
     let search_list = document.getElementById('search-results');
 
     if (!search_list) {
@@ -72,91 +40,68 @@ function addSearchedItem(note_title, chapter, sentence, note_data, note_page) {
 
     let newNote = document.createElement("div");
     newNote.innerHTML = `
-        <div class='list-group-item lh-tight notes' onclick="pageJump(${note_page})">
+        <div class='list-group-item lh-tight notes'>
             <div class="d-flex w-100 align-items-center justify-content-between">
-                <strong class="mb-1">${note_title}</strong>
-                <small class="text-muted"><em>Chapter:${chapter}, Sentence: ${sentence}</em></small>
+                <strong class="mb-1">${escapeHtml(note_title)}</strong>
+                <small class="text-muted"><em>Chapter: ${escapeHtml(chapter)}, Sentence: ${sentence + 1}</em></small>
                 <small class="text-muted">Page: ${note_page}</small>
             </div>
             <div class="col-10 mb-1 small">${note_data}</div>
         </div>
         <hr>
     `;
+    newNote.firstElementChild.addEventListener("click", () => pageJump(chapterIndex, note_page - 1 - current_book.content[chapterIndex].start));
 
     search_list.appendChild(newNote);
 }
 
-let verse_array = [];
+async function runTopSearch() {
+    document.getElementById('search-results').innerHTML = "";
 
-if (document.getElementById("btn-top-search") != null) {
-    document.getElementById("btn-top-search").addEventListener("click", function () {
-        document.getElementById('search-results').innerHTML = "";
+    let search_value = document.getElementById("top-search").value.trim();
+    if (search_value == "") return;
 
-        let search_value = document.getElementById("top-search").value;
-        console.log("Searching...");
-        console.log(search_value);
+    const searchTabTrigger = new bootstrap.Tab(document.querySelector('#search-tab'));
+    searchTabTrigger.show();
 
-        const searchTabTrigger = new bootstrap.Tab(document.querySelector('#search-tab'));
-        searchTabTrigger.show();
-        
-        // Usage
-        const matches = searchWordWithHighlight(current_book.content,search_value);
-        console.log(matches.length);
-        matches.forEach(m => {
-            console.log(m);  
-            //document.getElementById("num_of_results").innerText = m.highlightedText;
-            addSearchedItem(`[${search_value}]`, m.chapter, m.sentence, m.highlightedText, m.page)
-        });
+    showSpinner();
+    await Promise.all(current_book.content.map((chapter, index) => loadChapter(index)));
+    hideSpinner();
 
-        document.getElementById("num_of_results").innerText = matches.length;
+    const matches = searchWordWithHighlight(current_book.content, search_value);
+    matches.forEach(m => {
+        addSearchedItem(`[${search_value}]`, m.chapter, m.chapterIndex, m.sentence, m.highlightedText, m.page)
+    });
 
-        // let book_words = document.getElementsByClassName("read_cols");
-        // let book_passages = document.getElementsByClassName("passage");
-        // let verse_counter = 0;
-        // verse_array = [];
-        // let verse_pages = [];
+    document.getElementById("num_of_results").innerText = matches.length;
+}
 
-        // for (let b = 0; b < book_words.length; b++) {
-        //     for (let c = 0; c < book_words[b].children.length; c++)
-        //         if (book_words[b].children[c].innerText.toLowerCase() == search_value) {
-        //             book_words[b].children[c].style.backgroundColor = "rgba(90, 136, 204, 0.795)";
-        //             console.log(verses[book_words[b].children[c].className.split(" ")[1].slice(1,)]);
-        //             verse_array.push(book_words[b].children[c].className.split(" ")[1].slice(1,));
-        //             verse_pages.push(b);
-        //         }
-        //         else {
-        //             book_words[b].children[c].style.backgroundColor = "white";
-        //         }
-
-        // }
-
-        // for (let v = 0; v < verse_array.length; v++) {
-        //     console.log(verses[verse_array[v]]);
-        //     console.log(book_passages[verse_array[v]].innerText);
-        //     addSearchedItem(book_passages[verse_array[v] - 1].innerText, verses[verse_array[v]], verse_pages[v])
-        // }
-        // document.getElementById("num_of_results").innerText = verse_array.length;
-
+if (document.getElementById("btn-top-search") != null && document.getElementById("text-layout") != null) {
+    document.getElementById("btn-top-search").addEventListener("click", runTopSearch);
+    document.getElementById("top-search").addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            runTopSearch();
+        }
     });
 }
 
 function searchWordWithHighlight(data, searchWord) {
     const results = [];
-    const searchRegex = new RegExp(`\\b(${searchWord})\\b`, 'gi'); // whole word match, case-insensitive
+    const pattern = `(^|[^\\p{L}\\p{N}])(${escapeRegex(escapeHtml(searchWord))})(?=$|[^\\p{L}\\p{N}])`;
+    const testRegex = new RegExp(pattern, 'iu'); // whole word match, case-insensitive
+    const replaceRegex = new RegExp(pattern, 'giu');
 
     data.forEach((chapter, chapterIndex) => {
         chapter.pages.forEach((page, pageIndex) => {
             page.forEach((sentence, sentenceIndex) => {
-                const originalText = sentence.text;
-                if (searchRegex.test(originalText)) {
-                    const highlightedText = originalText.replace(
-                        searchRegex,
-                        '<mark>$1</mark>'
-                    );
+                const originalText = escapeHtml(sentence.text);
+                if (testRegex.test(originalText)) {
+                    const highlightedText = originalText.replace(replaceRegex, '$1<mark>$2</mark>');
 
                     results.push({
                         chapter: chapter.chapter,
-                        page: pageIndex,
+                        chapterIndex: chapterIndex,
+                        page: chapter.start + pageIndex + 1,
                         sentence: sentenceIndex,
                         highlightedText: highlightedText
                     });
@@ -166,30 +111,4 @@ function searchWordWithHighlight(data, searchWord) {
     });
 
     return results;
-}
-
-
-
-
-let result_links = document.getElementsByClassName("results");
-
-for (let r = 0; r < result_links.length; r++) {
-    result_links[r].addEventListener("click", function () {
-        console.log(r);
-        console.log(result_links[r])
-        if (r == 0) {
-            result_links[0].setAttribute("class", "nav-link results active");
-            result_links[1].setAttribute("class", "nav-link results");
-
-            document.getElementById("note-container").style.display = "block";
-            document.getElementById("search-container").style.display = "none";
-        }
-        else {
-            result_links[1].setAttribute("class", "nav-link results active");
-            result_links[0].setAttribute("class", "nav-link results");
-
-            document.getElementById("note-container").style.display = "none";
-            document.getElementById("search-container").style.display = "block";
-        }
-    });
 }

@@ -1,9 +1,12 @@
+import os
 import sqlite3
+import sys
 from langchain_ollama import OllamaEmbeddings
 from langchain_community.vectorstores import Chroma
 
-DB_PATH = "/home/carson/openwordbible/db.sqlite3"
-VECTOR_DIR = "/home/carson/rag/vectordb"
+RAG_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.environ.get("OWB_DB_PATH", os.path.join(RAG_DIR, "..", "db.sqlite3"))
+VECTOR_DIR = os.environ.get("RAG_VECTOR_DIR", os.path.join(RAG_DIR, "vectordb"))
 
 embeddings = OllamaEmbeddings(model="mxbai-embed-large:latest")
 
@@ -46,6 +49,11 @@ def ingest_book(book_id: int):
         embedding_function=embeddings
     )
 
+    # Sentences get new ids when a book is re-annotated, so drop the old ones first
+    existing = db.get(where={"book_id": book_id})
+    if existing["ids"]:
+        db.delete(ids=existing["ids"])
+
     db.add_texts(
         texts=texts,
         metadatas=metadatas,
@@ -56,5 +64,9 @@ def ingest_book(book_id: int):
     print(f"Ingested {len(texts)} sentences for book {book_id}")
 
 if __name__ == "__main__":
-    # Replace 1 with the actual book_id you want to ingest
-    ingest_book(6)
+    # python ingest_sentences.py <book_id> [<book_id> ...]
+    if len(sys.argv) < 2:
+        print("Usage: python ingest_sentences.py <book_id> [<book_id> ...]")
+        sys.exit(1)
+    for book_id in sys.argv[1:]:
+        ingest_book(int(book_id))

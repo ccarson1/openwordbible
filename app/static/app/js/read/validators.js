@@ -2,8 +2,8 @@ function validate_inputs() {
     let title = document.getElementById("note-title").value.trim();
     let data = document.getElementById("note-data").value.trim();
 
-    // Regular expression to check for text and numbers
-    let textNumberRegex = /^[a-zA-Z0-9\s:{}]+$/;
+    // Letters, numbers, spaces and common punctuation
+    let textNumberRegex = /^[\p{L}\p{N}\s:{}'".,;!?()\-]+$/u;
 
     // Function to display Bootstrap alert
     function showAlert(message, type) {
@@ -23,7 +23,7 @@ function validate_inputs() {
     }
     
     if (!textNumberRegex.test(title)) {
-        showAlert("Title must contain only text and numbers.", "danger");
+        showAlert("Title can only contain letters, numbers and basic punctuation.", "danger");
         return false;
     }
     

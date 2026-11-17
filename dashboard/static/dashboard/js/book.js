@@ -135,9 +135,13 @@ class Book {
     }
 
 
-    createEditorPopup(targetElement) {
+    sentence_text(sentence) {
+        return typeof sentence === "string" ? sentence : sentence.text;
+    }
 
-        console.log(targetElement)
+    createEditorPopup(c, p) {
+
+        let page = formated_book.content[c]['pages'][p];
 
         // Create overlay background
         let overlay = document.createElement("div");
@@ -161,12 +165,14 @@ class Book {
         popup.style.minWidth = "300px";
         popup.style.width = "70%";
 
+        let header = document.createElement("small");
+        header.innerText = `${formated_book.content[c]['chapter']} - page ${p + 1} (one sentence per line)`;
 
         // Create textarea
         let textarea = document.createElement("textarea");
         textarea.style.width = "100%";
         textarea.style.height = "70vh";
-        textarea.value = targetElement.children[0].innerText;
+        textarea.value = page.map(s => this.sentence_text(s)).join("\n");
 
         // Create buttons
         let saveButton = document.createElement("button");
@@ -175,11 +181,13 @@ class Book {
 
         let cancelButton = document.createElement("button");
         cancelButton.innerText = "Cancel";
+        cancelButton.style.marginRight = "10px";
 
         let deleteButton = document.createElement("button");
-        deleteButton.innerText = "Delete";
+        deleteButton.innerText = "Delete Page";
 
         // Append elements
+        popup.appendChild(header);
         popup.appendChild(textarea);
         popup.appendChild(document.createElement("br"));
         popup.appendChild(saveButton);
@@ -189,9 +197,15 @@ class Book {
         document.body.appendChild(overlay);
 
         // Save button action
-        saveButton.addEventListener("click", function () {
-            targetElement.innerText = textarea.value;
+        saveButton.addEventListener("click", () => {
+            let lines = textarea.value.split("\n").map(s => s.trim()).filter(Boolean);
+            formated_book.content[c]['pages'][p] = lines.map((line, i) => {
+                // Keep annotations when the sentence did not change
+                let old = page.find(s => this.sentence_text(s) === line);
+                return old !== undefined ? old : line;
+            });
             document.body.removeChild(overlay);
+            this.refresh_preview_pages();
         });
 
         // Cancel button action
@@ -199,31 +213,85 @@ class Book {
             document.body.removeChild(overlay);
         });
 
-        deleteButton.addEventListener("click", function () {
-            document.getElementById("page-list").removeChild(targetElement);
+        deleteButton.addEventListener("click", () => {
+            formated_book.content[c]['pages'].splice(p, 1);
             document.body.removeChild(overlay);
+            this.refresh_preview_pages();
         });
+    }
+
+    renameChapter(c) {
+        let name = prompt("Chapter name", formated_book.content[c]['chapter']);
+        if (name !== null && name.trim() !== "") {
+            formated_book.content[c]['chapter'] = name.trim();
+            this.refresh_preview_pages();
+        }
+    }
+
+    recount_chapters() {
+        let start = 0;
+        for (let c = 0; c < formated_book.content.length; c++) {
+            let length = formated_book.content[c]['pages'].length;
+            formated_book.content[c]['start'] = start;
+            formated_book.content[c]['end'] = start + length;
+            formated_book.content[c]['length'] = length;
+            start += length;
+        }
+        return start;
+    }
+
+    refresh_preview_pages() {
+        let total = this.recount_chapters();
+        document.getElementById("page-list").innerHTML = "";
+        for (let c = 0; c < formated_book.content.length; c++) {
+            this.populate_preview_pages(c);
+        }
+        document.getElementById("total-preview-pages").innerText = `Pages: ${total}`;
     }
 
     populate_preview_pages(c) {
 
         let page_list = document.getElementById("page-list");
         let newChapter = document.createElement("div");
-        newChapter.textContent = formated_book.content[c]['chapter'];
         newChapter.setAttribute("class", "page-container");
+
+        let title = document.createElement("h5");
+        title.textContent = formated_book.content[c]['chapter'];
+        title.style.cursor = "pointer";
+        title.title = "Click to rename";
+        title.addEventListener("click", () => this.renameChapter(c));
+        newChapter.appendChild(title);
 
         for (let p = 0; p < formated_book.content[c]['pages'].length; p++) {
             let newPage = document.createElement("div");
-            newPage.textContent = formated_book.content[c]['pages'][p];
             newPage.setAttribute("class", "page-list-item");
+
+            let number = document.createElement("small");
+            number.setAttribute("class", "page-number");
+            number.textContent = `Page ${formated_book.content[c]['start'] + p + 1}: `;
+
+            newPage.appendChild(number);
+            newPage.appendChild(document.createTextNode(
+                formated_book.content[c]['pages'][p].map(s => this.sentence_text(s)).join(" ")
+            ));
+            newPage.addEventListener("click", () => {
+                this.createEditorPopup(c, p);
+            });
             newChapter.appendChild(newPage);
         }
-        newChapter.addEventListener("click", () => {
-            this.createEditorPopup(newChapter);
-        });
         page_list.appendChild(newChapter);
 
 
+    }
+
+    sync_outline() {
+        // Keep edits made in the outline inputs before the outline is redrawn
+        let elements = document.getElementsByClassName("outline-element");
+        let outline = [];
+        for (let x = 0; x < elements.length; x++) {
+            outline.push({ title: elements[x].children[0].value, page: elements[x].children[1].value });
+        }
+        this.outline = outline;
     }
 
     set_book_data(book_data) {
@@ -251,7 +319,7 @@ class Book {
         return this.current_page;
     }
 
-    set_end_page(end_page = this.book_data['uploaded-file'].length) {
+    set_end_page(end_page = this.book_data['uploaded-file']['content'].length - 1) {
         this.end_page = end_page;
     }
     get_end_page() {
@@ -270,7 +338,7 @@ class Book {
         return this.partitionText;
     }
     set_outline(outline = this.book_data['uploaded-file']['book_outline']) {
-        this.outline = outline;
+        this.outline = outline || [];
     }
     get_outline() {
         return this.outline;
