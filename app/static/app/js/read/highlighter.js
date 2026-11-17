@@ -16,7 +16,6 @@ textLayout.addEventListener("mousedown", (e) => {
         if (myModal._isShown == false) {
             if (e.target.classList.contains("highlighted")) {
                 h_note = document.getElementsByClassName(e.target.classList.value)
-                console.log(h_note)
             }
             else {
                 isMouseDown = true;
@@ -122,7 +121,6 @@ document.querySelectorAll(".color-swatch").forEach(swatch => {
     swatch.addEventListener("click", () => {
         const color = swatch.dataset.color;
         temp_note_color = color;
-        console.log(temp_note_color);
         selectedWords.forEach(word => {
             word.style.backgroundColor = color;
         });
@@ -137,7 +135,6 @@ document.getElementById("save").addEventListener("click", () => {
 
     word_index_start = Array.from(selectedWords[0].parentElement.children).indexOf(selectedWords[0]);
     word_index_end = Array.from(selectedWords[selectedWords.length - 1].parentElement.children).indexOf(selectedWords[selectedWords.length - 1]);
-    console.log(`Note${current_book.id}_${sentence_index_start}`);
     document.getElementById("note-title").value = `Note${current_book.id}${currentPageIndex}${sentence_index_start}${sentence_index_end}${word_index_start}${word_index_end}`;
     myModal.show();
 
@@ -253,7 +250,7 @@ function toggleHighlighted() {
             for (let y = startWord; y <= endWord; y++) {
                 const wordEl = sentenceEl.children[y];
                 if (!wordEl) continue;
-                wordEl.style.backgroundColor = isHighlightingEnabled ? color : 'white';
+                wordEl.style.backgroundColor = isHighlightingEnabled ? color : '';
             }
         }
     }

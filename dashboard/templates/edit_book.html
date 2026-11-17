@@ -1,0 +1,35 @@
+{% extends 'dashbase.html' %}
+{% load static %}
+
+{% block extra_head_dash %}
+<link rel="stylesheet" href="{% static '/dashboard/css/books.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>Edit Book</h1>
+
+<div class="content">
+    <form method="POST" enctype="multipart/form-data" class="border rounded p-3">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}
+        <div class="mb-3">
+            {% if field.name == 'is_published' %}
+            <div class="form-check form-switch">
+                {{ field }}
+                <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            </div>
+            {% else %}
+            <label class="form-label small" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% endif %}
+            {% for error in field.errors %}
+            <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{% url 'dashboard:books' %}" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

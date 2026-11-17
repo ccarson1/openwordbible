@@ -43,7 +43,7 @@
                     <li class="nav-item">
                         <span style="display: flex;">
                             <a class="nav-link active" aria-current="page" href="{% url 'profile' %}" id="ui-username">
-                                {% if profile %}
+                                {% if profile and profile.profile_image %}
                                     <img src="{{ profile.profile_image.url }}" alt="" width="20" style="background-color: #0dcaf0; border-radius: 25px; border: 1px solid #0dcaf0;">
                                     <small>{{ user.username }}</small>
                                 {% else %}

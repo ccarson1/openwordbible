@@ -7,7 +7,7 @@
 <body class="container mt-5">
     <h2>Login</h2>
     {% for message in messages %}
-    <div class="alert alert-danger">{{ message }}</div>
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">{{ message }}</div>
     {% endfor %}
     <form method="POST">
         {% csrf_token %}

@@ -18,7 +18,7 @@
         <h1>Profile</h1>
         <!-- <div class="text-center">
             <h1>Profile</h1>
-            {% if profile %}
+            {% if profile and profile.profile_image %}
             <img src="{{ profile.profile_image.url }}" alt="" 
                 style="background-color: #0dcaf0; border-radius: 50%; width: 15%; border: 1px solid #0dcaf0;">
             {% else %}
@@ -86,7 +86,7 @@
 
         <div class="text-center">
             
-            {% if profile %}
+            {% if profile and profile.profile_image %}
             <img src="{{ profile.profile_image.url }}" alt="" 
                 style="background-color: #0dcaf0; border-radius: 50%; width: 15%; border: 1px solid #0dcaf0;">
             {% else %}
@@ -107,7 +107,7 @@
         <input type="text" name="username" value="{{ request.user.username }}" required>
         
         <label for="email">Email:</label>
-        <input type="email" name="email" value="{{ request.user.email }}" required>
+        <input type="email" name="email" value="{{ request.user.email }}">
     
         <label for="password">New Password:</label>
         <input type="password" name="password">

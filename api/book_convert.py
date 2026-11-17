@@ -1,3 +1,5 @@
+import os
+import re
 import ebooklib
 from ebooklib import epub
 from bs4 import BeautifulSoup
@@ -8,6 +10,38 @@ from pdfminer.high_level import extract_text
 from pdfminer.layout import LAParams
 from io import BytesIO
 # import spacy
+
+
+def clean_text(text):
+    # Join words split by a hyphen at the end of a line
+    text = re.sub(r'(\w)-[ \t]*\n\s*([a-z])', r'\1\2', text)
+    text = text.replace('\r', '')
+    # Collapse runs of spaces/tabs but keep line breaks
+    text = re.sub(r'[ \t\u00a0]+', ' ', text)
+    text = re.sub(r' *\n *', '\n', text)
+    return text.strip()
+
+
+def split_into_pages(text, words_per_page=600):
+    # Keep paragraphs together where possible
+    pages = []
+    current = []
+    count = 0
+    for paragraph in re.split(r'\n\s*\n', text):
+        paragraph = paragraph.strip()
+        if not paragraph:
+            continue
+        words = len(paragraph.split())
+        if current and count + words > words_per_page:
+            pages.append('\n\n'.join(current))
+            current = []
+            count = 0
+        current.append(paragraph)
+        count += words
+    if current:
+        pages.append('\n\n'.join(current))
+    return pages
+
 
 class ConvertBook():
     
@@ -20,19 +54,18 @@ class ConvertBook():
     #     doc = self.nlp(text)
     #     return ' '.join([token.text for token in doc])
     
-    def convert_from_text(self, file):
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            for chunk in file.chunks():
-                temp_file.write(chunk)
-            temp_file_path = temp_file.name
-
-        with open(temp_file_path, "r", encoding="utf-8") as temp_file:
-            file_content = temp_file.read()
+    def convert_from_text(self, file, words_per_page=600):
+        raw = b''.join(file.chunks())
+        try:
+            file_content = raw.decode('utf-8-sig')
+        except UnicodeDecodeError:
+            file_content = raw.decode('latin-1')
 
         book_data = {
             'title': '',
             'author': '',
-            'content': [file_content],
+            'book_outline': [],
+            'content': split_into_pages(clean_text(file_content), words_per_page),
             'identifier': '',
             'publisher' : '',
             'rights': '',
@@ -113,18 +146,20 @@ class ConvertBook():
 
                         page = get_page(item)
 
-                        # DEBUG (keeps your old behavior)
-                        print(type(cleaned_title))
-                        print(f"- {cleaned_title} (Page: {page})")
+                        if page is None:
+                            continue
+
+                        # Outline pages count blank pages, the converted content doesn't
+                        blank_before = len([o for o in offset_page if o['page'] < page - 1])
 
                         book_outline.append({
                             "title": cleaned_title,
-                            "page": page
+                            "page": page - blank_before
                         })
 
             process(outlines)
 
-            print(reader)
+            book_outline.sort(key=lambda o: o["page"])
             return book_outline
         
         file.seek(0)  # rewind to start
@@ -149,7 +184,7 @@ class ConvertBook():
         count = 0
 
         for index, page_text in enumerate(pages):
-            page_text = page_text.strip()
+            page_text = clean_text(page_text)
             if page_text:
                 book_text.append(page_text)
             else:
@@ -201,7 +236,16 @@ class ConvertBook():
             temp_file_path = temp_file.name
 
         # Read the EPUB file
-        book = epub.read_epub(temp_file_path)
+        try:
+            book = epub.read_epub(temp_file_path)
+        finally:
+            os.remove(temp_file_path)
+
+        def first(values):
+            if not values:
+                return ''
+            value = values[0]
+            return value[0] if isinstance(value, tuple) else value
 
         # Extract metadata
         title = book.get_metadata('DC', 'title')
@@ -215,12 +259,7 @@ class ConvertBook():
 
         content = []
         
-        for item in book.get_items():
-            
-            if item.get_type() != ebooklib.ITEM_DOCUMENT:
-                print(item.get_type())
-                #continue  # Skip non-text items
-
+        for item in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
             try:
                 raw_content = item.get_content()
 
@@ -230,24 +269,25 @@ class ConvertBook():
                 soup = BeautifulSoup(decoded_content, 'lxml')
                 
                 # Extract all paragraphs
-                text_content = [p.get_text() for p in soup.find_all('p')]
-                print(text_content)
-                # Append plain text instead of the soup object
-                content.append(text_content)  # Convert list of paragraphs to a single string
+                text_content = [clean_text(p.get_text()) for p in soup.find_all('p')]
+                text_content = '\n\n'.join(t for t in text_content if t)
+                if text_content:
+                    content.append(text_content)
 
             except Exception as e:
                 print(f"Error processing item: {e}")
         
         book_data = {
-            'title': title[0] if title else 'No Title Found',
-            'author': author[0] if author else 'No Author Found',
+            'title': first(title) or 'No Title Found',
+            'author': first(author) or 'No Author Found',
+            'book_outline': [],
             'content': content,
-            'identifier': identifier[0],
-            'publisher' : publisher,
-            'rights': rights,
-            'coverage' : coverage,
-            'date': date,
-            'description': description
+            'identifier': first(identifier),
+            'publisher' : first(publisher),
+            'rights': first(rights),
+            'coverage' : first(coverage),
+            'date': first(date),
+            'description': first(description)
         }
 
         return book_data

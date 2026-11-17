@@ -9,8 +9,6 @@ class Pdf_obj extends Book{
 
         for(let o=0; o<outline.length; o++){
 
-            console.log(`Title: ${outline[o]["title"]} Page: ${outline[o]["page"]}`);
-
             let newOutline = document.createElement("span");
             newOutline.setAttribute("class", "outline-element")
 
@@ -85,7 +83,7 @@ class Pdf_obj extends Book{
         let outline_container = document.getElementById("outline-container");
         for(let r=0; r<removeButtons.length; r++){
             removeButtons[r].addEventListener("click", () =>{
-                console.log(`Index: ${r}`);
+                this.sync_outline();
                 this.remove_outline(r);
                 this.clear_outline();
 

@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from api.models import Profile
 
@@ -18,7 +21,9 @@ def user_login(request):
             profile = Profile.objects.filter(user=user).first()
             profile_image_url = profile.profile_image.url if profile and profile.profile_image else None
             request.session["profile-image"] = profile_image_url
-            #request.session["userpass"] = user.password 
+            next_url = request.POST.get("next") or request.GET.get("next")
+            if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+                return redirect(next_url)
             return redirect("home")
         else:
             messages.error(request, "Invalid username or password")
@@ -30,16 +35,23 @@ def user_logout(request):
 
 def register(request):
     if request.method == "POST":
-        username = request.POST["username"]
+        username = request.POST["username"].strip()
         password = request.POST["password"]
         password2 = request.POST["password2"]
         
         if password == password2:
-            if User.objects.filter(username=username).exists():
+            if not username:
+                messages.error(request, "Username is required")
+            elif User.objects.filter(username=username).exists():
                 messages.error(request, "Username already taken")
             else:
-                user = User.objects.create_user(username=username, password=password)
-                user.save()
+                try:
+                    validate_password(password, User(username=username))
+                except ValidationError as e:
+                    for error in e.messages:
+                        messages.error(request, error)
+                    return render(request, "accounts/register.html")
+                User.objects.create_user(username=username, password=password)
                 messages.success(request, "Account created successfully! You can log in now.")
                 return redirect("accounts:login")
         else:

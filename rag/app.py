@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -10,10 +12,12 @@ from langchain.prompts import PromptTemplate
 
 app = FastAPI(title="Book RAG API")
 
+# Comma separated list of the sites allowed to call this server,
+# e.g. RAG_ALLOWED_ORIGINS="http://localhost:8000,http://192.168.56.101:8000"
 origins = [
-   "http://localhost:8000",
-   "http://127.0.0.1:8000",
-   "http://192.168.56.101:8000",
+   o.strip() for o in os.environ.get(
+      "RAG_ALLOWED_ORIGINS", "http://localhost:8000,http://127.0.0.1:8000"
+   ).split(",") if o.strip()
 ]
 
 app.add_middleware(
@@ -30,7 +34,7 @@ app.add_middleware(
 embeddings = OllamaEmbeddings(model="mxbai-embed-large:latest")
 
 db = Chroma(
-    persist_directory="vectordb",
+    persist_directory=os.environ.get("RAG_VECTOR_DIR", os.path.join(os.path.dirname(os.path.abspath(__file__)), "vectordb")),
     embedding_function=embeddings
 )
 

@@ -7,7 +7,10 @@ let textPreview = document.getElementById("text-preview");
 let activeTabText = 'TXT';
 let page_pile;
 let progressInterval = null;
+let preview_content = document.getElementById("text-preview");
 const CHUNK_SIZE = 250 * 1024;
+const OWB_SERVICE_URL = document.getElementById("owb-service-url").innerText.trim().replace(/\/$/, "");
+const DEFAULT_SENTENCE_REGEX = /(?<=[.!?]["'”’)\]]?)\s+(?=["'“‘(\[]?[A-Z0-9])/;
 
 let formated_book = {
     "content": [
@@ -17,11 +20,7 @@ let formated_book = {
 
 
 function set_page_numbers() {
-    let pages = document.getElementsByClassName("page-container");
-    for (let p = 0; p < pages.length; p++) {
-        pages[p].children[1].innerText = p;
-    }
-
+    page_pile.refresh_preview_pages();
 }
 
 function update_page_numbers() {
@@ -63,7 +62,7 @@ function pollProgress() {
 
     progressInterval = setInterval(async () => {
         try {
-            const res = await fetch("http://127.0.0.1:5000/progress");
+            const res = await fetch(`${OWB_SERVICE_URL}/progress`);
             const data = await res.json();
 
             // 🔥 USE BACKEND VALUE DIRECTLY
@@ -123,19 +122,27 @@ document.getElementById("up-book-txt").addEventListener('change', function (even
 });
 
 document.getElementById("convert-book").addEventListener("click", function () {
-    showSpinner();
-    console.log("Starting upload")
     let book_file = document.getElementById("up-book-txt");
+    activeTabText = activeTabText.toLocaleUpperCase();
+    if (book_file.files.length == 0) {
+        alert("Choose a file to convert first.");
+        return;
+    }
+    if (!['TXT', 'EPUB', 'PDF'].includes(activeTabText)) {
+        alert(`${activeTabText} files are not supported yet.`);
+        return;
+    }
+
+    showSpinner();
     let formData = new FormData();
     formData.append("book-file", book_file.files[0])
     formData.append("book-type", activeTabText)
+    formData.append("words-per-page", document.getElementById("input-words-per-page").value)
 
-    document.getElementById("add-partition").disabled = false;
-    document.getElementById("add-outline-element").disabled = false;
-    document.getElementById("btn-add-all-page").disabled = false;
-    document.getElementById("btn-add-page").disabled = false;
-    document.getElementById("btn-reset-page-numbers").disabled = false;
-    document.getElementById("btn-upload-page").disabled = false;
+    formated_book = { "content": [] };
+    document.getElementById("page-list").innerHTML = "";
+    document.getElementById("outline-container").innerHTML = "";
+    document.getElementById("total-preview-pages").innerText = "Pages:";
 
     if (activeTabText == 'TXT') {
         page_pile = new Txtpub(book_file.files[0]);
@@ -156,53 +163,60 @@ document.getElementById("convert-book").addEventListener("click", function () {
         }
     })
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-
-            }
-            return response.json();
+            return response.json().then(data => {
+                if (!response.ok) {
+                    throw new Error(data.error || data.detail || `HTTP error! status: ${response.status}`);
+                }
+                return data;
+            });
         })
         .then(data => {
-            console.log(data);
             page_pile.set_book_data(data);
             page_pile.set_book_array();
+            if (data['uploaded-file']['content'].length == 0) {
+                throw new Error("No text was found in this file.");
+            }
             page_pile.set_content();
-            if (activeTabText == 'TXT') {
+            preview_content.innerText = page_pile.get_content();
 
-                page_pile.populate_preview_text();
+            if (data['uploaded-file']['title'] && document.getElementById("book-name").value == "") {
+                document.getElementById("book-name").value = data['uploaded-file']['title'];
             }
-            else if (activeTabText == 'EPUB') {
-                preview_content = document.getElementById("text-preview");
-                preview_content.innerText = page_pile.get_content();
-            }
-            else if (activeTabText == 'PDF') {
-                preview_content = document.getElementById("text-preview");
-                preview_content.innerText = page_pile.get_content();
+            if (data['uploaded-file']['author'] && document.getElementById("input-book-author").value == "") {
+                document.getElementById("input-book-author").value = data['uploaded-file']['author'];
             }
 
+            document.getElementById("add-partition").disabled = false;
+            document.getElementById("add-outline-element").disabled = false;
+            document.getElementById("btn-add-all-page").disabled = false;
+            document.getElementById("btn-add-page").disabled = false;
+            document.getElementById("btn-reset-page-numbers").disabled = false;
+            document.getElementById("btn-upload-page").disabled = false;
 
             current_page = page_pile.get_current_page();
             page_pile.set_end_page();
             page_pile.set_content_pages();
             page_pile.outline_container();
             //page_pile.fill_form();
-            page_pile.initiate_outline();
             hideSpinner();
             update_page_numbers();
 
 
         })
+        .catch(error => {
+            hideSpinner();
+            alert("Convert failed: " + error.message);
+        });
 });
 
 
 back_btns = document.getElementsByClassName("btn-pre-back");
 for (let a = 0; a < back_btns.length; a++) {
     back_btns[a].addEventListener("click", function () {
-        if (current_page != 0) {
+        if (page_pile && current_page > 0) {
             current_page--
             page_pile.set_current_page(current_page);
             page_pile.set_content();
-            page_pile.set_content_pages();
             preview_content.innerText = page_pile.get_content();
             update_page_numbers();
         }
@@ -212,7 +226,7 @@ for (let a = 0; a < back_btns.length; a++) {
 next_btns = document.getElementsByClassName("btn-pre-next");
 for (let b = 0; b < next_btns.length; b++) {
     next_btns[b].addEventListener("click", function () {
-        if (current_page != page_pile.get_end_page()) {
+        if (page_pile && current_page < page_pile.get_end_page()) {
             current_page++
             page_pile.set_current_page(current_page);
             page_pile.set_content();
@@ -236,80 +250,82 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+function split_page(page, regex = page_pile.sentRegex || DEFAULT_SENTENCE_REGEX) {
+    return page
+        .replace(/\n/g, ' ')
+        .split(regex)
+        .map(s => s.trim())
+        .filter(Boolean);
+}
+
+function ends_sentence(sentence) {
+    return /[.!?]["'”’)\]]?$/.test(sentence);
+}
+
 document.getElementById("btn-add-page").addEventListener("click", function () {
-    let page_content = document.getElementById("text-preview").textContent;
-    //console.log(page_pile.get_content());
-    //let page_content = page_pile.get_content().join("");
-    page_pile.populate_preview_pages(page_content);
+    let sentences = split_page(preview_content.innerText);
+    if (sentences.length == 0) return;
+
+    if (formated_book.content.length == 0) {
+        formated_book.content.push({
+            chapter: document.getElementById("book-name").value || "Chapter 1",
+            pages: []
+        });
+    }
+    formated_book.content[formated_book.content.length - 1].pages.push(sentences);
+    page_pile.refresh_preview_pages();
 });
 
 document.getElementById("btn-add-all-page").addEventListener("click", function () {
-    content_pages = page_pile.get_content_pages();
-    console.log(content_pages);
+    let content_pages = page_pile.get_content_pages();
 
-    function split_page(pages, regex) {
-        return pages.map(page =>
-            page
-                .replace(/\n/g, ' ')
-                .split(regex)
-                .map(s => s.trim())
-                .filter(Boolean)
-        );
+    // Split every page into sentences. A sentence that runs past the end
+    // of a page is moved to the start of the next page so it isn't cut in two.
+    let sentence_pages = [];
+    let carry = "";
+    for (let p = 0; p < content_pages.length; p++) {
+        let text = Array.isArray(content_pages[p]) ? content_pages[p].join(" ") : content_pages[p];
+        let sentences = split_page((carry + " " + text).trim());
+        carry = "";
+        if (p < content_pages.length - 1 && sentences.length > 1 && !ends_sentence(sentences[sentences.length - 1])) {
+            carry = sentences.pop();
+        }
+        sentence_pages.push(sentences);
     }
 
-    let chapters = 2
-    if (page_pile.outline.length > 0) {
-        for (let x = 0; x < page_pile.outline.length; x++) {
-            start = parseInt(page_pile.outline[x]['page']) - 1
-            if ((x + 1) > page_pile.outline.length - 1) {
-                end = page_pile.content_pages.length;
-            }
-            else {
-                end = parseInt(page_pile.outline[x + 1]['page']) - 1
+    page_pile.sync_outline();
+    let outline = page_pile.outline
+        .map(o => ({ title: (o.title || "").trim(), page: parseInt(o.page) }))
+        .filter(o => !isNaN(o.page) && o.page >= 1 && o.page <= sentence_pages.length)
+        .sort((a, b) => a.page - b.page);
 
-            }
-            let chapter_pages = page_pile.content_pages.slice(start, end);
+    formated_book.content = [];
 
-            chapter_pages = split_page(chapter_pages, page_pile.sentRegex);
+    if (outline.length > 0) {
+        if (outline[0].page > 1) {
+            formated_book.content.push({
+                chapter: "Front Matter",
+                pages: sentence_pages.slice(0, outline[0].page - 1)
+            });
+        }
+        for (let x = 0; x < outline.length; x++) {
+            let start = outline[x].page - 1;
+            let end = (x + 1 < outline.length) ? outline[x + 1].page - 1 : sentence_pages.length;
 
             formated_book.content.push({
-                chapter: page_pile.outline[x]['title'],
-                pages: chapter_pages,
-                start: start,
-                end: end,
-                length: chapter_pages.length
+                chapter: outline[x].title || `Chapter ${x + 1}`,
+                pages: sentence_pages.slice(start, end)
             });
         }
     }
     else {
-        formated_book.content.push(
-            {
-                "chapter": page_pile.book_data['uploaded-file']['title'],
-                "pages": [page_pile.content],
-                "start": 0,
-                "end": 1,
-                "length": page_pile.book_data['uploaded-file'].content.length
-            }
-        )
+        formated_book.content.push({
+            chapter: document.getElementById("book-name").value || "Chapter 1",
+            pages: sentence_pages
+        });
     }
 
-    for (let c = 0; c < formated_book.content.length; c++) {
-        if (activeTabText == "EPUB") {
-            typeof (content_pages)
-            page_pile.populate_preview_pages(content_pages[c].join(" "));
-            //console.log(content_pages[c]);
-        }
-        else if (activeTabText == "TXT") {
-            page_pile.populate_preview_pages(content_pages[0]);
-        }
-        else if (activeTabText == "PDF") {
-            page_pile.populate_preview_pages(c);
-
-        }
-
-
-    }
-    document.getElementById("total-preview-pages").innerText = `Pages: ${document.getElementsByClassName("page-container").length}`
+    page_pile.refresh_preview_pages();
 
 });
 
@@ -325,11 +341,19 @@ document.getElementById("add-partition").addEventListener("click", function () {
         alert(partition.errorMessage);
     }
 
-    console.log(partition);
     hideSpinner();
 });
 
 document.getElementById("btn-upload-page").addEventListener("click", function () {
+    if (formated_book.content.length == 0) {
+        alert("Press Add All to build the pages before uploading.");
+        return;
+    }
+    if (document.getElementById('book-name').value.trim() == "" || document.getElementById('input-book-lang').value == "") {
+        alert("The book needs a name and a language.");
+        return;
+    }
+    page_pile.recount_chapters();
     showSpinner();
     book_image = document.getElementById("input-book-cover");
     book_index = collect_index();
@@ -340,7 +364,6 @@ document.getElementById("btn-upload-page").addEventListener("click", function ()
         console.error("No file selected");
     }
     let published_book = JSON.stringify(formated_book);
-    console.log(formated_book)
 
     book_data.append("published_book", published_book);
     book_data.append("book_name", document.getElementById('book-name').value);
@@ -366,18 +389,21 @@ document.getElementById("btn-upload-page").addEventListener("click", function ()
         }
     })
         .then(response => {
-            if (!response.ok) {
-                hideSpinner();
-                throw new Error(`HTTP error! status: ${response.status}`);
-
-            }
-            return response.json();
+            return response.json().then(data => {
+                if (!response.ok) {
+                    throw new Error(data.error || data.detail || `HTTP error! status: ${response.status}`);
+                }
+                return data;
+            });
         })
         .then(data => {
             hideSpinner();
-            console.log(data)
-            alert(data['message'])
+            alert(data['message'] + " Turn on Publish in Books to show it in the library.")
         })
+        .catch(error => {
+            hideSpinner();
+            alert("Upload failed: " + error.message);
+        });
 
 });
 
@@ -385,26 +411,14 @@ document.getElementById("add-outline-element").addEventListener("click", functio
     let newElementTitle = document.getElementById("new-element-title").value;
     let newElementValue = document.getElementById("new-element-value").value;
 
-    let offset_page = page_pile.book_data['uploaded-file'].offest_page
-    let active_page = parseInt(newElementValue);
-    for (x = 0; x < offset_page.length; x++) {
-        console.log(`Adjusting the page's offset ${active_page} : ${offset_page[x]['offset']}`)
-        if (active_page <= offset_page[x]['page']) {
-            console.log(`Adjusting the page's offset ${active_page} : ${offset_page[x]['offset']}`)
-            if (active_page == 1) {
-                newElementValue = 1
-            }
-            else {
-                newElementValue = (active_page - offset_page[x]['offset']);
-            }
-
-            break;
-        }
+    if (newElementTitle.trim() == "" || isNaN(parseInt(newElementValue))) {
+        alert("Enter a chapter name and a page number.");
+        return;
     }
 
-
-    console.log(`Adding Outline ${newElementTitle} with value ${newElementValue}`);
-    page_pile.outline.push({ title: newElementTitle, page: newElementValue })
+    page_pile.sync_outline();
+    page_pile.outline.push({ title: newElementTitle, page: parseInt(newElementValue) })
+    page_pile.outline.sort((a, b) => parseInt(a.page) - parseInt(b.page));
     page_pile.clear_outline();
     document.getElementById("new-element-title").value = "";
     document.getElementById("new-element-value").value = "";
@@ -428,12 +442,13 @@ document.getElementById("btn-annotate-page").addEventListener("click", async fun
     const book_author = document.getElementById("input-book-author").value;
     const book_index = collect_index();
 
-    if (!formated_book) {
+    if (!formated_book || formated_book.content.length == 0) {
         hideSpinner();
-        alert("Book data is missing.");
+        alert("Press Add All to build the pages before annotating.");
         return;
     }
 
+    page_pile.recount_chapters();
     const formated_book_string = JSON.stringify(formated_book);
     //const CHUNK_SIZE = 500000; // ~500 KB per chunk
     const totalChunks = Math.ceil(formated_book_string.length / CHUNK_SIZE);
@@ -451,7 +466,7 @@ document.getElementById("btn-annotate-page").addEventListener("click", async fun
             formData.append("chunk_index", i);
             formData.append("total_chunks", totalChunks);
 
-            const response = await fetch("http://127.0.0.1:5000/process", {
+            const response = await fetch(`${OWB_SERVICE_URL}/process`, {
                 method: "POST",
                 body: formData,
                 headers: {
@@ -468,68 +483,17 @@ document.getElementById("btn-annotate-page").addEventListener("click", async fun
             updateProgressBar(percentUploaded, `Uploaded chunk ${i + 1}/${totalChunks}`);
 
             const data = await response.json();
-            formated_book = data.published_book;
-            console.log(`Chunk ${i + 1} uploaded`, data);
+            if (data.published_book) {
+                formated_book = data.published_book;
+            }
         }
 
+        page_pile.refresh_preview_pages();
         hideSpinner();
         alert("Book uploaded and processed successfully!");
     } catch (err) {
         hideSpinner();
         console.error(err);
-        alert("Upload failed: " + err.message);
+        alert("Annotation failed: " + err.message + ". Is the OWB Service running?");
     }
 });
-
-// document.getElementById("btn-annotate-page").addEventListener("click", async function () {
-//     showSpinner();
-
-//     const book_image = document.getElementById("input-book-cover").files[0];
-//     const book_name = document.getElementById("input-book-title").value;
-//     const book_author = document.getElementById("input-book-author").value;
-//     const book_index = document.getElementById("input-book-index").value;
-
-//     if (!formated_book) {
-//         hideSpinner();
-//         alert("Book data is missing.");
-//         return;
-//     }
-
-//     const formated_book_string = JSON.stringify(formated_book);
-//     const CHUNK_SIZE = 100000; // ~100KB
-//     const totalChunks = Math.ceil(formated_book_string.length / CHUNK_SIZE);
-
-//     const results = [];
-
-//     for (let i = 0; i < totalChunks; i++) {
-//         const chunk = formated_book_string.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
-
-//         const formData = new FormData();
-//         formData.append("book_name", book_name);
-//         formData.append("book_author", book_author);
-//         formData.append("book_index", book_index);
-//         formData.append("book_image", book_image);
-//         formData.append("published_book", chunk);
-//         formData.append("chunk_index", i);
-//         formData.append("total_chunks", totalChunks);
-
-//         try {
-//             const response = await fetch("/process", {
-//                 method: "POST",
-//                 body: formData,
-//             });
-
-//             const result = await response.json();
-//             results.push(result);
-//         } catch (error) {
-//             console.error("Chunk upload failed at", i, error);
-//             hideSpinner();
-//             alert("Failed to upload chunk " + (i + 1));
-//             return;
-//         }
-//     }
-
-//     hideSpinner();
-//     alert("Book uploaded and processed successfully!");
-//     console.log("All results:", results);
-// });
